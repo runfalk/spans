@@ -1,0 +1,3 @@
+recursive-include spans *.py
+
+include MANIFEST.in LICENSE README.rst requirements.txt Makefile setup.py tox.ini
