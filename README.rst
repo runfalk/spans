@@ -62,7 +62,6 @@ reported.
 
 Installation
 ------------
-
 Spans exists on PyPI.
 
 ::
@@ -72,6 +71,10 @@ Spans exists on PyPI.
 Documentation
 -------------
 For full doumentation please run ``pydoc spans`` from a shell.
+
+Use with Psycopg2
+-----------------
+To use these range types with Psycopg2 the PsycoSpans library exists [#]_.
 
 Custom range types
 ------------------
@@ -103,3 +106,4 @@ good to go:
 For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
 
 .. [#] http://www.postgresql.org/docs/9.2/static/rangetypes.html
+.. [#] https://www.github.com/runfalk/psycospans

@@ -5,17 +5,8 @@ import os
 
 from setuptools import setup
 
-def cheeseshopify(rst):
-    """Since PyPI doesn't support the RST `code-block` directive or the
-    :code: role, replace all `code-block` directives with `::` and
-    `:code:` with "".
-    """
-
-    ret = rst.replace(".. code-block:: python", "::").replace(":code:", "")
-    return ret
-
 with open("README.rst") as fp:
-    long_desc = cheeseshopify(fp.read())
+    long_desc = fp.read()
 
 with open("LICENSE") as fp:
     license = fp.read()

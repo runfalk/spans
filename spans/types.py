@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 _internal_range = namedtuple(
-    "internal_range", ["lower", "upper", "lower_inc", "upper_inc", "empty"])
+    "_internal_range", ["lower", "upper", "lower_inc", "upper_inc", "empty"])
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
 @total_ordering
