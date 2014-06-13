@@ -4,13 +4,13 @@ import sys
 
 __all__ = ["python3", "version", "bstr", "ustr", "uchr", "u_doctest"]
 
-version = tuple(map(int, sys.version.split(" ")[0].split(".")))
+version = tuple(map(int, sys.version.split(".")[0:2]))
 python3 = False
 
-if version >= (3, 0, 0):
+if version >= (3, 0):
     python3 = True
 
-    if version < (3, 3, 0):
+    if version < (3, 3):
         raise ImportError("Module is only compatible with Python (<=2.7, >=3.3)")
 
     bstr, ustr, uchr = bytes, str, chr
