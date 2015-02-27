@@ -27,7 +27,7 @@ setup(
     license=license,
     author="Andreas Runfalk",
     author_email="andreas@runfalk.se",
-    url="https://www.github.com/runfalk/spans", # TODO: Fix
+    url="https://www.github.com/runfalk/spans",
     packages=["spans"],
     install_requires=requirements,
     classifiers=(

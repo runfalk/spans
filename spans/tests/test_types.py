@@ -1,3 +1,6 @@
+import pickle
+
+from datetime import date, timedelta
 from unittest import TestCase
 
 from ..types import *
@@ -18,7 +21,7 @@ class TestIntRange(TestCase):
         self.assertTrue(bounded_range.lower_inc)
         self.assertFalse(bounded_range.upper_inc)
 
-        rebound_range =intrange().replace(lower=1, upper=10)
+        rebound_range = intrange().replace(lower=1, upper=10)
         self.assertTrue(rebound_range.lower_inc)
         self.assertFalse(rebound_range.upper_inc)
 
@@ -45,6 +48,19 @@ class TestIntRange(TestCase):
 
         with self.assertRaises(AttributeError):
             range.upper_inc = True
+
+    def test_offset(self):
+        low_range = intrange(0, 5)
+        high_range = intrange(5, 10)
+
+        self.assertNotEqual(low_range, high_range)
+        self.assertEqual(low_range.offset(5), high_range)
+        self.assertEqual(low_range, high_range.offset(-5))
+
+    def test_offset_unbounded(self):
+        range = intrange()
+
+        self.assertEqual(range, range.offset(10))
 
     def test_equality(self):
         self.assertEqual(intrange(1, 5), intrange(1, 5))
@@ -219,3 +235,24 @@ class TestIntRange(TestCase):
         self.assertEqual(intrange(1, 10).intersection(intrange(5)), intrange(5, 10))
         self.assertEqual(intrange(1, 10).intersection(intrange(upper=5)), intrange(1, 5))
 
+    def test_pickling(self):
+        range = intrange(1, 10)
+
+        self.assertEqual(range, pickle.loads(pickle.dumps(range)))
+
+    def test_iteration(self):
+        self.assertEqual(list(intrange(1, 10)), list(range(1, 10)))
+
+class TestFloatRange(TestCase):
+    def test_invalid_bounds(self):
+        with self.assertRaises(ValueError):
+            floatrange(10.0, 5.0)
+
+class TestDateRange(TestCase):
+    def test_offset(self):
+        range_low = daterange(date(2000, 1, 1), date(2000, 1, 6))
+        range_high = daterange(date(2000, 1, 5), date(2000, 1, 10))
+
+        self.assertNotEqual(range_low, range_high)
+        self.assertEqual(range_low.offset(timedelta(days=4)), range_high)
+        self.assertEqual(range_low, range_high.offset(timedelta(days=-4)))

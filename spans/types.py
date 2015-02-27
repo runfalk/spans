@@ -23,7 +23,7 @@ _empty_internal_range = _internal_range(None, None, False, False, True)
 class range_(object):
     """Base class of all ranges."""
 
-    __slots__ = ("_range")
+    __slots__ = ("_range",)
 
     def __init__(self, lower=None, upper=None, lower_inc=True, upper_inc=False):
         """
@@ -45,6 +45,14 @@ class range_(object):
                 " expected '{expected_type.__name__}'").format(
                     expected_type=self.type,
                     upper_type=upper.__class__))
+
+        # Verify that lower is less than or equal to upper if both are set to
+        # prevent invalid ranges like [10,1)
+        if lower is not None and upper is not None and upper < lower:
+            raise ValueError(
+                "Upper bound ({upper}) is less than lower bound ({lower})".format(
+                    upper=upper,
+                    lower=lower))
 
         self._range = _internal_range(
             lower, upper, lower_inc, upper_inc, False)
@@ -94,6 +102,13 @@ class range_(object):
                 lower="" if self.lower is None else repr(self.lower),
                 upper="" if self.upper is None else repr(self.upper),
                 ub="]" if self.upper_inc else ")")
+
+    # Support pickling using the default ancient pickling protocol for Python 2.7
+    def __getstate__(self):
+        return self._range
+
+    def __setstate__(self, state):
+        self._range = state
 
     @property
     def lower(self):
@@ -509,6 +524,8 @@ class discreterange(range_):
 
     """
 
+    __slots__ = ()
+
     def __init__(self, *args, **kwargs):
         super(discreterange, self).__init__(*args, **kwargs)
 
@@ -553,7 +570,51 @@ class discreterange(range_):
             yield next
             next = self.next(next)
 
-class intrange(discreterange):
+class offsetablerange(object):
+    """
+    Mixin for range types that supports being offset by a value. This value must
+    be of the same type as the range boundaries. For date types this will not
+    work and can be solved by explicitly defining an offset_type:
+
+        class datetimerange(range_, offsetablerange):
+            __slots__ = ()
+
+            type = datetime
+            offset_type = timedelta
+
+    """
+
+    __slots__ = ()
+
+    offset_type = None
+
+    def offset(self, offset):
+        """
+        Shift the range to the left or right with the given offset
+
+            >>> intrange(0, 5).offset(5)
+            intrange([5,10))
+            >>> intrange(5, 10).offset(-5)
+            intrange([0,5))
+
+        Note that range objects are immutable and are never modified in place.
+        """
+
+        offset_type = self.type if self.offset_type is None else self.offset_type
+
+        if offset is not None and not isinstance(offset, offset_type):
+            raise TypeError((
+                "Invalid type for offset '{offset_type.__name__}'"
+                " expected '{expected_type.__name__}'").format(
+                    expected_type=offset_type,
+                    offset_type=offset.__class__))
+
+        lower = None if self.lower is None else self.lower + offset
+        upper = None if self.upper is None else self.upper + offset
+
+        return self.replace(lower=lower, upper=upper)
+
+class intrange(discreterange, offsetablerange):
     """Range that operates on int."""
 
     __slots__ = ()
@@ -564,7 +625,7 @@ class intrange(discreterange):
     def __len__(self):
         return self.upper - self.lower
 
-class floatrange(range_):
+class floatrange(range_, offsetablerange):
     """Range that operates on float."""
 
     __slots__ = ()
@@ -572,26 +633,24 @@ class floatrange(range_):
     type = float
 
 class strrange(discreterange):
-    # For doctests to work on both python 2 and 3 we need to strip the unicode
-    # prefix from the expected output
-    __doc__ = u_doctest("""
+    """
     Range that operates on unicode strings. Next character is determined
     lexicographically. Representation might seem odd due to normalization.
 
-        >>> strrange(u"a", u"z")
-        strrange([{u}'a',{u}'z'))
-        >>> strrange(u"a", u"z", upper_inc=True)
-        strrange([{u}'a',{u}'{'))
+        >>> strrange(u"a", u"z") # doctest: +IGNORE_UNICODE
+        strrange([u'a',u'z'))
+        >>> strrange(u"a", u"z", upper_inc=True) # doctest: +IGNORE_UNICODE
+        strrange([u'a',u'{'))
 
     Iteration over a strrange is only sensible when having single character
     boundaries.
 
-        >>> list(strrange(u"a", u"e", upper_inc=True))
-        [{u}'a', {u}'b', {u}'c', {u}'d', {u}'e']
+        >>> list(strrange(u"a", u"e", upper_inc=True)) # doctest: +IGNORE_UNICODE
+        [u'a', u'b', u'c', u'd', u'e']
         >>> len(list(strrange(u"aa", u"zz", upper_inc=True))) # doctest: +SKIP
         27852826
 
-    """)
+    """
 
     __slots__ = ()
 
@@ -611,12 +670,13 @@ class strrange(discreterange):
         else:
             return curr[:-1] + uchr(ord(curr[-1]) + 1)
 
-class daterange(discreterange):
+class daterange(discreterange, offsetablerange):
     """Range that operates on datetime's date class."""
 
     __slots__ = ()
 
     type = date
+    offset_type = timedelta
     step = timedelta(days=1)
 
     def __len__(self):
@@ -633,14 +693,15 @@ class daterange(discreterange):
 
         return (self.upper - self.lower).days
 
-class datetimerange(range_):
+class datetimerange(range_, offsetablerange):
     """Range that operates on datetime's datetime class."""
 
     __slots__ = ()
 
     type = datetime
+    offset_type = timedelta
 
-class timedeltarange(range_):
+class timedeltarange(range_, offsetablerange):
     """Range that operates on datetime's timedelta class."""
 
     __slots__ = ()

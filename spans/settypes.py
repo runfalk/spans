@@ -1,8 +1,10 @@
 from functools import total_ordering
 from itertools import chain
 
+from ._compat import add_metaclass
 from .types import range_
 from .types import *
+from .types import discreterange, offsetablerange
 
 __all__ = [
     "intrangeset",
@@ -13,9 +15,26 @@ __all__ = [
     "timedeltarangeset"
 ]
 
+class metarangeset(type):
+    def __new__(cls, name, bases, attrs):
+        parents = list(bases)
+
+        if "type" in attrs:
+            mixin_map = [
+                (discreterange, discreterangeset),
+                (offsetablerange, offsetablerangeset)
+            ]
+
+            for rangemixin, rangesetmixin in mixin_map:
+                if issubclass(attrs["type"], rangemixin):
+                    parents.append(rangesetmixin)
+
+        return super(metarangeset, cls).__new__(cls, name, tuple(parents), attrs)
+
 @total_ordering
+@add_metaclass(metarangeset)
 class rangeset(object):
-    __slots__ = ("_list")
+    __slots__ = ("_list",)
 
     def __init__(self, ranges):
         self._list = [self.type.empty()]
@@ -30,6 +49,13 @@ class rangeset(object):
             return "{instance.__class__.__name__}({list!r})".format(
                 instance=self,
                 list=self._list)
+
+    # Support pickling using the default ancient pickling protocol for Python 2.7
+    def __getstate__(self):
+        return self._list
+
+    def __setstate__(self, state):
+        self._list = state
 
     def __nonzero__(self):
         """
@@ -275,7 +301,12 @@ class rangeset(object):
     # Python 3 support
     __bool__ = __nonzero__
 
-class discreterangeset(rangeset):
+class discreterangeset(object):
+    """
+    Mixin that adds support for discrete range set operations. Automatically used
+    by rangeset when range type inherits discreterange.
+    """
+
     __slots__ = ()
 
     def values(self):
@@ -289,7 +320,30 @@ class discreterangeset(rangeset):
 
         return chain(*self)
 
-class intrangeset(discreterangeset):
+class offsetablerangeset(object):
+    """
+    Mixin that adds support for offsetable range set operations. Automatically used
+    by rangeset when range type inherits offsetablerange.
+    """
+
+    __slots__ = ()
+
+    def offset(self, offset):
+        """
+        Shift the range set to the left or right with the given offset
+
+            >>> intrangeset([intrange(0, 5), intrange(10, 15)]).offset(5)
+            intrangeset([intrange([5,10)), intrange([15,20))])
+            >>> intrangeset([intrange(5, 10), intrange(15, 20)]).offset(-5)
+            intrangeset([intrange([0,5)), intrange([10,15))])
+
+        This function returns an offset copy of the original set, i.e. updating
+        is not done in place.
+        """
+
+        return self.__class__(map(lambda x: x.offset(offset), self))
+
+class intrangeset(rangeset):
     __slots__ = ()
 
     type = intrange
@@ -299,12 +353,12 @@ class floatrangeset(rangeset):
 
     type = floatrange
 
-class strrangeset(discreterangeset):
+class strrangeset(rangeset):
     __slots__ = ()
 
     type = strrange
 
-class daterangeset(discreterangeset):
+class daterangeset(rangeset):
     __slots__ = ()
 
     type = daterange

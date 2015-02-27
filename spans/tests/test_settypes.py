@@ -1,3 +1,5 @@
+import pickle
+
 from unittest import TestCase
 
 from ..types import *
@@ -73,3 +75,8 @@ class TestIntRangeSet(TestCase):
         self.assertEqual(
             list(intrangeset([intrange(1, 5), intrange(10, 15)]).values()),
             list(range(1, 5)) + list(range(10, 15)))
+
+    def test_pickling(self):
+        range = intrangeset([intrange(1, 10), intrange(20, 30)])
+
+        self.assertEqual(range, pickle.loads(pickle.dumps(range)))
