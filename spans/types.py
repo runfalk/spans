@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from functools import total_ordering
 
 from ._compat import *
+from ._utils import PicklableSlotMixin
 
 __all__ = [
     "intrange",
@@ -20,12 +21,12 @@ _internal_range = namedtuple(
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
 @total_ordering
-class range_(object):
+class range_(PicklableSlotMixin):
     """Base class of all ranges."""
 
     __slots__ = ("_range",)
 
-    def __init__(self, lower=None, upper=None, lower_inc=True, upper_inc=False):
+    def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
         """
         Initialize a new range object. This is very strict about types. It allows
         subclasses but nothing else. None as lower or upper boundary means
@@ -53,6 +54,13 @@ class range_(object):
                 "Upper bound ({upper}) is less than lower bound ({lower})".format(
                     upper=upper,
                     lower=lower))
+
+        # Handle default values for lower_inc and upper_inc
+        if lower_inc is None:
+            lower_inc = True
+
+        if upper_inc is None:
+            upper_inc = False
 
         self._range = _internal_range(
             lower, upper, lower_inc, upper_inc, False)
@@ -102,13 +110,6 @@ class range_(object):
                 lower="" if self.lower is None else repr(self.lower),
                 upper="" if self.upper is None else repr(self.upper),
                 ub="]" if self.upper_inc else ")")
-
-    # Support pickling using the default ancient pickling protocol for Python 2.7
-    def __getstate__(self):
-        return self._range
-
-    def __setstate__(self, state):
-        self._range = state
 
     @property
     def lower(self):
@@ -262,7 +263,7 @@ class range_(object):
 
         """
 
-        # Must return empty if either is an empty set
+        # Must return False if either is an empty set
         if not self or not other:
             return False
         return (
@@ -550,17 +551,38 @@ class discreterange(range_):
 
         return curr + cls.step
 
-    def endswith(self, other):
+    @classmethod
+    def prev(cls, curr):
+        """Returns the previous value for the data type"""
+
+        return curr - cls.step
+
+    @property
+    def last(self):
         """
-        Discrete ranges are always a closed set and thus we can return True even
-        when upper boundary is not included.
+        Returns the last element within this range.
+
+            >>> intrange(1, 10).last
+            9
+            >>> intrange(1, 10, upper_inc=True).last
+            10
+            >>> intrange(1).last is None
+            True
+
         """
 
+        if not self or self.upper_inf:
+            return None
+        else:
+            # This is always valid since discrete sets are normalized to upper
+            # bound not included
+            return self.prev(self.upper)
+
+    def endswith(self, other):
+        # Discrete ranges have a last element even in cases when upper bound is
+        # not included in set
         if isinstance(other, self.type):
-            if self.upper_inc:
-                return self.upper == other
-            else:
-                return self.upper == self.next(other)
+            return self.last == other
         else:
             return super(discreterange, self).endswith(other)
 
@@ -596,9 +618,15 @@ class offsetablerange(object):
             intrange([5,10))
             >>> intrange(5, 10).offset(-5)
             intrange([0,5))
+            >>> intrange.empty().offset(5)
+            intrange(empty)
 
         Note that range objects are immutable and are never modified in place.
         """
+
+        # If range is empty it can't be offset
+        if not self:
+            return self
 
         offset_type = self.type if self.offset_type is None else self.offset_type
 
@@ -670,6 +698,20 @@ class strrange(discreterange):
         else:
             return curr[:-1] + uchr(ord(curr[-1]) + 1)
 
+    @classmethod
+    def prev(cls, curr):
+        # Python's strings are ordered using lexical ordering
+        if not curr:
+            return ""
+
+        last = curr[-1]
+
+        # Make sure to loop around when we reach the minimum unicode point
+        if ord(last) == 0:
+            return cls.prev(curr[:-1]) + uchr(sys.maxunicode)
+        else:
+            return curr[:-1] + uchr(ord(curr[-1]) - 1)
+
 class daterange(discreterange, offsetablerange):
     """Range that operates on datetime's date class."""
 
@@ -678,6 +720,35 @@ class daterange(discreterange, offsetablerange):
     type = date
     offset_type = timedelta
     step = timedelta(days=1)
+
+    def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
+        if lower is not None and type(lower) is not date:
+            raise TypeError((
+                "Invalid type for lower bound '{lower_type.__name__}'"
+                " expected '{expected_type.__name__}'").format(
+                    expected_type=self.type,
+                    lower_type=lower.__class__))
+
+        if upper is not None and type(upper) is not date:
+            raise TypeError((
+                "Invalid type for upper bound '{upper_type.__name__}'"
+                " expected '{expected_type.__name__}'").format(
+                    expected_type=self.type,
+                    upper_type=upper.__class__))
+
+        super(daterange, self).__init__(lower, upper, lower_inc, upper_inc)
+
+    @classmethod
+    def from_date(cls, date):
+        """
+        Create a day long daterange from for the given date.
+
+            >>> import datetime
+            >>> daterange.from_date(datetime.date(2000, 1, 1))
+            daterange([datetime.date(2000, 1, 1),datetime.date(2000, 1, 2)))
+        """
+
+        return cls(date, date, upper_inc=True)
 
     def __len__(self):
         """

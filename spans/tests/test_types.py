@@ -1,6 +1,6 @@
 import pickle
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from unittest import TestCase
 
 from ..types import *
@@ -48,6 +48,14 @@ class TestIntRange(TestCase):
 
         with self.assertRaises(AttributeError):
             range.upper_inc = True
+
+    def test_last(self):
+        self.assertIsNone(intrange().last)
+        self.assertIsNone(intrange.empty().last)
+        self.assertIsNone(intrange(1).last)
+
+        self.assertEqual(intrange(upper=10).last, 9)
+        self.assertEqual(intrange(1, 10).last, 9)
 
     def test_offset(self):
         low_range = intrange(0, 5)
@@ -256,3 +264,25 @@ class TestDateRange(TestCase):
         self.assertNotEqual(range_low, range_high)
         self.assertEqual(range_low.offset(timedelta(days=4)), range_high)
         self.assertEqual(range_low, range_high.offset(timedelta(days=-4)))
+
+    def test_from_date(self):
+        date_start = date(2000, 1, 1)
+        self.assertEqual(
+            daterange.from_date(date_start),
+            daterange(date_start, date_start + timedelta(1)))
+
+        with self.assertRaises(TypeError):
+            daterange.from_date(datetime(2000, 1, 1))
+
+    def test_last(self):
+        span = daterange(date(2000, 1, 1), date(2000, 2, 1))
+        self.assertEqual(span.last, date(2000, 1, 31))
+
+    def test_datetime_input(self):
+        with self.assertRaises(TypeError):
+            daterange(datetime(2000, 1, 1))
+
+class TestStrRange(TestCase):
+    def test_last(self):
+        self.assertEqual(strrange(u"a", u"c").last, u"b")
+        self.assertEqual(strrange(u"aa", u"cc").last, u"cb")
