@@ -79,6 +79,21 @@ class rangeset(object):
     def __lt__(self, other):
         return self._list < other._list
 
+    def __len__(self):
+        """
+        Returns the cardinality of the set which is 0 for the empty set or else
+        the length of the list used internally.
+
+            >>> len(intrangeset([]))
+            0
+            >>> len(intrangeset([intrange(1,5)]))
+            1
+            >>> len(intrangeset([intrange(1,5),intrange(10,20)]))
+            2
+
+        """
+        return len(self._list) if self else 0
+
     def __invert__(self):
         """
         Returns an inverted version of this set. The inverted set contains no
