@@ -94,6 +94,27 @@ class rangeset(object):
         """
         return len(self._list) if self else 0
 
+    def __contains__(self, elem):
+        """
+        Return True if one range within the set contains elem, which may be
+        either a range of the same type or a scalar of the same type as the
+        ranges within the set.
+
+            >>> 3 in intrangeset([intrange(1, 5)])
+            True
+            >>> 7 in intrangeset([intrange(1, 5), intrange(10, 20)])
+            False
+            >>> intrange(2, 3) in intrangeset([intrange(1, 5)])
+            True
+            >>> intrange(4, 6) in intrangeset([intrange(1, 5), intrange(8, 9)])
+            False
+
+        """
+        for r in self._list:
+            if r.contains(elem) is True:
+                return True
+        return False
+
     def __invert__(self):
         """
         Returns an inverted version of this set. The inverted set contains no
