@@ -1,6 +1,6 @@
 Spans
 =====
-|test-status|
+|test-status| |test-coverage|
 
 Spans is a pure Python implementation of PostgreSQL's range types [#]_. Range types
 are conveinent when working with intervals of any kind. Every time you've found
@@ -117,6 +117,11 @@ For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
    :alt: Test status
    :scale: 100%
    :target: https://travis-ci.org/runfalk/spans
+
+.. |test-coverage| image:: https://codecov.io/github/runfalk/spans/coverage.svg?branch=master
+   :alt: Test coverage
+   :scale: 100%
+   :target: https://codecov.io/github/runfalk/spans?branch=master
 
 .. |documentation-status| image:: https://readthedocs.org/projects/spans/badge/
    :alt: Documentation status
