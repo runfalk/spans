@@ -7,6 +7,6 @@ python:
 install:
     - pip install codecov
 script:
-    - python -m unittest spans.tests.suite
+    - coverage run -m unittest spans.tests.suite
 after_success:
     - codecov
