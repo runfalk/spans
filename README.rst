@@ -1,5 +1,7 @@
 Spans
 =====
+|test-status|
+
 Spans is a pure Python implementation of PostgreSQL's range types [#]_. Range types
 are conveinent when working with intervals of any kind. Every time you've found
 yourself working with date_start and date_end, an interval may have been what
@@ -64,13 +66,16 @@ Installation
 ------------
 Spans exists on PyPI.
 
-::
+.. code-block:: bash
 
-    pip install Spans
+    $ pip install Spans
 
 Documentation
 -------------
-For full doumentation please run ``pydoc spans`` from a shell.
+`Documentation <http://spans.readthedocs.org/en/latest/>`_ is hosted on Read the
+Docs.
+
+|documentation-status|
 
 Use with Psycopg2
 -----------------
@@ -107,3 +112,13 @@ For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
 
 .. [#] http://www.postgresql.org/docs/9.2/static/rangetypes.html
 .. [#] https://www.github.com/runfalk/psycospans
+
+.. |test-status| image:: https://travis-ci.org/runfalk/spans.svg
+   :alt: Test status
+   :scale: 100%
+   :target: https://travis-ci.org/runfalk/spans
+
+.. |documentation-status| image:: https://readthedocs.org/projects/spans/badge/
+   :alt: Documentation status
+   :scale: 100%
+   :target: http://spans.readthedocs.org/en/latest/
