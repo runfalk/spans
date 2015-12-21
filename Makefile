@@ -3,6 +3,9 @@ clean-pyc:
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -type d -name '__pycache__' -exec rm -rf {} +
 
+doc:
+	make -C doc/ html
+
 test:
 	tox
 

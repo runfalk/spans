@@ -29,9 +29,12 @@ def add_metaclass(metaclass):
     Class decorator for creating a class with a metaclass. Shamelessly copied from
     Six (https://bitbucket.org/gutworth/six).
 
+    .. code-block:: python
+
         @add_metaclass(MetaClass)
         def NormalClass(object):
             pass
+
     """
 
     def wrapper(cls):

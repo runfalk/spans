@@ -5,3 +5,4 @@
 .tox/
 dist/
 venv/
+doc/_build/

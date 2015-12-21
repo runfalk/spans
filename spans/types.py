@@ -22,17 +22,28 @@ _empty_internal_range = _internal_range(None, None, False, False, True)
 
 @total_ordering
 class range_(PicklableSlotMixin):
-    """Base class of all ranges."""
+    """
+    Abstract base class of all ranges.
+
+    Initialize a new range object. Ranges are very strict about types. This
+    means that both `lower` or `upper` must be of the given class or subclass or
+    ``None``.
+
+    All ranges are immutable.
+
+    :param lower: Lower end of range.
+    :param upper: Upper end of range.
+    :param lower_inc: ``True`` if lower end should be included in range. Default
+                      is ``True``
+    :param upper_inc: ``True`` if upper end should be included in range. Default
+                      is ``False``
+    :raises TypeError: If lower or upper bound is not of the correct type.
+    :raises ValueError: If upper bound is lower than lower bound.
+    """
 
     __slots__ = ("_range",)
 
     def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
-        """
-        Initialize a new range object. This is very strict about types. It allows
-        subclasses but nothing else. None as lower or upper boundary means
-        -infinity or infinity.
-        """
-
         if lower is not None and not isinstance(lower, self.type):
             raise TypeError((
                 "Invalid type for lower bound '{lower_type.__name__}'"
@@ -67,7 +78,16 @@ class range_(PicklableSlotMixin):
 
     @classmethod
     def empty(cls):
-        """Returns an empty set."""
+        """
+        Returns an empty set. An empty set is unbounded and only contain the
+        empty set.
+
+            >>> intrange.empty() in intrange.empty()
+            True
+
+        It is unbounded but the boundaries are not infinite. Its boundaries are
+        returned as ``None``. Every set contains the empty set.
+        """
 
         self = cls.__new__(cls)
         self._range = _empty_internal_range
@@ -75,8 +95,10 @@ class range_(PicklableSlotMixin):
 
     def replace(self, *args, **kwargs):
         """
-        Returns a new instance of self with the given arguments replaced. It takes
-        the exact same arguments as the constructor.
+        replace(lower=None, upper=None, lower_inc=None, upper_inc=None)
+
+        Returns a new instance of self with the given arguments replaced. It
+        takes the exact same arguments as the constructor.
 
             >>> intrange(1, 5).replace(upper=10)
             intrange([1,10))
@@ -113,7 +135,14 @@ class range_(PicklableSlotMixin):
 
     @property
     def lower(self):
-        """Returns the lower boundary or None if -infinity"""
+        """
+        Returns the lower boundary or None if it is unbounded.
+
+            >>> intrange(1, 5).lower
+            1
+            >>> intrange(upper=5).lower
+
+        """
 
         if self:
             return None if self.lower_inf else self._range.lower
@@ -121,7 +150,14 @@ class range_(PicklableSlotMixin):
 
     @property
     def upper(self):
-        """Returns the upper boundary or None if infinity"""
+        """
+        Returns the upper boundary or None if it is unbounded.
+
+            >>> intrange(1, 5).upper
+            5
+            >>> intrange(1).upper
+
+        """
 
         if self:
             return None if self.upper_inf else self._range.upper
@@ -131,7 +167,11 @@ class range_(PicklableSlotMixin):
     def lower_inc(self):
         """
         Returns True if lower bound is included in range. If lower bound is
-        -infinity this returns False.
+        unbounded this returns False.
+
+            >>> intrange(1, 5).lower_inc
+            True
+
         """
 
         return False if self.lower_inf else self._range.lower_inc
@@ -140,20 +180,40 @@ class range_(PicklableSlotMixin):
     def upper_inc(self):
         """
         Returns True if upper bound is included in range. If upper bound is
-        infinity this returns False.
+        unbounded this returns False.
+
+            >>> intrange(1, 5).upper_inc
+            False
+
         """
 
         return False if self.upper_inf else self._range.upper_inc
 
     @property
     def lower_inf(self):
-        """Returns True if lower bound is -infinity."""
+        """
+        Returns True if lower bound is unbounded.
+
+            >>> intrange(1, 5).lower_inf
+            False
+            >>> intrange(upper=5).lower_inf
+            True
+
+        """
 
         return self._range.lower is None and not self._range.empty
 
     @property
     def upper_inf(self):
-        """Returns True if upper bound is infinity."""
+        """
+        Returns True if upper bound is unbounded.
+
+            >>> intrange(1, 5).upper_inf
+            False
+            >>> intrange(1).upper_inf
+            True
+
+        """
 
         return self._range.upper is None and not self._range.empty
 
@@ -206,11 +266,21 @@ class range_(PicklableSlotMixin):
             >>> intrange(1, 10).contains(10)
             False
 
+        Contains can also be called using the ``in`` operator.
+
+            >>> 1 in intrange(1, 10)
+            True
+
+        :param other: Object to be checked whether it exists within this range
+                      or not.
+        :return: ``True`` if `other` is completely within this range, otherwise
+                 ``False``.
+        :raises TypeError: If `other` is not of the correct type.
         """
 
         if isinstance(other, self.__class__):
             if not self:
-                return bool(other)
+                return not other
             elif not other or other.startsafter(self) and other.endsbefore(self):
                 return True
             else:
@@ -230,7 +300,23 @@ class range_(PicklableSlotMixin):
                     other))
 
     def within(self, other):
-        """Opposite of contains. Tests if this range is within other."""
+        """
+        Tests if this range is within `other`.
+
+            >>> a = intrange(1, 10)
+            >>> b = intrange(3, 8)
+            >>> a.contains(b)
+            True
+            >>> b.within(a)
+            True
+
+        :param other: Range to test against.
+        :return: ``True`` if this range is completely within the given range,
+                 otherwise ``False``.
+        :raises TypeError: If given range is of the wrong type.
+
+        See also :meth:`~spans.types.range_.contains`.
+        """
 
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -247,6 +333,11 @@ class range_(PicklableSlotMixin):
             >>> intrange(1, 5).overlap(intrange(5, 10))
             False
 
+        :param other: Range to test against.
+        :return: ``True`` if ranges intersect, otherwise ``False``.
+        :raises TypeError: If `other` is of another type than this range.
+
+        See also :meth:`~spans.types.range_.intersection`.
         """
 
         return not self << other and not other << self
@@ -261,6 +352,11 @@ class range_(PicklableSlotMixin):
             >>> intrange(1, 5).adjacent(intrange(10, 15))
             False
 
+        The empty set is not adjacent to any set.
+
+        :param other: Range to test against.
+        :return: ``True`` if this range is adjacent with `other`, otherwise
+                 ``False``.
         """
 
         # Must return False if either is an empty set
@@ -272,19 +368,26 @@ class range_(PicklableSlotMixin):
 
     def union(self, other):
         """
-        Unifies two ranges. For this to work the ranges must either overlap or
-        be adjacent. If these criterias are not fulfilled ValueError will be
-        raised.
+        Merges this range with a given range.
 
             >>> intrange(1, 5).union(intrange(5, 10))
             intrange([1,10))
             >>> intrange(1, 10).union(intrange(5, 15))
             intrange([1,15))
+
+        Two ranges can not be merged if the resulting range would be split in
+        two. This happens when the two sets are neither adjacent nor overlaps.
+
             >>> intrange(1, 5).union(intrange(10, 15))
             Traceback (most recent call last):
               File "<stdin>", line 1, in <module>
             ValueError: Ranges must be either adjacent or overlapping
 
+        This does not modify the range in place.
+
+        :param other: Range to merge with.
+        :return: A new range that is the union of this and `other`.
+        :raises ValueError: If `other` can not be merged with this range.
         """
 
         # Consider empty ranges
@@ -319,10 +422,7 @@ class range_(PicklableSlotMixin):
 
     def difference(self, other):
         """
-        Returns a new range containing all points in self that are not present
-        in other. If all points in other are present in self an empty range is
-        returned. A difference call must never split the reference range in two.
-        Doing this will raise a ValueError.
+        Compute the difference between this and a given range.
 
             >>> intrange(1, 10).difference(intrange(10, 15))
             intrange([1,10))
@@ -332,11 +432,22 @@ class range_(PicklableSlotMixin):
             intrange([1,5))
             >>> intrange(1, 5).difference(intrange(1, 10))
             intrange(empty)
+
+        The difference can not be computed if the resulting range would be split
+        in two separate ranges. This happens when the given range is completely
+        within this range and does not start or end at the same value.
+
             >>> intrange(1, 15).difference(intrange(5, 10))
             Traceback (most recent call last):
               File "<stdin>", line 1, in <module>
             ValueError: Other range must not be within this range
 
+        This does not modify the range in place.
+
+        :param other: Range to difference against.
+        :return: A new range that is the difference between this and `other`.
+        :raises ValueError: If difference bethween this and `other` can not be
+                            computed.
         """
 
         # Consider empty ranges
@@ -367,6 +478,8 @@ class range_(PicklableSlotMixin):
             >>> intrange(1, 10).intersection(intrange(5, 10))
             intrange([5,10))
 
+        :param other: Range to interect with.
+        :return: A new range that is the intersection between this and `other`.
         """
 
         if not self or not other or not self.overlap(other):
@@ -385,9 +498,17 @@ class range_(PicklableSlotMixin):
 
     def startswith(self, other):
         """
-        Returns True if self starts at the same point as other. Other can be
-        either range or scalar of the range's type. If range doesn't include the
-        start, a scalar other value will always return False.
+        Test if this range starts with `other`. `other` may be either range or
+        scalar.
+
+            >>> intrange(1, 5).startswith(1)
+            True
+            >>> intrange(1, 5).startswith(intrange(1, 10))
+            True
+
+        :param other: Range or scalar to test.
+        :return: ``True`` if this range starts with `other`, otherwise ``False``
+        :raises TypeError: If `other` is of the wrong type.
         """
 
         if isinstance(other, self.__class__):
@@ -407,9 +528,17 @@ class range_(PicklableSlotMixin):
 
     def endswith(self, other):
         """
-        Returns True if self ends at the same point as other. Other can be
-        either range or scalar of the range's type. If range doesn't include the
-        end, a scalar other value will always return False.
+        Test if this range ends with `other`. `other` may be either range or
+        scalar.
+
+            >>> intrange(1, 5).endswith(4)
+            True
+            >>> intrange(1, 10).endswith(intrange(5, 10))
+            True
+
+        :param other: Range or scalar to test.
+        :return: ``True`` if this range ends with `other`, otherwise ``False``
+        :raises TypeError: If `other` is of the wrong type.
         """
 
         if isinstance(other, self.__class__):
@@ -428,7 +557,23 @@ class range_(PicklableSlotMixin):
                     other))
 
     def startsafter(self, other):
-        """Returns True if self starts either after or the same spot as other."""
+        """
+        Test if this range starts after `other`. `other` may be either range or
+        scalar. This only takes the lower end of the ranges into consideration.
+        If the scalar or the lower end of the given range is greater than or
+        equal to this range's lower end, ``True`` is returned.
+
+            >>> intrange(1, 5).startsafter(0)
+            True
+            >>> intrange(1, 5).startsafter(intrange(0, 5))
+            True
+
+        If `other` has the same start as the given
+
+        :param other: Range or scalar to test.
+        :return: ``True`` if this range starts after `other`, otherwise ``False``
+        :raises TypeError: If `other` is of the wrong type.
+        """
 
         if isinstance(other, self.__class__):
             if self.lower == other.lower:
@@ -448,6 +593,21 @@ class range_(PicklableSlotMixin):
 
     def endsbefore(self, other):
         """Returns True if self end either before or the same spot as other."""
+        """
+        Test if this range ends before `other`. `other` may be either range or
+        scalar. This only takes the upper end of the ranges into consideration.
+        If the scalar or the upper end of the given range is less than or equal
+        to this range's upper end, ``True`` is returned.
+
+            >>> intrange(1, 5).endsbefore(4)
+            True
+            >>> intrange(1, 5).endsbefore(intrange(1, 5))
+            True
+
+        :param other: Range or scalar to test.
+        :return: ``True`` if this range ends before `other`, otherwise ``False``
+        :raises TypeError: If `other` is of the wrong type.
+        """
 
         if isinstance(other, self.__class__):
             if self.upper == other.upper:
@@ -467,13 +627,21 @@ class range_(PicklableSlotMixin):
 
     def left_of(self, other):
         """
-        Returns True if self is completely left of other.
+        Test if this range `other` is completely left of `other`.
 
             >>> intrange(1, 5).left_of(intrange(5, 10))
             True
             >>> intrange(1, 10).left_of(intrange(5, 10))
             False
 
+        The bitwise right shift operator ``<<`` is overloaded for this operation
+        too.
+
+            >>> intrange(1, 5) << intrange(5, 10)
+            True
+
+        :param other: Range to test against.
+        :return: ``True`` if this range is completely to the left of ``other``.
         """
 
         if not self or not other:
@@ -490,13 +658,21 @@ class range_(PicklableSlotMixin):
 
     def right_of(self, other):
         """
-        Returns True if self is completely right of other.
+        Test if this range `other` is completely right of `other`.
 
             >>> intrange(5, 10).right_of(intrange(1, 5))
             True
             >>> intrange(1, 10).right_of(intrange(1, 5))
             False
 
+        The bitwise right shift operator ``>>`` is overloaded for this operation
+        too.
+
+            >>> intrange(5, 10) >> intrange(1, 5)
+            True
+
+        :param other: Range to test against.
+        :return: ``True`` if this range is completely to the right of ``other``.
         """
 
         return other.left_of(self)
@@ -506,13 +682,18 @@ class range_(PicklableSlotMixin):
 
 class discreterange(range_):
     """
-    Discrete ranges are always presented in a normalized form. This means that:
+    Discrete ranges are a subset of ranges that works on discrete types. This
+    includes ``int`` and ``datetime.date``.
 
         >>> intrange(0, 5, lower_inc=False)
         intrange([1,5))
+        >>> intrange(0, 5, lower_inc=False).lower_inc
+        True
 
-    Thus all descrete ranges must provide a unit class attribute containing the
-    step length. For intrange this would be:
+    All discrete ranges must provide a unit attribute containing the step
+    length. For intrange this would be:
+
+    .. code-block:: python
 
         class intrange(discreterange):
             type = int
@@ -523,6 +704,10 @@ class discreterange(range_):
         >>> intrange(0, 1, lower_inc=False)
         intrange(empty)
 
+    Discrete ranges are iterable.
+
+        >>> list(intrange(1, 5))
+        [1, 2, 3, 4]
     """
 
     __slots__ = ()
@@ -547,20 +732,37 @@ class discreterange(range_):
 
     @classmethod
     def next(cls, curr):
-        """Returns the next value for the data type"""
+        """
+        Increment the given value with the step defined for this class.
+
+            >>> intrange.next(1)
+            2
+
+        :param curr: Value to increment.
+        :return: Incremented value.
+        """
 
         return curr + cls.step
 
     @classmethod
     def prev(cls, curr):
-        """Returns the previous value for the data type"""
+        """
+        Decrement the given value with the step defined for this class.
+
+            >>> intrange.prev(1)
+            0
+
+        :param curr: Value to decrement.
+        :return: Decremented value.
+        """
 
         return curr - cls.step
 
     @property
     def last(self):
         """
-        Returns the last element within this range.
+        Returns the last element within this range. If the range has no upper
+        limit ``None`` is returned.
 
             >>> intrange(1, 10).last
             9
@@ -569,6 +771,9 @@ class discreterange(range_):
             >>> intrange(1).last is None
             True
 
+        :return: Last element within this range.
+
+        .. versionadded:: 0.1.4
         """
 
         if not self or self.upper_inf:
@@ -598,6 +803,8 @@ class offsetablerange(object):
     be of the same type as the range boundaries. For date types this will not
     work and can be solved by explicitly defining an offset_type:
 
+    .. code-block:: python
+
         class datetimerange(range_, offsetablerange):
             __slots__ = ()
 
@@ -622,6 +829,10 @@ class offsetablerange(object):
             intrange(empty)
 
         Note that range objects are immutable and are never modified in place.
+
+        :param offset: Scalar to offset by.
+
+        .. versionadded:: 0.1.3
         """
 
         # If range is empty it can't be offset
@@ -643,7 +854,15 @@ class offsetablerange(object):
         return self.replace(lower=lower, upper=upper)
 
 class intrange(discreterange, offsetablerange):
-    """Range that operates on int."""
+    """
+    Range that operates on int.
+
+        >>> intrange(1, 5)
+        intrange([1,5))
+
+    Inherits methods from :class:`~spans.types.range_`,
+    :class:`~spans.types.discreterange` and :class:`~spans.types.offsetablerange`.
+    """
 
     __slots__ = ()
 
@@ -654,7 +873,15 @@ class intrange(discreterange, offsetablerange):
         return self.upper - self.lower
 
 class floatrange(range_, offsetablerange):
-    """Range that operates on float."""
+    """
+    Range that operates on float.
+
+        >>> floatrange(1.0, 5.0)
+        floatrange([1.0,5.0))
+
+    Inherits methods from :class:`~spans.types.range_` and
+    :class:`~spans.types.offsetablerange`.
+    """
 
     __slots__ = ()
 
@@ -678,6 +905,8 @@ class strrange(discreterange):
         >>> len(list(strrange(u"aa", u"zz", upper_inc=True))) # doctest: +SKIP
         27852826
 
+    Inherits methods from :class:`~spans.types.range_` and
+    :class:`~spans.types.discreterange`.
     """
 
     __slots__ = ()
@@ -713,7 +942,20 @@ class strrange(discreterange):
             return curr[:-1] + uchr(ord(curr[-1]) - 1)
 
 class daterange(discreterange, offsetablerange):
-    """Range that operates on datetime's date class."""
+    """
+    Range that operates on ``datetime.date``.
+
+        >>> daterange(date(2015, 1, 1), date(2015, 2, 1))
+        daterange([datetime.date(2015, 1, 1),datetime.date(2015, 2, 1)))
+
+    Offsets are done using ``datetime.timedelta``.
+
+        >>> daterange(date(2015, 1, 1), date(2015, 2, 1)).offset(timedelta(14))
+        daterange([datetime.date(2015, 1, 15),datetime.date(2015, 2, 15)))
+
+    Inherits methods from :class:`~spans.types.range_`,
+    :class:`~spans.types.discreterange` and :class:`~spans.types.offsetablerange`.
+    """
 
     __slots__ = ()
 
@@ -743,9 +985,11 @@ class daterange(discreterange, offsetablerange):
         """
         Create a day long daterange from for the given date.
 
-            >>> import datetime
-            >>> daterange.from_date(datetime.date(2000, 1, 1))
+            >>> daterange.from_date(date(2000, 1, 1))
             daterange([datetime.date(2000, 1, 1),datetime.date(2000, 1, 2)))
+
+        :param date: A date to convert.
+        :return: A new range that contains the given date.
         """
 
         return cls(date, date, upper_inc=True)
@@ -765,7 +1009,20 @@ class daterange(discreterange, offsetablerange):
         return (self.upper - self.lower).days
 
 class datetimerange(range_, offsetablerange):
-    """Range that operates on datetime's datetime class."""
+    """
+    Range that operates on ``datetime.datetime``.
+
+        >>> datetimerange(datetime(2015, 1, 1), datetime(2015, 2, 1))
+        datetimerange([datetime.datetime(2015, 1, 1, 0, 0),datetime.datetime(2015, 2, 1, 0, 0)))
+
+    Offsets are done using ``datetime.timedelta``.
+
+        >>> datetimerange(
+        ...     datetime(2015, 1, 1), datetime(2015, 2, 1)).offset(timedelta(14))
+        datetimerange([datetime.datetime(2015, 1, 15, 0, 0),datetime.datetime(2015, 2, 15, 0, 0)))
+
+    Inherits methods from :class:`~spans.types.range_` and :class:`~spans.types.offsetablerange`.
+    """
 
     __slots__ = ()
 
@@ -773,7 +1030,20 @@ class datetimerange(range_, offsetablerange):
     offset_type = timedelta
 
 class timedeltarange(range_, offsetablerange):
-    """Range that operates on datetime's timedelta class."""
+    """
+    Range that operates on datetime's timedelta class.
+
+        >>> timedeltarange(timedelta(1), timedelta(5))
+        timedeltarange([datetime.timedelta(1),datetime.timedelta(5)))
+
+    Offsets are done using ``datetime.timedelta``.
+
+        >>> timedeltarange(timedelta(1), timedelta(5)).offset(timedelta(14))
+        timedeltarange([datetime.timedelta(15),datetime.timedelta(19)))
+
+    Inherits methods from :class:`~spans.types.range_` and
+    :class:`~spans.types.offsetablerange`.
+    """
 
     __slots__ = ()
 

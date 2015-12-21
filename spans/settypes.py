@@ -6,6 +6,9 @@ from .types import range_
 from .types import *
 from .types import discreterange, offsetablerange
 
+# Imports needed for doctests in date range sets
+from datetime import *
+
 __all__ = [
     "intrangeset",
     "floatrangeset",
@@ -16,24 +19,105 @@ __all__ = [
 ]
 
 class metarangeset(type):
+    """
+    A meta class for rangesets. The purpose is to automatically add relevant
+    mixins to the range set class based on what mixins and baseclasses the range
+    class has.
+    """
+
+    mixin_map = {}
+
     def __new__(cls, name, bases, attrs):
         parents = list(bases)
 
         if "type" in attrs:
-            mixin_map = [
-                (discreterange, discreterangeset),
-                (offsetablerange, offsetablerangeset)
-            ]
-
-            for rangemixin, rangesetmixin in mixin_map:
+            for rangemixin, rangesetmixin in cls.mixin_map.items():
                 if issubclass(attrs["type"], rangemixin):
                     parents.append(rangesetmixin)
 
         return super(metarangeset, cls).__new__(cls, name, tuple(parents), attrs)
 
+    @classmethod
+    def add(cls, range_mixin, range_set_mixin):
+        cls.mixin_map[range_mixin] = range_set_mixin
+
+class discreterangeset(object):
+    """
+    Mixin that adds support for discrete range set operations. Automatically used
+    by rangeset when range type inherits discreterange
+
+    See also :class:`~spans.types.discreterange`.
+    """
+
+    __slots__ = ()
+
+    def values(self):
+        """
+        Returns an iterator over each value in this range set.
+
+            >>> list(intrangeset([intrange(1, 5), intrange(10, 15)]).values())
+            [1, 2, 3, 4, 10, 11, 12, 13, 14]
+
+        """
+
+        return chain(*self)
+metarangeset.add(discreterange, discreterangeset)
+
+
+class offsetablerangeset(object):
+    """
+    Mixin that adds support for offsetable range set operations. Automatically used
+    by rangeset when range type inherits offsetablerange.
+
+    See also :meth:`spans.types.offsetablerange`.
+    """
+
+    __slots__ = ()
+
+    def offset(self, offset):
+        """
+        Shift the range set to the left or right with the given offset
+
+            >>> intrangeset([intrange(0, 5), intrange(10, 15)]).offset(5)
+            intrangeset([intrange([5,10)), intrange([15,20))])
+            >>> intrangeset([intrange(5, 10), intrange(15, 20)]).offset(-5)
+            intrangeset([intrange([0,5)), intrange([10,15))])
+
+        This function returns an offset copy of the original set, i.e. updating
+        is not done in place.
+        """
+
+        return self.__class__(r.offset(offset) for r in self)
+metarangeset.add(offsetablerange, offsetablerangeset)
+
+
 @total_ordering
 @add_metaclass(metarangeset)
 class rangeset(object):
+    """
+    A range set works a lot like a range with some differences:
+
+    - All range sets supports ``len()``. Cardinality for a range set means the
+      number of distinct ranges required to represent this set. See
+      :meth:`~spans.settypes.rangeset.__len__`.
+    - All range sets are iterable. The iterator returns a range for each
+      iteration.
+    - All range sets are invertible using the ``~`` operator. The result is a
+      new range set that does not intersect the original range set at all.
+
+          >>> ~intrangeset([intrange(1, 5)])
+          intrangeset([intrange((,1)), intrange([5,))])
+
+    - Contrary to ranges. A range set may be split into multiple ranges when
+      performing set operations such as union, difference or intersection.
+
+    .. tip::
+        The ``rangeset`` constructor supports any iterable sequence as argument.
+
+    :param ranges: A sequence of ranges to add to this set.
+    :raises TypeError: If any of the given ranges are of incorrect type.
+    """
+
     __slots__ = ("_list",)
 
     def __init__(self, ranges):
@@ -82,7 +166,7 @@ class rangeset(object):
     def __len__(self):
         """
         Returns the cardinality of the set which is 0 for the empty set or else
-        the length of the list used internally.
+        the number of ranges used to represent this range set.
 
             >>> len(intrangeset([]))
             0
@@ -91,29 +175,10 @@ class rangeset(object):
             >>> len(intrangeset([intrange(1,5),intrange(10,20)]))
             2
 
+
+        .. versionadded:: 0.2.0
         """
         return len(self._list) if self else 0
-
-    def __contains__(self, elem):
-        """
-        Return True if one range within the set contains elem, which may be
-        either a range of the same type or a scalar of the same type as the
-        ranges within the set.
-
-            >>> 3 in intrangeset([intrange(1, 5)])
-            True
-            >>> 7 in intrangeset([intrange(1, 5), intrange(10, 20)])
-            False
-            >>> intrange(2, 3) in intrangeset([intrange(1, 5)])
-            True
-            >>> intrange(4, 6) in intrangeset([intrange(1, 5), intrange(8, 9)])
-            False
-
-        """
-        for r in self._list:
-            if r.contains(elem) is True:
-                return True
-        return False
 
     def __invert__(self):
         """
@@ -147,13 +212,49 @@ class rangeset(object):
             >>> rs is rs_copy
             False
 
+        :return: A new range set with the same ranges as this range set.
         """
 
         return self.__class__(self)
 
+    def contains(self, item):
+        """
+        Test if this range
+        Return True if one range within the set contains elem, which may be
+        either a range of the same type or a scalar of the same type as the
+        ranges within the set.
+
+            >>> intrangeset([intrange(1, 5)]).contains(3)
+            True
+            >>> intrangeset([intrange(1, 5), intrange(10, 20)]).contains(7)
+            False
+            >>> intrangeset([intrange(1, 5)]).contains(intrange(2, 3))
+            True
+            >>> intrangeset(
+            ...     [intrange(1, 5), intrange(8, 9)]).contains(intrange(4, 6))
+            False
+
+        Contains can also be called using the ``in`` operator.
+
+            >>> 3 in intrangeset([intrange(1, 5)])
+            True
+
+        This operation is `O(n)` where `n` is the number of ranges within this
+        range set.
+
+        :param item: Range or scalar to test for.
+        :return: True if element is contained within this set.
+
+        .. versionadded:: 0.2.0
+        """
+        for r in self._list:
+            if r.contains(item) is True:
+                return True
+        return False
+
     def add(self, item):
         """
-        Adds a range to the set. This operation updates the set in place.
+        Adds a range to the set.
 
             >>> rs = intrangeset([])
             >>> rs.add(intrange(1, 10))
@@ -166,6 +267,10 @@ class rangeset(object):
             >>> rs
             intrangeset([intrange([1,15)), intrange([20,30))])
 
+        This operation updates the set in place.
+
+        :param item: Range to add to this set.
+        :raises TypeError: If any of the given ranges are of incorrect type.
         """
 
         self._test_type(item)
@@ -218,6 +323,7 @@ class rangeset(object):
             >>> rs
             intrangeset([intrange([1,5)), intrange([10,15))])
 
+        :param item: Range to remove from this set.
         """
 
         # If the list currently only have an empty range do nothing
@@ -263,6 +369,7 @@ class rangeset(object):
             >>> intrangeset([intrange(1, 5), intrange(30, 40)]).span()
             intrange([1,40))
 
+        :return: A new range the contains this entire range set.
         """
 
         # If the list is empty we treat it specially by returning an empty range
@@ -282,6 +389,8 @@ class rangeset(object):
             ...     intrangeset([intrange(5, 10)]))
             intrangeset([intrange([1,10))])
 
+        :param other: Range set to merge with.
+        :return: A new range set that is the union of this and `other`.
         """
 
         # Make a copy of self and add all its ranges to the copy
@@ -300,6 +409,8 @@ class rangeset(object):
             ...     intrangeset([intrange(5, 10)]))
             intrangeset([intrange([1,5)), intrange([10,15))])
 
+        :param other: Range set to compute difference against.
+        :return: A new range set that is the difference between this and `other`.
         """
 
         # Make a copy of self and remove all its ranges from the copy
@@ -317,6 +428,9 @@ class rangeset(object):
             ...     intrangeset([intrange(5, 10)]))
             intrangeset([intrange([5,10))])
 
+        :param other: Range set to intersect this range set with.
+        :return: A new range set that is the intersection between this and
+                 `other`.
         """
 
         # TODO: Optimize this
@@ -328,6 +442,8 @@ class rangeset(object):
                     intersection.add(a.intersection(b))
         return intersection
 
+    __contains__ = contains
+
     # Some operators that set() has:
     # TODO: Use NotImplemented
     __or__ = union
@@ -337,74 +453,114 @@ class rangeset(object):
     # Python 3 support
     __bool__ = __nonzero__
 
-class discreterangeset(object):
-    """
-    Mixin that adds support for discrete range set operations. Automatically used
-    by rangeset when range type inherits discreterange.
-    """
-
-    __slots__ = ()
-
-    def values(self):
-        """
-        Returns an iterator going through each value in this range set.
-
-            >>> list(intrangeset([intrange(1, 5), intrange(10, 15)]).values())
-            [1, 2, 3, 4, 10, 11, 12, 13, 14]
-
-        """
-
-        return chain(*self)
-
-class offsetablerangeset(object):
-    """
-    Mixin that adds support for offsetable range set operations. Automatically used
-    by rangeset when range type inherits offsetablerange.
-    """
-
-    __slots__ = ()
-
-    def offset(self, offset):
-        """
-        Shift the range set to the left or right with the given offset
-
-            >>> intrangeset([intrange(0, 5), intrange(10, 15)]).offset(5)
-            intrangeset([intrange([5,10)), intrange([15,20))])
-            >>> intrangeset([intrange(5, 10), intrange(15, 20)]).offset(-5)
-            intrangeset([intrange([0,5)), intrange([10,15))])
-
-        This function returns an offset copy of the original set, i.e. updating
-        is not done in place.
-        """
-
-        return self.__class__(map(lambda x: x.offset(offset), self))
-
 class intrangeset(rangeset):
+    """
+    Range set that operates on intranges.
+
+        >>> intrangeset([intrange(1, 5), intrange(10, 15)])
+        intrangeset([intrange([1,5)), intrange([10,15))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset`,
+    :class:`~spans.settypes.discreterangeset` and
+    :class:`~spans.settypes.offsetablerangeset`.
+
+    See also :class:`~spans.types.intrange`.
+    """
+
     __slots__ = ()
 
     type = intrange
 
 class floatrangeset(rangeset):
+    """
+    Range set that operates on floatranges.
+
+        >>> floatrangeset([floatrange(1.0, 5.0), floatrange(10.0, 15.0)])
+        floatrangeset([floatrange([1.0,5.0)), floatrange([10.0,15.0))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset`,
+    :class:`~spans.settypes.discreterangeset` and
+    :class:`~spans.settypes.offsetablerangeset`.
+
+    See also :class:`~spans.types.floatrange`.
+    """
+
     __slots__ = ()
 
     type = floatrange
 
 class strrangeset(rangeset):
+    """
+    Range set that operates on strranges.
+
+        >>> strrangeset([
+        ...     strrange(u"a", u"f", upper_inc=True),
+        ...     strrange(u"0", u"9", upper_inc=True)]) # doctest: +IGNORE_UNICODE
+        strrangeset([strrange([u'0',u':')), strrange([u'a',u'g'))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset` and
+    :class:`~spans.settypes.discreterangeset`.
+
+    See also :class:`~spans.types.strrange`.
+    """
+
     __slots__ = ()
 
     type = strrange
 
 class daterangeset(rangeset):
+    """
+    Range set that operates on dateranges.
+
+        >>> month = daterange(date(2000, 1, 1), date(2000, 2, 1))
+        >>> daterangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
+        daterangeset([daterange([datetime.date(2000, 1, 1),datetime.date(2000, 2, 1))),
+            daterange([datetime.date(2001, 1, 1),datetime.date(2001, 2, 1)))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset`,
+    :class:`~spans.settypes.discreterangeset` and
+    :class:`~spans.settypes.offsetablerangeset`.
+
+    See also :class:`~spans.types.daterange`.
+    """
+
     __slots__ = ()
 
     type = daterange
 
 class datetimerangeset(rangeset):
+    """
+    Range set that operates on datetimeranges.
+
+        >>> month = datetimerange(datetime(2000, 1, 1), datetime(2000, 2, 1))
+        >>> datetimerangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
+        datetimerangeset([datetimerange([datetime.datetime(2000, 1, 1, 0, 0),datetime.datetime(2000, 2, 1, 0, 0))),
+            datetimerange([datetime.datetime(2001, 1, 1, 0, 0),datetime.datetime(2001, 2, 1, 0, 0)))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset` and
+    :class:`~spans.settypes.offsetablerangeset`.
+
+    See also :class:`~spans.types.datetimerange`.
+    """
+
     __slots__ = ()
 
     type = datetimerange
 
 class timedeltarangeset(rangeset):
+    """
+    Range set that operates on timedeltaranges.
+
+        >>> week = timedeltarange(timedelta(0), timedelta(7))
+        >>> timedeltarangeset([week, week.offset(timedelta(7))])
+        timedeltarangeset([timedeltarange([datetime.timedelta(0),datetime.timedelta(14)))])
+
+    Inherits methods from :class:`~spans.settypes.rangeset` and
+    :class:`~spans.settypes.offsetablerangeset`.
+
+    See also :class:`~spans.types.timedeltarange`.
+    """
+
     __slots__ = ()
 
     type = timedeltarange
