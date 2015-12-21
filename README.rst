@@ -1,6 +1,6 @@
 Spans
 =====
-|test-status| |test-coverage|
+|test-status| |test-coverage| |documentation-status|
 
 Spans is a pure Python implementation of PostgreSQL's range types [#]_. Range types
 are conveinent when working with intervals of any kind. Every time you've found
@@ -74,8 +74,6 @@ Documentation
 -------------
 `Documentation <http://spans.readthedocs.org/en/latest/>`_ is hosted on Read the
 Docs.
-
-|documentation-status|
 
 Use with Psycopg2
 -----------------
