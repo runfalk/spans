@@ -1,11 +1,26 @@
 Spans
 =====
-|test-status| |test-coverage| |documentation-status|
+|test-status| |test-coverage| |documentation-status| |pypi-version|
 
 Spans is a pure Python implementation of PostgreSQL's range types [#]_. Range types
 are conveinent when working with intervals of any kind. Every time you've found
 yourself working with date_start and date_end, an interval may have been what
-you were looking for.
+you were actually looking for.
+
+Here is an example on how to use ranges to determine if something happened in
+the 90s.
+
+.. code-block:: python
+
+    >>> from spans import *
+    >>> from datetime import *
+    >>> the90s = daterange(date(1990, 1, 1), date(2000, 1, 1))
+    >>> date(1996, 12, 4) in the90s
+    True
+    >>> date(2000, 1, 1) in the90s
+    False
+    >>> the90s.union(daterange(date(2000, 1, 1), date(2010, 1, 1)))
+    daterange([datetime.date(1990, 1, 1), datetime.date(2010, 1, 1))))
 
 If you are making a booking application for a bed and breakfast hotel and want
 to ensure no room gets double booked:
@@ -112,16 +127,25 @@ For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
 .. [#] https://www.github.com/runfalk/psycospans
 
 .. |test-status| image:: https://travis-ci.org/runfalk/spans.svg
-   :alt: Test status
-   :scale: 100%
-   :target: https://travis-ci.org/runfalk/spans
+    :alt: Test status
+    :scale: 100%
+    :target: https://travis-ci.org/runfalk/spans
 
 .. |test-coverage| image:: https://codecov.io/github/runfalk/spans/coverage.svg?branch=master
-   :alt: Test coverage
-   :scale: 100%
-   :target: https://codecov.io/github/runfalk/spans?branch=master
+    :alt: Test coverage
+    :scale: 100%
+    :target: https://codecov.io/github/runfalk/spans?branch=master
 
 .. |documentation-status| image:: https://readthedocs.org/projects/spans/badge/
-   :alt: Documentation status
-   :scale: 100%
-   :target: http://spans.readthedocs.org/en/latest/
+    :alt: Documentation status
+    :scale: 100%
+    :target: http://spans.readthedocs.org/en/latest/
+
+.. |pypi-version| image:: https://badge.fury.io/py/spans.svg
+    :alt: PyPI version status
+    :scale: 100%
+    :target: https://pypi.python.org/pypi/Spans/
+
+.. Include changelog on PyPI
+
+.. include:: doc/changelog.rst
