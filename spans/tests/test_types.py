@@ -324,11 +324,16 @@ class TestFloatRange(TestCase):
     def test_startswith(self):
         # Special case that discrete ranges can't cover
         self.assertFalse(floatrange(1.0, lower_inc=False).startswith(1.0))
+        self.assertFalse(floatrange(1.0, lower_inc=False).startswith(
+            floatrange(1.0)))
 
     def test_endswith(self):
         # Special case that discrete ranges can't cover
         self.assertFalse(floatrange(upper=5.0).endswith(5.0))
         self.assertTrue(floatrange(upper=5.0, upper_inc=True).endswith(5.0))
+
+        self.assertFalse(floatrange(upper=5.0).endswith(
+            floatrange(upper=5.0, upper_inc=True)))
 
 class TestDateRange(TestCase):
     def test_datetime(self):
@@ -373,10 +378,10 @@ class TestStrRange(TestCase):
         self.assertEqual(strrange(u"a", u"c").last, u"b")
         self.assertEqual(strrange(u"aa", u"cc").last, u"cb")
 
-    def text_prev(self):
+    def test_prev(self):
         self.assertEqual(strrange.prev(u""), u"")
         self.assertEqual(strrange.prev(u"b"), u"a")
 
-    def text_next(self):
+    def test_next(self):
         self.assertEqual(strrange.next(u""), u"")
         self.assertEqual(strrange.next(u"a"), u"b")
