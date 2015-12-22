@@ -1,7 +1,7 @@
-from functools import total_ordering
 from itertools import chain
 
 from ._compat import add_metaclass
+from ._utils import sane_total_ordering
 from .types import range_
 from .types import *
 from .types import discreterange, offsetablerange
@@ -91,7 +91,7 @@ class offsetablerangeset(object):
 metarangeset.add(offsetablerange, offsetablerangeset)
 
 
-@total_ordering
+@sane_total_ordering
 @add_metaclass(metarangeset)
 class rangeset(object):
     """

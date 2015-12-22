@@ -2,10 +2,9 @@ import sys
 
 from collections import namedtuple
 from datetime import date, datetime, timedelta
-from functools import total_ordering
 
 from ._compat import *
-from ._utils import PicklableSlotMixin
+from ._utils import PicklableSlotMixin, sane_total_ordering
 
 __all__ = [
     "intrange",
@@ -20,7 +19,7 @@ _internal_range = namedtuple(
     "_internal_range", ["lower", "upper", "lower_inc", "upper_inc", "empty"])
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
-@total_ordering
+@sane_total_ordering
 class range_(PicklableSlotMixin):
     """
     Abstract base class of all ranges.
@@ -238,18 +237,6 @@ class range_(PicklableSlotMixin):
     def __nonzero__(self):
         return not self._range.empty
 
-    def __contains__(self, item):
-        try:
-            return self.contains(item)
-        except TypeError:
-            return NotImplemented
-
-    def __lshift__(self, other):
-        return self.left_of(other)
-
-    def __rshift__(self, other):
-        return self.right_of(other)
-
     def contains(self, other):
         """
         Return True if this contains other. Other may be either range of same
@@ -357,10 +344,15 @@ class range_(PicklableSlotMixin):
         :param other: Range to test against.
         :return: ``True`` if this range is adjacent with `other`, otherwise
                  ``False``.
+        :raises TypeError: If given argument is of invalid type
         """
 
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
+                    other))
         # Must return False if either is an empty set
-        if not self or not other:
+        elif not self or not other:
             return False
         return (
             (self.lower == other.upper and self.lower_inc != other.upper_inc) or
@@ -676,6 +668,11 @@ class range_(PicklableSlotMixin):
         """
 
         return other.left_of(self)
+
+    # TODO: Properly implement NotImplemented
+    __contains__ = contains
+    __lshift__ = left_of
+    __rshift__ = right_of
 
     # Python 3 support
     __bool__ = __nonzero__

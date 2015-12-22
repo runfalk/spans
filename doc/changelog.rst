@@ -14,6 +14,9 @@ Not released yet
   (`Michael Krate <https://github.com/der-michik>`_)
 - Added `Sphinx <http://sphinx-doc.org/>`_ style doc strings to all methods
 - Added proper Sphinx documentation
+- Added unit tests for uncovered parts, mostly error checking
+- Fixed a potential bug where comparing ranges of different types would result
+  in an infinite loop
 - Changed meta class implementation for range sets to allow more mixins for
   custom range sets
 
