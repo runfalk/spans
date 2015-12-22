@@ -1,8 +1,10 @@
 import pickle
+import sys
 
 from datetime import date, datetime, timedelta
 from unittest import TestCase
 
+from .._compat import uchr
 from ..types import *
 
 class TestIntRange(TestCase):
@@ -315,10 +317,19 @@ class TestFloatRange(TestCase):
         with self.assertRaises(ValueError):
             floatrange(10.0, 5.0)
 
+    def test_less_than(self):
+        # Special case that discrete ranges can't cover
+        self.assertTrue(floatrange(1.0) < floatrange(1.0, lower_inc=False))
+        self.assertFalse(floatrange(1.0, lower_inc=False) < floatrange(1.0))
+
     def test_contains(self):
         self.assertTrue(floatrange(1.0, 5.0).contains(1.0))
         self.assertTrue(floatrange(1.0, 5.0).contains(3.0))
         self.assertFalse(floatrange(1.0, 5.0, lower_inc=False).contains(1.0))
+        self.assertTrue(
+            floatrange(1.0, 5.0, upper_inc=True).contains(5.0))
+        self.assertTrue(
+            floatrange(1.0, 5.0, lower_inc=False, upper_inc=True).contains(5.0))
         self.assertFalse(floatrange(1.0, 5.0).contains(5.0))
 
     def test_startswith(self):
@@ -382,6 +393,12 @@ class TestStrRange(TestCase):
         self.assertEqual(strrange.prev(u""), u"")
         self.assertEqual(strrange.prev(u"b"), u"a")
 
+        # Confirm that wrap around is correct
+        self.assertEqual(strrange.prev(uchr(0)), uchr(sys.maxunicode))
+
     def test_next(self):
         self.assertEqual(strrange.next(u""), u"")
         self.assertEqual(strrange.next(u"a"), u"b")
+
+        # Confirm that wrap around is correct
+        self.assertEqual(strrange.next(uchr(sys.maxunicode)), uchr(0))
