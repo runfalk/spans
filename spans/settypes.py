@@ -247,6 +247,7 @@ class rangeset(object):
 
         .. versionadded:: 0.2.0
         """
+
         for r in self._list:
             if r.contains(item) is True:
                 return True
@@ -325,6 +326,8 @@ class rangeset(object):
 
         :param item: Range to remove from this set.
         """
+
+        self._test_type(item)
 
         # If the list currently only have an empty range do nothing
         if not self:
