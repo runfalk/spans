@@ -7,6 +7,9 @@ are conveinent when working with intervals of any kind. Every time you've found
 yourself working with date_start and date_end, an interval may have been what
 you were actually looking for.
 
+Spans has successfully been used in production since its first release
+30th August, 2013.
+
 Here is an example on how to use ranges to determine if something happened in
 the 90s.
 

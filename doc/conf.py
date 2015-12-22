@@ -78,7 +78,10 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build"]
+exclude_patterns = [
+    "_build",
+    "*.inc.rst",
+]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -288,3 +291,8 @@ texinfo_documents = [
 # Autodoc settings
 autodoc_docstring_signature = True
 autodoc_member_order = "groupwise"
+
+doctest_global_setup = """
+from spans import *
+from datetime import *
+"""

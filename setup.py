@@ -77,18 +77,19 @@ class RstPreProcessor(object):
 
 rst_pre_processor = RstPreProcessor()
 
-@rst_pre_processor.add_role("meth")
 @rst_pre_processor.add_role("class")
 @rst_pre_processor.add_role("attr")
+@rst_pre_processor.add_role("meth")
 def role_simplyfier(processor, role, argument, content):
-    extra = {
-        "meth": "()"
+    format = {
+        "attr": "``.{}``",
+        "meth": "``{}()``",
     }
 
     if content.startswith("~"):
-        return "``{}``".format(content[1:].split(".")[-1] + extra.get(role, ""))
+        return format.get(role, "``{}``").format(content[1:].split(".")[-1])
     else:
-        return "``{}``".format(content + extra.get(role, ""))
+        return format.get(role, "``{}``").format(content + extra.get(role, ""))
 
 @rst_pre_processor.add_block("image")
 def image_remover(processor, block, args, extra, content):
@@ -128,28 +129,31 @@ if os.path.exists("requirements.txt"):
     with open("requirements.txt") as fp:
         requirements = fp.read().split("\n")
 
-setup(
-    name="Spans",
-    version=version,
-    description="Continuous set support for Python",
-    long_description=long_desc,
-    license=license,
-    author="Andreas Runfalk",
-    author_email="andreas@runfalk.se",
-    url="https://www.github.com/runfalk/spans",
-    packages=["spans"],
-    install_requires=requirements,
-    classifiers=(
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Topic :: Utilities"
-    ),
-    zip_safe=False,
-    test_suite="spans.tests.suite"
-)
+if __name__ == "__main__":
+    setup(
+        name="Spans",
+        version=version,
+        description="Continuous set support for Python",
+        long_description=long_desc,
+        license=license,
+        author="Andreas Runfalk",
+        author_email="andreas@runfalk.se",
+        url="https://www.github.com/runfalk/spans",
+        packages=["spans"],
+        install_requires=requirements,
+        classifiers=(
+            "Development Status :: 5 - Production/Stable",
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: MIT License",
+            "Programming Language :: Python",
+            "Programming Language :: Python :: 2",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3.3",
+            "Programming Language :: Python :: 3.4",
+            "Programming Language :: Python :: 3.5",
+            "Topic :: Utilities"
+        ),
+        zip_safe=False,
+        test_suite="spans.tests.suite"
+    )

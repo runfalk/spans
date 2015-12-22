@@ -7,10 +7,16 @@ doc:
 	make -C doc/ html
 
 test:
+	make -C doc doctest
 	tox
 
 sdist:
 	python setup.py sdist
 	rm -rf *.egg-info
 
-.PHONY : init clean-pyc test sdist
+preview-readme:
+	python -c 'import setup; print(setup.long_desc)' > README.preview.rst
+	retext README.preview.rst
+	rm README.preview.rst
+
+.PHONY : init clean-pyc test sdist preview-readme
