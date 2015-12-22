@@ -4,9 +4,14 @@ For a recent project of mine I started using PostgreSQL's ``tsrange`` type and n
 
 Requirements
 ------------
-Spans have no requirements but the standard library.
+Spans have no requirements but the standard library. It is known to work on the following Python versions
 
-- Python 2.7+ or 3.4+ (may work on other versions too)
+- Python 2.7
+- Python 3.3
+- Python 3.4
+- Python 3.5
+
+It may work on other version as well.
 
 Installation
 ------------

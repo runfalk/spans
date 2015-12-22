@@ -19,4 +19,4 @@ preview-readme:
 	retext README.preview.rst
 	rm README.preview.rst
 
-.PHONY : init clean-pyc test sdist preview-readme
+.PHONY : clean-pyc doc test sdist preview-readme

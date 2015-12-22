@@ -66,6 +66,8 @@ Spans make working with intervals of time easy. In this example we want to list 
             (span.upper.seconds // 60) % 60,
         ))
 
+This code outputs:
+
 .. testoutput::
 
     Monday    15:00-17:00
