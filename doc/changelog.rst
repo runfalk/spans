@@ -6,7 +6,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 0.2.0
 -------------
-Not released yet
+Released on 22nd December, 2015
 
 - Added :meth:`~spans.settypes.rangeset.__len__` to range sets
   (`Michael Krate <https://github.com/der-michik>`_)
