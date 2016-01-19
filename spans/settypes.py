@@ -158,9 +158,13 @@ class rangeset(object):
         return iter(self._list)
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self._list == other._list
 
     def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return self._list < other._list
 
     def __len__(self):
