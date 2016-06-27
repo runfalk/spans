@@ -123,6 +123,8 @@ class TestIntRangeSet(TestCase):
             intrangeset([range_a, range_b]) == intrangeset([range_a, range_b]))
         self.assertFalse(
             intrangeset([range_a, range_b]) == intrangeset([range_a]))
+        self.assertFalse(
+            intrangeset([range_a]) == "foo")
 
     def test_less_than(self):
         range_a = intrange(1, 5)
@@ -134,6 +136,8 @@ class TestIntRangeSet(TestCase):
             intrangeset([range_a, range_b]) < intrangeset([range_b]))
         self.assertFalse(
             intrangeset([range_a, range_b]) <= intrangeset([range_a]))
+        self.assertFalse(
+            intrangeset([range_a]) == "foo")
 
     def test_greater_than(self):
         range_a = intrange(1, 5)

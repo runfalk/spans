@@ -9,9 +9,9 @@ Version 0.2.0
 Released on 22nd December, 2015
 
 - Added :meth:`~spans.settypes.rangeset.__len__` to range sets
-  (`Michael Krate <https://github.com/der-michik>`_)
+  (`Michael Krahe <https://github.com/der-michik>`_)
 - Added :meth:`~spans.settypes.rangeset.contains` to range sets
-  (`Michael Krate <https://github.com/der-michik>`_)
+  (`Michael Krahe <https://github.com/der-michik>`_)
 - Added `Sphinx <http://sphinx-doc.org/>`_ style doc strings to all methods
 - Added proper Sphinx documentation
 - Added unit tests for uncovered parts, mostly error checking
