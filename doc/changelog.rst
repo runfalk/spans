@@ -4,6 +4,15 @@ Version are structured like the following: ``<major>.<minor>.<bugfix>``. The
 first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
+Version 0.2.1
+-------------
+Released on 27th June, 2016
+
+- Fixed :class:`~spans.settypes.rangeset` not returning ``NotImplemented`` when
+  comparing to classes that are not sub classes of ``rangeset``, pull request
+  `#2 <https://github.com/runfalk/spans/pull/2>`_
+  (`Michael Krahe <https://github.com/der-michik>`_)
+
 Version 0.2.0
 -------------
 Released on 22nd December, 2015
