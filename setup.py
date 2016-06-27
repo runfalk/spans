@@ -118,9 +118,6 @@ def rst_preprocess(file):
 with open("README.rst") as fp:
     long_desc = rst_pre_processor.process(fp.read())
 
-with open("LICENSE") as fp:
-    license = fp.read()
-
 with open("spans/__init__.py") as fp:
     version = re.search('__version__\s+=\s+"([^"]+)', fp.read()).group(1)
 
@@ -135,7 +132,7 @@ if __name__ == "__main__":
         version=version,
         description="Continuous set support for Python",
         long_description=long_desc,
-        license=license,
+        license="MIT",
         author="Andreas Runfalk",
         author_email="andreas@runfalk.se",
         url="https://www.github.com/runfalk/spans",

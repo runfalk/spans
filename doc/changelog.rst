@@ -12,6 +12,9 @@ Released on 27th June, 2016
   comparing to classes that are not sub classes of ``rangeset``, pull request
   `#2 <https://github.com/runfalk/spans/pull/2>`_
   (`Michael Krahe <https://github.com/der-michik>`_)
+- Updated license in ``setup.py`` to follow
+  `recommendations <https://packaging.python.org/en/latest/distributing/#license>`_
+  by PyPA
 
 Version 0.2.0
 -------------
