@@ -4,6 +4,13 @@ Version are structured like the following: ``<major>.<minor>.<bugfix>``. The
 first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
+Version 0.2.2
+-------------
+Unreleased
+
+- Fixed `bug #3 <https://github.com/runfalk/spans/issues/3>`_, intersection of
+  multiple range sets not working correctly.
+
 Version 0.2.1
 -------------
 Released on 27th June, 2016

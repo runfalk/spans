@@ -440,14 +440,34 @@ class rangeset(object):
                  `other`.
         """
 
-        # TODO: Optimize this
+        # Initialize output with a reference to this rangeset. When
+        # intersecting against multiple rangesets at once this will be replaced
+        # after each iteration.
+        output = self
 
-        intersection = self.__class__([])
         for other in others:
-            for a in self:
+            # Intermediate rangeset containing intersection for this current
+            # iteration.
+            intersection = self.__class__([])
+
+            # Intersect every range within the current output with every range
+            # within the currently processed other rangeset. All intersecting
+            # parts are added to the intermediate intersection set.
+            for a in output:
                 for b in other:
                     intersection.add(a.intersection(b))
-        return intersection
+
+            # If the intermediate intersection rangeset is still empty, there
+            # where no intersections with at least one of the arguments and
+            # we can quit early, since any intersection with the empty set will
+            # always be empty.
+            if not intersection:
+                return intersection
+
+            # Update output with intersection for the current iteration.
+            output = intersection
+
+        return output
 
     __contains__ = contains
 

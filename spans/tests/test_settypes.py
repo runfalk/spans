@@ -151,3 +151,20 @@ class TestIntRangeSet(TestCase):
             intrangeset([range_b]) > intrangeset([range_a, range_b]))
         self.assertTrue(
             intrangeset([range_a, range_b]) >= intrangeset([range_a]))
+
+    def test_bug3_intersection(self):
+        """
+        `Bug #3 <https://github.com/runfalk/spans/issues/3>`_
+        """
+
+        range_a = intrange(1, 5)
+        range_b = intrange(5, 10)
+        range_c = intrange(10, 15)
+
+        rangeset_a = intrangeset([range_a, range_c])
+        rangeset_b = intrangeset([range_b])
+        rangeset_c = intrangeset([range_c])
+        rangeset_empty = intrangeset([])
+
+        self.assertEqual(
+            rangeset_a.intersection(rangeset_b, rangeset_c), rangeset_empty)
