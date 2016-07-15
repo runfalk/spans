@@ -55,7 +55,7 @@ Range set
 ~~~~~~~~~
 .. autoclass:: spans.settypes.rangeset
    :members:
-   :special-members: __len__
+   :special-members: __iter__, __len__
 
 Discrete range set
 ~~~~~~~~~~~~~~~~~~

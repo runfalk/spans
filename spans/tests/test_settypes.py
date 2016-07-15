@@ -29,6 +29,20 @@ class TestIntRangeSet(TestCase):
         self.assertEqual(list(rset), list(rcopy))
         self.assertIsNot(rset._list, rcopy._list)
 
+    def test_contains(self):
+        rset = intrangeset([intrange(1, 10)])
+
+        self.assertTrue(rset.contains(intrange(1, 5)))
+        self.assertTrue(rset.contains(intrange(5, 10)))
+        self.assertFalse(rset.contains(intrange(5, 15)))
+
+        self.assertTrue(rset.contains(1))
+        self.assertTrue(rset.contains(5))
+        self.assertFalse(rset.contains(10))
+
+        self.assertTrue(rset.contains(intrange.empty()))
+        self.assertTrue(intrangeset([]).contains(intrange.empty()))
+
     def test_add(self):
         rset = intrangeset([intrange(1, 15)])
         rset.add(intrange(5, 15))
@@ -168,3 +182,10 @@ class TestIntRangeSet(TestCase):
 
         self.assertEqual(
             rangeset_a.intersection(rangeset_b, rangeset_c), rangeset_empty)
+
+    def test_bug4_empty_set_iteration(self):
+        """
+        `Bug #4 <https://github.com/runfalk/spans/issues/4>`
+        """
+
+        self.assertEqual(list(intrangeset([])), [])

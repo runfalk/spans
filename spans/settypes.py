@@ -101,7 +101,7 @@ class rangeset(object):
       number of distinct ranges required to represent this set. See
       :meth:`~spans.settypes.rangeset.__len__`.
     - All range sets are iterable. The iterator returns a range for each
-      iteration.
+      iteration. See :meth:`~spans.settypes.rangeset.__iter__` for more details.
     - All range sets are invertible using the ``~`` operator. The result is a
       new range set that does not intersect the original range set at all.
 
@@ -121,18 +121,15 @@ class rangeset(object):
     __slots__ = ("_list",)
 
     def __init__(self, ranges):
-        self._list = [self.type.empty()]
+        self._list = []
 
         for r in ranges:
             self.add(r)
 
     def __repr__(self):
-        if not self:
-            return "{0.__class__.__name__}([])".format(self)
-        else:
-            return "{instance.__class__.__name__}({list!r})".format(
-                instance=self,
-                list=self._list)
+        return "{instance.__class__.__name__}({list!r})".format(
+            instance=self,
+            list=self._list)
 
     # Support pickling using the default ancient pickling protocol for Python 2.7
     def __getstate__(self):
@@ -152,9 +149,27 @@ class rangeset(object):
             True
 
         """
-        return bool(len(self._list) != 1 or self._list[0])
+        return bool(self._list)
 
     def __iter__(self):
+        """
+        Returns an iterator over all ranges within this set. Note that this
+        iterates over the normalized version of the range set:
+
+            >>> list(intrangeset(
+            ...     [intrange(1, 5), intrange(5, 10), intrange(15, 20)]))
+            [intrange([1,10)), intrange([15,20))]
+
+        If the set is empty an empty iterator is returned.
+
+            >>> list(intrangeset([]))
+            []
+
+        .. versionchanged:: 0.3.0
+           This method used to return an empty range when the rangeset was
+           empty.
+        """
+
         return iter(self._list)
 
     def __eq__(self, other):
@@ -182,7 +197,7 @@ class rangeset(object):
 
         .. versionadded:: 0.2.0
         """
-        return len(self._list) if self else 0
+        return len(self._list)
 
     def __invert__(self):
         """
@@ -252,6 +267,12 @@ class rangeset(object):
         .. versionadded:: 0.2.0
         """
 
+        # All range sets contain the empty range. However, we must verify the
+        # type of what is being passed as well to make sure we indeed got an
+        # empty set of the correct type.
+        if isinstance(item, self.type) and not item:
+            return True
+
         for r in self._list:
             if r.contains(item) is True:
                 return True
@@ -282,12 +303,6 @@ class rangeset(object):
 
         # If item is empty, do not add it
         if not item:
-            return
-
-        # If the list currently only have an empty range in it replace it by this
-        # item
-        if not self:
-            self._list = [item]
             return
 
         i = 0
@@ -333,7 +348,8 @@ class rangeset(object):
 
         self._test_type(item)
 
-        # If the list currently only have an empty range do nothing
+        # If the list currently only have an empty range do nothing since an
+        # empty rangeset can't be removed from anyway.
         if not self:
             return
 
@@ -363,10 +379,6 @@ class rangeset(object):
                     break
             i += 1
 
-        # If the list was wiped clean we must at least have the empty range in it
-        if not self._list:
-            self._list.append(self.type.empty())
-
     def span(self):
         """
         Return a range that spans from the first point to the last point in this
@@ -379,9 +391,9 @@ class rangeset(object):
         :return: A new range the contains this entire range set.
         """
 
-        # If the list is empty we treat it specially by returning an empty range
+        # If the set is empty we treat it specially by returning an empty range
         if not self:
-            return self._list[0]
+            return self.type.empty()
 
         return self._list[0].replace(
             upper=self._list[-1].upper,

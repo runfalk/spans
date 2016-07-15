@@ -4,12 +4,16 @@ Version are structured like the following: ``<major>.<minor>.<bugfix>``. The
 first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
-Version 0.2.2
+Version 0.3.0
 -------------
 Unreleased
 
-- Fixed `bug #3 <https://github.com/runfalk/spans/issues/3>`_, intersection of
-  multiple range sets not working correctly.
+- Added documentation for :meth:`~spans.settypes.rangeset.__iter__`
+- Fixed intersection of multiple range sets not working correctly
+  (`bug #3 <https://github.com/runfalk/spans/issues/3>`_)
+- Fixed iteration of :class:`~spans.settypes.rangeset` returning an empty range
+  when ``rangeset`` is empty
+  (`bug #4 <https://github.com/runfalk/spans/issues/4>`_)
 
 Version 0.2.1
 -------------
