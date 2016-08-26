@@ -6,7 +6,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 0.3.0
 -------------
-Unreleased
+Released on 26th August, 2016
 
 - Added documentation for :meth:`~spans.settypes.rangeset.__iter__`
 - Fixed intersection of multiple range sets not working correctly
@@ -14,6 +14,10 @@ Unreleased
 - Fixed iteration of :class:`~spans.settypes.rangeset` returning an empty range
   when ``rangeset`` is empty
   (`bug #4 <https://github.com/runfalk/spans/issues/4>`_)
+
+.. warning::
+   This change is backwards incompatible to code that expect rangesets to always
+   return at least one set when iterating.
 
 Version 0.2.1
 -------------
