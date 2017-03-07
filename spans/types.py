@@ -994,7 +994,7 @@ class daterange(discreterange, offsetablerange):
         super(daterange, self).__init__(lower, upper, lower_inc, upper_inc)
 
     @classmethod
-    def from_date(cls, date):
+    def from_date(cls, date, what=None):
         """
         Create a day long daterange from for the given date.
 
@@ -1005,7 +1005,25 @@ class daterange(discreterange, offsetablerange):
         :return: A new range that contains the given date.
         """
 
-        return cls(date, date, upper_inc=True)
+        # TODO: Add subclasses that support stepping between the intervals.
+        #       Calling next for a week would result in the coming week
+        if what is None or what == "day":
+            return cls(date, date, upper_inc=True)
+        elif what == "week":
+            start = date - timedelta(date.weekday())
+            return cls(start, start + timedelta(7))
+        elif what == "american_week":
+            start = date - timedelta((date.weekday() + 1) % 7)
+            return cls(start, start + timedelta(7))
+        elif what == "month":
+            start = date.replace(day=1)
+            return cls(start, (start + timedelta(31)).replace(day=1))
+        elif what == "quarter":
+            start = date.replace(month=(date.month - 1) // 3 * 3 + 1, day=1)
+            return cls(start, (start + timedelta(93)).replace(day=1))
+        elif what == "year":
+            start = date.replace(month=1, day=1)
+            return cls(start, (start + timedelta(366)).replace(day=1))
 
     def __len__(self):
         """

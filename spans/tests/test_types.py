@@ -371,6 +371,64 @@ class TestDateRange(TestCase):
         with self.assertRaises(TypeError):
             daterange.from_date(datetime(2000, 1, 1))
 
+    def test_from_date_week(self):
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 1), what="week"),
+            daterange(date(1999, 12, 27), date(2000, 1, 3)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 2), what="week"),
+            daterange(date(1999, 12, 27), date(2000, 1, 3)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 3), what="week"),
+            daterange(date(2000, 1, 3), date(2000, 1, 10)))
+
+    def test_from_date_american_week(self):
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 1), what="american_week"),
+            daterange(date(1999, 12, 26), date(2000, 1, 2)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 2), what="american_week"),
+            daterange(date(2000, 1, 2), date(2000, 1, 9)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 3), what="american_week"),
+            daterange(date(2000, 1, 2), date(2000, 1, 9)))
+
+    def test_from_date_month(self):
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 1), what="month"),
+            daterange(date(2000, 1, 1), date(2000, 1, 31), upper_inc=True))
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 31), what="month"),
+            daterange(date(2000, 1, 1), date(2000, 1, 31), upper_inc=True))
+        self.assertEqual(
+            daterange.from_date(date(2000, 2, 15), what="month"),
+            daterange(date(2000, 2, 1), date(2000, 2, 29), upper_inc=True))
+        self.assertEqual(
+            daterange.from_date(date(2001, 2, 15), what="month"),
+            daterange(date(2001, 2, 1), date(2001, 2, 28), upper_inc=True))
+
+    def test_from_date_quarter(self):
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 1), what="quarter"),
+            daterange(date(2000, 1, 1), date(2000, 3, 31), upper_inc=True))
+        self.assertEqual(
+            daterange.from_date(date(2000, 2, 15), what="quarter"),
+            daterange(date(2000, 1, 1), date(2000, 3, 31), upper_inc=True))
+        self.assertEqual(
+            daterange.from_date(date(2000, 3, 31), what="quarter"),
+            daterange(date(2000, 1, 1), date(2000, 3, 31), upper_inc=True))
+
+    def test_from_date_year(self):
+        self.assertEqual(
+            daterange.from_date(date(2000, 1, 1), what="year"),
+            daterange(date(2000, 1, 1), date(2001, 1, 1)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 6, 1), what="year"),
+            daterange(date(2000, 1, 1), date(2001, 1, 1)))
+        self.assertEqual(
+            daterange.from_date(date(2000, 12, 31), what="year"),
+            daterange(date(2000, 1, 1), date(2001, 1, 1)))
+
     def test_last(self):
         span = daterange(date(2000, 1, 1), date(2000, 2, 1))
         self.assertEqual(span.last, date(2000, 1, 31))
