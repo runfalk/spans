@@ -383,6 +383,16 @@ class TestDateRange(TestCase):
         with self.assertRaises(ValueError):
             len(daterange())
 
+    def test_bug5_date_subclassing(self):
+        """
+        `Bug #5 <https://github.com/runfalk/spans/issues/5>`
+        """
+
+        class DateSubClass(date):
+            pass
+
+        daterange(DateSubClass(2000, 1, 1))
+
 
 class TestStrRange(TestCase):
     def test_last(self):

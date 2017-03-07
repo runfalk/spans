@@ -4,6 +4,14 @@ Version are structured like the following: ``<major>.<minor>.<bugfix>``. The
 first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
+Version 0.4.0
+-------------
+Released on <unreleased>
+
+- Fixed :class:`~spans.types.daterange` not accepting subclasses of ``date``
+  (`bug #5 <https://github.com/runfalk/spans/issues/5>`_)
+
+
 Version 0.3.0
 -------------
 Released on 26th August, 2016

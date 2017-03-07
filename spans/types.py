@@ -938,6 +938,22 @@ class strrange(discreterange):
         else:
             return curr[:-1] + uchr(ord(curr[-1]) - 1)
 
+
+def _is_valid_date(obj, accept_none=True):
+    """
+    Check if an object is an instance of, or a subclass deriving from, a
+    ``date``. However, it does not consider ``datetime`` or subclasses thereof
+    as valid dates.
+
+    :param obj: Object to test as date.
+    :param accept_none: If True None is considered as a valid date object.
+    """
+
+    if accept_none and obj is None:
+        return True
+    return isinstance(obj, date) and not isinstance(obj, datetime)
+
+
 class daterange(discreterange, offsetablerange):
     """
     Range that operates on ``datetime.date``.
@@ -961,14 +977,14 @@ class daterange(discreterange, offsetablerange):
     step = timedelta(days=1)
 
     def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
-        if lower is not None and type(lower) is not date:
+        if not _is_valid_date(lower, accept_none=True):
             raise TypeError((
                 "Invalid type for lower bound '{lower_type.__name__}'"
                 " expected '{expected_type.__name__}'").format(
                     expected_type=self.type,
                     lower_type=lower.__class__))
 
-        if upper is not None and type(upper) is not date:
+        if not _is_valid_date(upper, accept_none=True):
             raise TypeError((
                 "Invalid type for upper bound '{upper_type.__name__}'"
                 " expected '{expected_type.__name__}'").format(
