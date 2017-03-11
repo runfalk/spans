@@ -144,7 +144,7 @@ For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
     :scale: 100%
     :target: http://spans.readthedocs.org/en/latest/
 
-.. |pypi-version| image:: https://badge.fury.io/py/spans.svg
+.. |pypi-version| image:: https://badge.fury.io/py/Spans.svg
     :alt: PyPI version status
     :scale: 100%
     :target: https://pypi.python.org/pypi/Spans/
