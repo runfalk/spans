@@ -889,15 +889,15 @@ class strrange(discreterange):
     Range that operates on unicode strings. Next character is determined
     lexicographically. Representation might seem odd due to normalization.
 
-        >>> strrange(u"a", u"z") # doctest: +IGNORE_UNICODE
+        >>> strrange(u"a", u"z")
         strrange([u'a',u'z'))
-        >>> strrange(u"a", u"z", upper_inc=True) # doctest: +IGNORE_UNICODE
+        >>> strrange(u"a", u"z", upper_inc=True)
         strrange([u'a',u'{'))
 
     Iteration over a strrange is only sensible when having single character
     boundaries.
 
-        >>> list(strrange(u"a", u"e", upper_inc=True)) # doctest: +IGNORE_UNICODE
+        >>> list(strrange(u"a", u"e", upper_inc=True))
         [u'a', u'b', u'c', u'd', u'e']
         >>> len(list(strrange(u"aa", u"zz", upper_inc=True))) # doctest: +SKIP
         27852826

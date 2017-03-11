@@ -23,7 +23,7 @@ the 90s.
     >>> date(2000, 1, 1) in the90s
     False
     >>> the90s.union(daterange(date(2000, 1, 1), date(2010, 1, 1)))
-    daterange([datetime.date(1990, 1, 1), datetime.date(2010, 1, 1))))
+    daterange([datetime.date(1990, 1, 1),datetime.date(2010, 1, 1)))
 
 If you are making a booking application for a bed and breakfast hotel and want
 to ensure no room gets double booked:

@@ -534,7 +534,7 @@ class strrangeset(rangeset):
 
         >>> strrangeset([
         ...     strrange(u"a", u"f", upper_inc=True),
-        ...     strrange(u"0", u"9", upper_inc=True)]) # doctest: +IGNORE_UNICODE
+        ...     strrange(u"0", u"9", upper_inc=True)])
         strrangeset([strrange([u'0',u':')), strrange([u'a',u'g'))])
 
     Inherits methods from :class:`~spans.settypes.rangeset` and

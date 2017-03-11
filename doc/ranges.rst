@@ -73,7 +73,7 @@ Range sets are sets of intervals, where each element must be represented by one 
 .. code-block:: python
 
 	>>> intrangeset([intrange(1, 5), intrange(10, 15)])
-	intrangeset([intrange([1, 5)), intrange([10,15))])
+	intrangeset([intrange([1,5)), intrange([10,15))])
 
 Like ranges, range sets support :class:`~spans.settypes.rangeset.union`, :class:`~spans.settypes.rangeset.difference` and :class:`~spans.settypes.rangeset.intersection`. Contrary to Python's built in sets these operations do not modify the range set in place. Instead it returns a new set. Unchanged ranges are reused to conserve memory since ranges are immutable.
 

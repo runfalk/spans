@@ -5,6 +5,7 @@ import os
 
 from setuptools import setup
 
+
 class RstPreProcessor(object):
     def __init__(self):
         self.roles = {}
@@ -80,7 +81,7 @@ rst_pre_processor = RstPreProcessor()
 @rst_pre_processor.add_role("class")
 @rst_pre_processor.add_role("attr")
 @rst_pre_processor.add_role("meth")
-def role_simplyfier(processor, role, argument, content):
+def role_simplifier(processor, role, argument, content):
     format = {
         "attr": "``.{}``",
         "meth": "``{}()``",
@@ -91,20 +92,16 @@ def role_simplyfier(processor, role, argument, content):
     else:
         return format.get(role, "``{}``").format(content + extra.get(role, ""))
 
-@rst_pre_processor.add_block("image")
-def image_remover(processor, block, args, extra, content):
-    if extra is not None:
-        processor.add_replacement(extra, "")
-    return ""
 
 @rst_pre_processor.add_block("include")
 def includer(processor, block, args, extra, content):
     with open(args) as fp:
         return fp.read().rstrip()
 
+
 def rst_preprocess(file):
     """
-    Preprocess rST file to support Sphinx like include directive. Includes are
+    Preprocess reST file to support Sphinx like include directive. Includes are
     relative to the current working directory.
     """
 
@@ -115,16 +112,14 @@ def rst_preprocess(file):
             fp.read(),
             flags=re.MULTILINE)
 
+
 with open("README.rst") as fp:
     long_desc = rst_pre_processor.process(fp.read())
+
 
 with open("spans/__init__.py") as fp:
     version = re.search('__version__\s+=\s+"([^"]+)', fp.read()).group(1)
 
-requirements = []
-if os.path.exists("requirements.txt"):
-    with open("requirements.txt") as fp:
-        requirements = fp.read().split("\n")
 
 if __name__ == "__main__":
     setup(
@@ -137,7 +132,7 @@ if __name__ == "__main__":
         author_email="andreas@runfalk.se",
         url="https://www.github.com/runfalk/spans",
         packages=["spans"],
-        install_requires=requirements,
+        install_requires=[],
         classifiers=(
             "Development Status :: 5 - Production/Stable",
             "Intended Audience :: Developers",
@@ -152,5 +147,4 @@ if __name__ == "__main__":
             "Topic :: Utilities"
         ),
         zip_safe=False,
-        test_suite="spans.tests.suite"
     )

@@ -10,7 +10,9 @@ Released on <unreleased>
 
 - Fixed :class:`~spans.types.daterange` not accepting subclasses of ``date``
   (`bug #5 <https://github.com/runfalk/spans/issues/5>`_)
-
+- Fixed some broken doctests
+- Moved unit tests to `pytest <http://docs.pytest.org/en/latest/>`_
+- Removed `Tox <https://tox.readthedocs.io/en/latest/>`_ config
 
 Version 0.3.0
 -------------
