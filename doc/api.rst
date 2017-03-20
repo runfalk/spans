@@ -40,6 +40,11 @@ Date range
 .. autoclass:: spans.types.daterange
    :members: from_date
 
+Typed date range
+~~~~~~~~~~~~~~~~
+.. autoclass:: spans.types.TypedDateRange
+   :members:
+
 Datetime range
 ~~~~~~~~~~~~~~
 .. autoclass:: spans.types.datetimerange
@@ -47,6 +52,7 @@ Datetime range
 Timedelta range
 ~~~~~~~~~~~~~~~
 .. autoclass:: spans.types.timedeltarange
+
 
 Range sets
 ----------

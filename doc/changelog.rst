@@ -8,11 +8,26 @@ Version 0.4.0
 -------------
 Released on <unreleased>
 
+- Added new argument to :meth:`~spans.types.daterange.from_date` for working
+  with different kinds of date intervals. The argument accepts a period of either
+  ``"day"`` (default), ``"week"`` (ISO week), ``"american_week"`` (starts on
+  sunday), ``"month"``, ``"quarter"`` or ``"year"``.
+- Added new methods to :class:`~spans.types.daterange` for working with different
+  kinds of date intervals:
+  :meth:`~spans.types.daterange.from_week`,
+  :meth:`~spans.types.daterange.from_month`,
+  :meth:`~spans.types.daterange.from_quarter` and
+  :meth:`~spans.types.daterange.from_year`.
+- Added a new class :class:`~spans.types.PeriodRange` for working with periods
+  like weeks, months, quarters or years. It inherits all methods from
+  :class:`~spans.types.daterange` and is aware of its own period type. It
+  allows things like getting the previous or next week.
 - Fixed :class:`~spans.types.daterange` not accepting subclasses of ``date``
   (`bug #5 <https://github.com/runfalk/spans/issues/5>`_)
 - Fixed some broken doctests
 - Moved unit tests to `pytest <http://docs.pytest.org/en/latest/>`_
 - Removed `Tox <https://tox.readthedocs.io/en/latest/>`_ config
+- Minor documentation tweaks
 
 Version 0.3.0
 -------------

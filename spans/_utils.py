@@ -1,11 +1,35 @@
 """Helper functions"""
 
+from datetime import date, datetime, timedelta
+
 from ._compat import *
 
 __all__ = [
+    "date_from_iso_week",
     "find_slots",
-    "PicklableSlotMixin"
+    "PicklableSlotMixin",
+    "sane_total_ordering",
 ]
+
+def date_from_iso_week(year, week, day_of_week=None):
+    if day_of_week is None:
+        day_of_week = 1
+
+    if not 1 <= day_of_week <= 7:
+        raise ValueError(
+            "Day of week is not in range 1 through 7, got {!r}".format(day_of_week))
+
+    day = datetime.strptime(
+        "{:04d}-{:02d}-{:d}".format(year, week, day_of_week), "%Y-%W-%w")
+
+    # ISO week 1 is defined as the first week to have 4 or more days in January.
+    # Python's built-in date parsing considers the week that contain the first
+    # Monday of the year to be the first week.
+    if date(year, 1, 4).isoweekday() > 4:
+        day -= timedelta(days=7)
+
+    return day.date()
+
 
 def find_slots(cls):
     """Return a set of all slots for a given class and its parents"""
@@ -23,6 +47,7 @@ def find_slots(cls):
 
     return slots
 
+
 class PicklableSlotMixin(object):
     __slots__ = ()
 
@@ -32,6 +57,7 @@ class PicklableSlotMixin(object):
     def __setstate__(self, data):
         for attr, value in data.items():
             setattr(self, attr, value)
+
 
 def sane_total_ordering(cls):
     def __ge__(self, other):

@@ -9,14 +9,16 @@ from .types import discreterange, offsetablerange
 # Imports needed for doctests in date range sets
 from datetime import *
 
+
 __all__ = [
     "intrangeset",
     "floatrangeset",
     "strrangeset",
     "daterangeset",
     "datetimerangeset",
-    "timedeltarangeset"
+    "timedeltarangeset",
 ]
+
 
 class metarangeset(type):
     """
@@ -41,6 +43,15 @@ class metarangeset(type):
     def add(cls, range_mixin, range_set_mixin):
         cls.mixin_map[range_mixin] = range_set_mixin
 
+    @classmethod
+    def register(cls, range_mixin):
+        def decorator(range_set_mixin):
+            cls.add(range_mixin, range_set_mixin)
+            return range_set_mixin
+        return decorator
+
+
+@metarangeset.register(discreterange)
 class discreterangeset(object):
     """
     Mixin that adds support for discrete range set operations. Automatically used
@@ -61,9 +72,9 @@ class discreterangeset(object):
         """
 
         return chain(*self)
-metarangeset.add(discreterange, discreterangeset)
 
 
+@metarangeset.register(offsetablerange)
 class offsetablerangeset(object):
     """
     Mixin that adds support for offsetable range set operations. Automatically used
@@ -88,7 +99,6 @@ class offsetablerangeset(object):
         """
 
         return self.__class__(r.offset(offset) for r in self)
-metarangeset.add(offsetablerange, offsetablerangeset)
 
 
 @sane_total_ordering
@@ -492,6 +502,7 @@ class rangeset(object):
     # Python 3 support
     __bool__ = __nonzero__
 
+
 class intrangeset(rangeset):
     """
     Range set that operates on intranges.
@@ -509,6 +520,7 @@ class intrangeset(rangeset):
     __slots__ = ()
 
     type = intrange
+
 
 class floatrangeset(rangeset):
     """
@@ -528,6 +540,7 @@ class floatrangeset(rangeset):
 
     type = floatrange
 
+
 class strrangeset(rangeset):
     """
     Range set that operates on strranges.
@@ -546,6 +559,7 @@ class strrangeset(rangeset):
     __slots__ = ()
 
     type = strrange
+
 
 class daterangeset(rangeset):
     """
@@ -567,6 +581,7 @@ class daterangeset(rangeset):
 
     type = daterange
 
+
 class datetimerangeset(rangeset):
     """
     Range set that operates on datetimeranges.
@@ -585,6 +600,7 @@ class datetimerangeset(rangeset):
     __slots__ = ()
 
     type = datetimerange
+
 
 class timedeltarangeset(rangeset):
     """

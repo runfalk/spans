@@ -4,7 +4,8 @@ from collections import namedtuple
 from datetime import date, datetime, timedelta
 
 from ._compat import *
-from ._utils import PicklableSlotMixin, sane_total_ordering
+from ._utils import date_from_iso_week, PicklableSlotMixin, sane_total_ordering
+
 
 __all__ = [
     "intrange",
@@ -12,12 +13,15 @@ __all__ = [
     "strrange",
     "daterange",
     "datetimerange",
-    "timedeltarange"
+    "timedeltarange",
+    "PeriodRange",
 ]
+
 
 _internal_range = namedtuple(
     "_internal_range", ["lower", "upper", "lower_inc", "upper_inc", "empty"])
 _empty_internal_range = _internal_range(None, None, False, False, True)
+
 
 @sane_total_ordering
 class range_(PicklableSlotMixin):
@@ -91,6 +95,16 @@ class range_(PicklableSlotMixin):
         self = cls.__new__(cls)
         self._range = _empty_internal_range
         return self
+
+
+    @classmethod
+    def is_valid_range(cls, obj):
+        return isinstance(obj, cls)
+
+
+    @classmethod
+    def is_valid_scalar(cls, obj):
+        return isinstance(obj, cls.type)
 
     def replace(self, *args, **kwargs):
         """
@@ -217,12 +231,12 @@ class range_(PicklableSlotMixin):
         return self._range.upper is None and not self._range.empty
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
+        if not self.is_valid_range(other):
             return NotImplemented
         return self._range == other._range
 
     def __lt__(self, other):
-        if not isinstance(other, self.__class__):
+        if not self.is_valid_range(other):
             return NotImplemented
         elif self.lower == other.lower:
             if self.lower_inc != other.lower_inc:
@@ -265,14 +279,14 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If `other` is not of the correct type.
         """
 
-        if isinstance(other, self.__class__):
+        if self.is_valid_range(other):
             if not self:
                 return not other
             elif not other or other.startsafter(self) and other.endsbefore(self):
                 return True
             else:
                 return False
-        elif isinstance(other, self.type):
+        elif self.is_valid_scalar(other):
             if self.lower_inc and self.upper_inc:
                 return self.lower <= other <= self.upper
             elif self.lower_inc:
@@ -302,10 +316,11 @@ class range_(PicklableSlotMixin):
                  otherwise ``False``.
         :raises TypeError: If given range is of the wrong type.
 
-        See also :meth:`~spans.types.range_.contains`.
+        .. seealso::
+           :meth:`~spans.types.range_.contains`
         """
 
-        if not isinstance(other, self.__class__):
+        if not self.is_valid_range(other):
             raise TypeError(
                 "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
                     other))
@@ -347,7 +362,7 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If given argument is of invalid type
         """
 
-        if not isinstance(other, self.__class__):
+        if not self.is_valid_range(other):
             raise TypeError(
                 "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
                     other))
@@ -503,20 +518,20 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If `other` is of the wrong type.
         """
 
-        if isinstance(other, self.__class__):
+        if self.is_valid_range(other):
             if self.lower_inc == other.lower_inc:
                 return self.lower == other.lower
             else:
                 return False
-        elif isinstance(other, self.type):
+        elif self.is_valid_scalar(other):
             if self.lower_inc:
                 return self.lower == other
             else:
                 return False
         else:
             raise TypeError(
-                "Unsupported type to test for starts with '{0.__class__.__name__}'".format(
-                    other))
+                "Unsupported type to test for starts with '{}'".format(
+                    other.__class__.__name__))
 
     def endswith(self, other):
         """
@@ -533,20 +548,20 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If `other` is of the wrong type.
         """
 
-        if isinstance(other, self.__class__):
+        if self.is_valid_range(other):
             if self.upper_inc == other.upper_inc:
                 return self.upper == other.upper
             else:
                 return False
-        elif isinstance(other, self.type):
+        elif self.is_valid_scalar(other):
             if self.upper_inc:
                 return self.upper == other
             else:
                 return False
         else:
             raise TypeError(
-                "Unsupported type to test for ends with '{0.__class__.__name__}'".format(
-                    other))
+                "Unsupported type to test for ends with '{}'".format(
+                    other.__class__.__name__))
 
     def startsafter(self, other):
         """
@@ -567,31 +582,30 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If `other` is of the wrong type.
         """
 
-        if isinstance(other, self.__class__):
+        if self.is_valid_range(other):
             if self.lower == other.lower:
-                return other.lower_inc if self.lower_inc else not other.lower_inc
+                return other.lower_inc or not self.lower_inc
             elif self.lower_inf:
                 return False
             elif other.lower_inf:
                 return True
             else:
                 return self.lower > other.lower
-        elif isinstance(other, self.type):
+        elif self.is_valid_scalar(other):
             return self.lower >= other
         else:
             raise TypeError(
-                "Unsupported type to test for starts after '{0.__class__.__name__}'".format(
-                    other))
+                "Unsupported type to test for starts after '{}'".format(
+                    other.__class__.__name__))
 
     def endsbefore(self, other):
-        """Returns True if self end either before or the same spot as other."""
         """
         Test if this range ends before `other`. `other` may be either range or
         scalar. This only takes the upper end of the ranges into consideration.
         If the scalar or the upper end of the given range is less than or equal
         to this range's upper end, ``True`` is returned.
 
-            >>> intrange(1, 5).endsbefore(4)
+            >>> intrange(1, 5).endsbefore(5)
             True
             >>> intrange(1, 5).endsbefore(intrange(1, 5))
             True
@@ -601,21 +615,21 @@ class range_(PicklableSlotMixin):
         :raises TypeError: If `other` is of the wrong type.
         """
 
-        if isinstance(other, self.__class__):
+        if self.is_valid_range(other):
             if self.upper == other.upper:
-                return other.upper_inc if self.upper_inc else not other.upper_inc
+                return not self.upper_inc or other.upper_inc
             elif self.upper_inf:
                 return False
             elif other.upper_inf:
                 return True
             else:
                 return self.upper <= other.upper
-        elif isinstance(other, self.type):
+        elif self.is_valid_scalar(other):
             return self.upper <= other
         else:
             raise TypeError(
-                "Unsupported type to test for ends before '{0.__class__.__name__}'".format(
-                    other))
+                "Unsupported type to test for ends before '{}'".format(
+                    other.__class__.__name__))
 
     def left_of(self, other):
         """
@@ -676,6 +690,7 @@ class range_(PicklableSlotMixin):
 
     # Python 3 support
     __bool__ = __nonzero__
+
 
 class discreterange(range_):
     """
@@ -783,7 +798,7 @@ class discreterange(range_):
     def endswith(self, other):
         # Discrete ranges have a last element even in cases when upper bound is
         # not included in set
-        if isinstance(other, self.type):
+        if self.is_valid_scalar(other):
             return self.last == other
         else:
             return super(discreterange, self).endswith(other)
@@ -793,6 +808,7 @@ class discreterange(range_):
         while next < self.upper:
             yield next
             next = self.next(next)
+
 
 class offsetablerange(object):
     """
@@ -850,6 +866,7 @@ class offsetablerange(object):
 
         return self.replace(lower=lower, upper=upper)
 
+
 class intrange(discreterange, offsetablerange):
     """
     Range that operates on int.
@@ -869,6 +886,7 @@ class intrange(discreterange, offsetablerange):
     def __len__(self):
         return self.upper - self.lower
 
+
 class floatrange(range_, offsetablerange):
     """
     Range that operates on float.
@@ -883,6 +901,7 @@ class floatrange(range_, offsetablerange):
     __slots__ = ()
 
     type = float
+
 
 class strrange(discreterange):
     """
@@ -994,7 +1013,7 @@ class daterange(discreterange, offsetablerange):
         super(daterange, self).__init__(lower, upper, lower_inc, upper_inc)
 
     @classmethod
-    def from_date(cls, date, what=None):
+    def from_date(cls, date, period=None):
         """
         Create a day long daterange from for the given date.
 
@@ -1002,28 +1021,129 @@ class daterange(discreterange, offsetablerange):
             daterange([datetime.date(2000, 1, 1),datetime.date(2000, 1, 2)))
 
         :param date: A date to convert.
+        :param period: The period to normalize date to. A period may be one of:
+                       ``day`` (default), ``week``, ``american_week``,
+                       ``month``, ``quarter`` or ``year``.
         :return: A new range that contains the given date.
+
+
+        .. seealso::
+
+           There are convenience methods for most period types:
+           :meth:`~spans.types.daterange.from_week`,
+           :meth:`~spans.types.daterange.from_month`,
+           :meth:`~spans.types.daterange.from_quarter` and
+           :meth:`~spans.types.daterange.from_year`.
+
+           :class:`~spans.types.PeriodRange` has the same interface but is
+           period aware. This means it is possible to get things like next week
+           or month.
+
+        .. versionchanged:: 0.4.0
+           Added the period parameter.
         """
 
-        # TODO: Add subclasses that support stepping between the intervals.
-        #       Calling next for a week would result in the coming week
-        if what is None or what == "day":
+        if period is None or period == "day":
             return cls(date, date, upper_inc=True)
-        elif what == "week":
+        elif period == "week":
             start = date - timedelta(date.weekday())
             return cls(start, start + timedelta(7))
-        elif what == "american_week":
+        elif period == "american_week":
             start = date - timedelta((date.weekday() + 1) % 7)
             return cls(start, start + timedelta(7))
-        elif what == "month":
+        elif period == "month":
             start = date.replace(day=1)
             return cls(start, (start + timedelta(31)).replace(day=1))
-        elif what == "quarter":
+        elif period == "quarter":
             start = date.replace(month=(date.month - 1) // 3 * 3 + 1, day=1)
             return cls(start, (start + timedelta(93)).replace(day=1))
-        elif what == "year":
+        elif period == "year":
             start = date.replace(month=1, day=1)
             return cls(start, (start + timedelta(366)).replace(day=1))
+        else:
+            raise ValueError("Unexpected period, got {!r}".format(period))
+
+    @classmethod
+    def from_week(cls, year, iso_week):
+        """
+        Create ``daterange`` based on a year and an ISO week
+
+        :param year: Year as an integer
+        :param iso_week: ISO week number
+        :return: A new ``daterange`` for the given week
+
+        .. versionadded:: 0.4.0
+        """
+
+        first_day = date_from_iso_week(year, iso_week)
+        return cls.from_date(first_day, period="week")
+
+    # NOTE: from_american_week doesn't exist since I don't know enough about
+    #       their calendar, if they even use enumerated weeks.
+
+    @classmethod
+    def from_month(cls, year, month):
+        """
+        Create ``daterange`` based on a year and amonth
+
+        :param year: Year as an integer
+        :param iso_week: Month as an integer between 1 and 12
+        :return: A new ``daterange`` for the given month
+
+        .. versionadded:: 0.4.0
+        """
+
+        first_day = date(year, month, 1)
+        return cls.from_date(first_day, period="month")
+
+    @classmethod
+    def from_quarter(cls, year, quarter):
+        """
+        Create ``daterange`` based on a year and quarter.
+
+        A quarter is considered to be:
+
+        - January through March (Q1),
+        - April through June (Q2),
+        - July through September (Q3) or,
+        - October through December (Q4)
+
+        :param year: Year as an integer
+        :param quarter: Quarter as an integer between 1 and 4
+        :return: A new ``daterange`` for the given quarter
+
+        .. versionadded:: 0.4.0
+        """
+
+        quarter_months = {
+            1: 1,
+            2: 4,
+            3: 7,
+            4: 10,
+        }
+
+        if quarter not in quarter_months:
+            error_msg = (
+                "quarter is not a valid quarter. Expected a value between 1 "
+                "and 4 got {!r}")
+            raise ValueError(error_msg.format(quarter))
+
+        first_day = date(year, quarter_months[quarter], 1)
+        return cls.from_date(first_day, period="quarter")
+
+    @classmethod
+    def from_year(cls, year):
+        """
+        Create ``daterange`` based on a year
+
+        :param year: Year as an integer
+        :return: A new ``daterange`` for the given year
+
+        .. versionadded:: 0.4.0
+        """
+
+        first_day = date(year, 1, 1)
+        return cls.from_date(first_day, period="year")
 
     def __len__(self):
         """
@@ -1038,6 +1158,7 @@ class daterange(discreterange, offsetablerange):
             raise ValueError("Unbounded ranges don't have a length")
 
         return (self.upper - self.lower).days
+
 
 class datetimerange(range_, offsetablerange):
     """
@@ -1060,6 +1181,7 @@ class datetimerange(range_, offsetablerange):
     type = datetime
     offset_type = timedelta
 
+
 class timedeltarange(range_, offsetablerange):
     """
     Range that operates on datetime's timedelta class.
@@ -1079,3 +1201,125 @@ class timedeltarange(range_, offsetablerange):
     __slots__ = ()
 
     type = timedelta
+
+
+class PeriodRange(daterange):
+    """
+    A type aware version of :class:`~spans.types.daterange`.
+
+    Type aware refers to being aware of what kind of range it represents.
+    Available types are the same as the ``type`` argument for to
+    :meth:`~spans.types.daterange.from_date`.
+
+    Some methods are unavailable due since they don't make sense for
+    :class:`~spans.types.PeriodRange`, and some may return a normal
+    :class:`~spans.types.daterange` since they may modifify the range in ways
+    not compatible with its type.
+
+    .. note::
+
+       This class does not have a range set implementation
+
+    .. versionadded:: 0.4.0
+    """
+
+    __slots__ = ("period")
+
+    @classmethod
+    def empty(cls):
+        """
+        :raise TypeError: since typed date ranges must never be empty
+        """
+
+        raise TypeError("{} does not support empty ranges".format(cls.__name__))
+
+    # We override the is valid check here because dateranges will not be
+    # accepted as valid arguments otherwise.
+    @classmethod
+    def is_valid_range(cls, other):
+        return isinstance(other, daterange)
+
+    @classmethod
+    def from_date(cls, day, period=None):
+        span = daterange.from_date(day, period=period)
+
+        new_span = cls()
+        new_span._range = span._range
+        new_span.period = period
+
+        return new_span
+
+    @property
+    def daterange(self):
+        # We don't have to consider empty ranges, since a typed date range is
+        # never empty
+        return daterange(
+            lower=self.lower,
+            upper=self.upper,
+            lower_inc=self.lower_inc,
+            upper_inc=self.upper_inc)
+
+    def offset(self, offset):
+        """
+        Offset the date range by the given amount of periods.
+
+        This differs from :meth:`~spans.types.offsetablerange.offset` by not
+        accepting a ``timedelta`` object. Instead it expects an integer to
+        adjust the typed date range by. The given value may be negative as well.
+
+        :param offset: Number of periods to offset this range by. A period is
+                       either a day, week, american week, month, quarter or
+                       year, depending on this range's period type.
+        :return: New offset :class:`~spans.types.PeriodRange`
+        """
+
+        span = self
+        if offset > 0:
+            for i in iter_range(offset):
+                span = span.next_period()
+        elif offset < 0:
+            for i in iter_range(-offset):
+                span = span.prev_period()
+        return span
+
+    def prev_period(self):
+        """
+        The period before this range.
+
+            >>> span = PeriodRange.from_date(date(2000, 1, 1), period="month")
+            >>> span.prev_period()
+            PeriodRange([datetime.date(1999, 12, 1),datetime.date(2000, 1, 1)))
+
+        :return: A new :class:`~spans.types.PeriodRange` for the period
+                 before this period
+        """
+
+        return self.from_date(self.prev(self.lower), period=self.period)
+
+    def next_period(self):
+        """
+        The period after this range.
+
+            >>> span = PeriodRange.from_date(date(2000, 1, 1), period="month")
+            >>> span.next_period()
+            PeriodRange([datetime.date(2000, 2, 1),datetime.date(2000, 3, 1)))
+
+        :return: A new :class:`~spans.types.PeriodRange` for the period after
+                 this period
+        """
+
+        # We can use this shortcut since dateranges are always normalized
+        return self.from_date(self.upper, period=self.period)
+
+    # Override methods that modifies the range to return a daterange instead
+    def replace(self, *args, **kwargs):
+        return self.daterange.replace(*args, **kwargs)
+
+    def union(self, other):
+        return self.daterange.union(other)
+
+    def intersection(self, other):
+        return self.daterange.intersection(other)
+
+    def difference(self, other):
+        return self.daterange.difference(other)

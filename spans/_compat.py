@@ -3,26 +3,35 @@
 import sys
 
 __all__ = [
-    "python3",
-    "version",
+    "add_metaclass",
+    "is_python2",
+    "iter_range",
     "bstr",
-    "ustr",
     "uchr",
-    "add_metaclass"
+    "ustr",
+    "version",
 ]
 
-version = tuple(map(int, sys.version.split(".")[0:2]))
-python3 = False
+version = sys.version_info[:2]
 
 if version >= (3, 0):
-    python3 = True
+    is_python2 = False
 
     if version < (3, 3):
         raise ImportError("Module is only compatible with Python (<=2.7, >=3.3)")
 
-    bstr, ustr, uchr = bytes, str, chr
+    bstr = bytes
+    ustr = str
+    uchr = chr
+    iter_range = range
 else:
-    bstr, ustr, uchr = str, unicode, unichr
+    is_python2 = True
+
+    bstr = str
+    ustr = unicode
+    uchr = unichr
+    iter_range = xrange
+
 
 def add_metaclass(metaclass):
     """
