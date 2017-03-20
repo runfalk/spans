@@ -1,84 +1,16 @@
 Spans
 =====
-|test-status| |test-coverage| |documentation-status| |pypi-version|
+|test-status| |test-coverage| |documentation-status| |pypi-version| |license|
 
-Spans is a pure Python implementation of PostgreSQL's range types [#]_. Range types
-are conveinent when working with intervals of any kind. Every time you've found
-yourself working with date_start and date_end, an interval may have been what
-you were actually looking for.
+Spans is a pure Python implementation of PostgreSQL's
+`range types <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_.
+Range types are conveinent when working with intervals of any kind. Every time
+you've found yourself working with date_start and date_end, an interval may have
+been what you were actually looking for.
 
 Spans has successfully been used in production since its first release
 30th August, 2013.
 
-Here is an example on how to use ranges to determine if something happened in
-the 90s.
-
-.. code-block:: python
-
-    >>> from spans import daterange
-    >>> from datetime import date
-    >>> the90s = daterange(date(1990, 1, 1), date(2000, 1, 1))
-    >>> date(1996, 12, 4) in the90s
-    True
-    >>> date(2000, 1, 1) in the90s
-    False
-    >>> the90s.union(daterange(date(2000, 1, 1), date(2010, 1, 1)))
-    daterange([datetime.date(1990, 1, 1),datetime.date(2010, 1, 1)))
-
-If you are making a booking application for a bed and breakfast hotel and want
-to ensure no room gets double booked:
-
-.. code-block:: python
-
-    from collections import defaultdict
-    from datetime import date
-    from spans import daterange
-
-    # Add a booking from 2013-01-14 through 2013-01-15
-    bookings = defaultdict(list, {
-        1 : [daterange(date(2013, 1, 14), date(2013, 1, 16))]
-    }
-
-    def is_valid_booking(bookings, room, new_booking):
-        return not any(booking.overlap(new_booking for booking in bookings[room])
-
-    print is_valid_booking(
-        bookings, 1, daterange(date(2013, 1, 14), date(2013, 1, 18))) # False
-    print is_valid_booking(
-        bookings, 1, daterange(date(2013, 1, 16), date(2013, 1, 18))) # True
-
-The library supports ranges and sets of ranges. A ``range`` has no discontinuities
-between its endpoints. For some applications this is a requirement and hence the
-``rangeset`` type exists.
-
-Apart from the above mentioned overlap operation; ranges support ``union``,
-``difference``, ``intersection``, ``contains``, ``startswith``, ``endswith``,
-``left_of`` and ``right_of``.
-
-Built-in ranges:
-
-- ``intrange``
-- ``floatrange``
-- ``strrangerange`` - For ``unicode`` strings
-- ``daterange``
-- ``datetimerange``
-- ``timedeltarange``
-
-For each one of the ``range`` types a ``rangeset`` type exists as well:
-
-- ``intrangeset``
-- ``floatrangeset``
-- ``strrangerangeset``
-- ``daterangeset``
-- ``datetimerangeset``
-- ``timedeltarangeset``
-
-Motivation
-----------
-For a recent project of mine I started using PostgreSQL's ``tsrange`` type and
-needed an equivalent in Python. These range types attempt to mimick PostgreSQL's
-behavior in every way. Deviating from it is considered as a bug and should be
-reported.
 
 Installation
 ------------
@@ -88,46 +20,85 @@ Spans exists on PyPI.
 
     $ pip install Spans
 
-Documentation
--------------
 `Documentation <http://spans.readthedocs.org/en/latest/>`_ is hosted on Read the
 Docs.
 
-Use with Psycopg2
------------------
-To use these range types with Psycopg2 the PsycoSpans library exists [#]_.
 
-Custom range types
-------------------
-Using your own types for ranges are easy, just extend a base class and you're
-good to go:
+Example
+-------
+Imagine you are building a calendar and want to display all weeks that overlaps
+the current month. Normally you have to do some date trickery to achieve this,
+since the month's bounds may be any day of the week. With Spans' set-like
+operations and shortcuts the problem becomes a breeze.
+
+We start by importing ``date`` and ``daterange``
 
 .. code-block:: python
 
-    from spans.types import range_, discreterange
-    from spans.settypes import rangeset, discreterangeset
+    >>> from datetime import date
+    >>> from spans import daterange
 
-    class intrange(discreterange):
-        __slots__ = ()
-        type = int
-        step = 1
+Using ``daterange.from_month`` we can get range representing January in the year
+2000
 
-    class intrangeset(discreterangeset):
-        __slots__ = ()
-        type = intrange
+.. code-block:: python
 
-    class floatrange(range_):
-        __slots__ = ()
-        type = float
+    >>> month = daterange.from_month(2000, 1)
+    >>> month
+    daterange([datetime.date(2000, 1, 1),datetime.date(2000, 2, 1)))
 
-    class floatrangeset(rangeset):
-        __slots__ = ()
-        type = floatrange
+Now we can calculate the ranges for the weeks where the first and last day of
+month are
 
-For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
+.. code-block:: python
 
-.. [#] http://www.postgresql.org/docs/9.2/static/rangetypes.html
-.. [#] https://www.github.com/runfalk/psycospans
+    >>> start_week = daterange.from_date(month.lower, period="week")
+    >>> end_week = daterange.from_date(month.last, period="week")
+    >>> start_week
+    daterange([datetime.date(1999, 12, 27),datetime.date(2000, 1, 3)))
+    >>> end_week
+    daterange([datetime.date(2000, 1, 31),datetime.date(2000, 2, 7)))
+
+Using a union we can express the calendar view.
+
+.. code-block:: python
+
+    >>> start_week.union(month).union(end_week)
+    daterange([datetime.date(1999, 12, 27),datetime.date(2000, 2, 7)))
+
+Do you want to know more? Head over to the
+`documentation <http://spans.readthedocs.org/en/latest/>`_.
+
+
+Use with Psycopg2
+-----------------
+To use these range types with Psycopg2 the
+`PsycoSpans <https://www.github.com/runfalk/psycospans>`_.
+
+
+Motivation
+----------
+For a project of mine I started using PostgreSQL's ``tsrange`` type and needed
+an equivalent in Python. These range types attempt to mimick PostgreSQL's
+behavior in every way. Deviating from it is considered as a bug and should be
+reported.
+
+
+Contribute
+----------
+I appreciate all the help I can get! Some things to think about:
+
+- If it's a simple fix, such as documentation or trivial bug fix, please file
+  an issue or submit a pull request. Make sure to only touch lines relevant to
+  the issue. I don't accept pull requests that simply reformat the code to be
+  PEP8-compliant. To me the history of the repository is more important.
+- If it's a feature request or a non-trivial bug, always open an issue first to
+  discuss the matter. It would be a shame if good work went to waste because a
+  pull request doesn't fit the scope of this project.
+
+Pull requests are credited in the change log which is displayed on PyPI and the
+documentaion on Read the Docs.
+
 
 .. |test-status| image:: https://travis-ci.org/runfalk/spans.svg
     :alt: Test status
@@ -148,6 +119,11 @@ For a deeper set of examples please refer to ``types.py`` and ``settypes.py``.
     :alt: PyPI version status
     :scale: 100%
     :target: https://pypi.python.org/pypi/Spans/
+
+.. |license| image:: https://img.shields.io/github/license/runfalk/spans.svg
+    :alt: MIT License
+    :scale: 100%
+    :target: https://github.com/runfalk/spans/blob/master/LICENSE
 
 .. Include changelog on PyPI
 
