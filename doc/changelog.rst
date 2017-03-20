@@ -6,7 +6,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 0.4.0
 -------------
-Released on <unreleased>
+Released on 20th March, 2017
 
 - Added new argument to :meth:`~spans.types.daterange.from_date` for working
   with different kinds of date intervals. The argument accepts a period of either

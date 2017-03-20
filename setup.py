@@ -132,7 +132,6 @@ if __name__ == "__main__":
         author_email="andreas@runfalk.se",
         url="https://www.github.com/runfalk/spans",
         packages=["spans"],
-        install_requires=[],
         classifiers=(
             "Development Status :: 5 - Production/Stable",
             "Intended Audience :: Developers",
@@ -145,6 +144,7 @@ if __name__ == "__main__":
             "Programming Language :: Python :: 3.4",
             "Programming Language :: Python :: 3.5",
             "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: Implementation :: CPython",
             "Programming Language :: Python :: Implementation :: PyPy",
             "Topic :: Utilities"
         ),

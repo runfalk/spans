@@ -10,6 +10,8 @@ Spans have no requirements but the standard library. It is known to work on the 
 - Python 3.3
 - Python 3.4
 - Python 3.5
+- Python 3.6
+- PyPy
 
 It may work on other version as well.
 
@@ -20,6 +22,7 @@ Spans is available from `PyPI <https://pypi.python.org/pypi/Spans/>`_.
 .. code-block:: bash
 
     $ pip install spans
+
 
 Example
 -------

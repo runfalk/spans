@@ -1,6 +1,6 @@
 Spans
 =====
-|test-status| |test-coverage| |documentation-status| |pypi-version| |license|
+|test-status| |test-coverage| |documentation-status| |pypi-version| |py-versions| |license|
 
 Spans is a pure Python implementation of PostgreSQL's
 `range types <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_.
@@ -117,6 +117,11 @@ documentaion on Read the Docs.
 
 .. |pypi-version| image:: https://badge.fury.io/py/Spans.svg
     :alt: PyPI version status
+    :scale: 100%
+    :target: https://pypi.python.org/pypi/Spans/
+
+.. |py-versions| image:: https://img.shields.io/pypi/pyversions/Spans.svg
+    :alt: Python version
     :scale: 100%
     :target: https://pypi.python.org/pypi/Spans/
 
