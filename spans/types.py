@@ -1207,7 +1207,7 @@ class PeriodRange(daterange):
     A type aware version of :class:`~spans.types.daterange`.
 
     Type aware refers to being aware of what kind of range it represents.
-    Available types are the same as the ``type`` argument for to
+    Available types are the same as the ``period`` argument for to
     :meth:`~spans.types.daterange.from_date`.
 
     Some methods are unavailable due since they don't make sense for
@@ -1215,11 +1215,12 @@ class PeriodRange(daterange):
     :class:`~spans.types.daterange` since they may modifify the range in ways
     not compatible with its type.
 
+    .. versionadded:: 0.4.0
+
     .. note::
 
-       This class does not have a range set implementation
-
-    .. versionadded:: 0.4.0
+       This class does not have its own range set implementation, but can be
+       used with :class:`~spans.settypes.daterangeset`.
     """
 
     __slots__ = ("period")
