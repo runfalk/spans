@@ -316,8 +316,7 @@ class range_(PicklableSlotMixin):
                  otherwise ``False``.
         :raises TypeError: If given range is of the wrong type.
 
-        .. seealso::
-           :meth:`~spans.types.range_.contains`
+        .. seealso:: :meth:`~spans.types.range_.contains`
         """
 
         if not self.is_valid_range(other):

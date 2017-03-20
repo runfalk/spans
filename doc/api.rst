@@ -21,7 +21,7 @@ Discrete range
 Offsetable range
 ~~~~~~~~~~~~~~~~
 .. autoclass:: spans.types.offsetablerange
-	:members: offset
+   :members: offset
 
 Integer range
 ~~~~~~~~~~~~~
@@ -38,11 +38,12 @@ String range
 Date range
 ~~~~~~~~~~
 .. autoclass:: spans.types.daterange
-   :members: from_date
+   :members:
+   :special-members: __len__
 
-Typed date range
-~~~~~~~~~~~~~~~~
-.. autoclass:: spans.types.TypedDateRange
+Period range
+~~~~~~~~~~~~
+.. autoclass:: spans.types.PeriodRange
    :members:
 
 Datetime range
@@ -71,7 +72,7 @@ Discrete range set
 Offsetable range set
 ~~~~~~~~~~~~~~~~~~~~
 .. autoclass:: spans.settypes.offsetablerangeset
-	:members: offset
+   :members: offset
 
 Integer range set
 ~~~~~~~~~~~~~~~~~
