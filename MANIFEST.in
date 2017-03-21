@@ -1,4 +1,9 @@
-recursive-include spans *.py
-recursive-include tests *.py
+include Makefile README.rst LICENSE
 
-include MANIFEST.in LICENSE README.rst Makefile setup.py setup.cfg doc/*.rst
+graft doc
+graft tests
+
+global-exclude *.py[co]
+
+prune doc/_build
+prune doc/_themes

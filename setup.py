@@ -132,6 +132,14 @@ if __name__ == "__main__":
         author_email="andreas@runfalk.se",
         url="https://www.github.com/runfalk/spans",
         packages=["spans"],
+        extras_require={
+            "dev": [
+                "pytest>=3.0",
+                "pytest-cov",
+                "codecov",
+                "twine",
+            ],
+        },
         classifiers=(
             "Development Status :: 5 - Production/Stable",
             "Intended Audience :: Developers",

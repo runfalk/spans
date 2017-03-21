@@ -1,8 +1,12 @@
 *.pyc
 *.pyo
 *.egg
-*.egg-info
-.tox/
+*.egg-info/
+
+.coverage
+
+.cache/
+build/
 dist/
-venv/
+*venv/
 doc/_build/
