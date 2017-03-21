@@ -1,3 +1,5 @@
+PYVER := $(shell python -c 'import sys; print("{0.major}.{0.minor}".format(sys.version_info))')
+
 build: test doc sdist wheel
 
 clean: clean-pyc clean-build
@@ -18,7 +20,11 @@ doc:
 	make -C doc/ html
 
 test:
+ifeq ($(PYVER), 2.7)
 	make -C doc/ doctest
+else
+	@echo "Skipping doctests as they only work on Python 2.7 due to unicode literals"
+endif
 	pytest
 
 sdist:
