@@ -4,6 +4,17 @@ Version are structured like the following: ``<major>.<minor>.<bugfix>``. The
 first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
+
+Version 0.5.0
+-------------
+Released on <unreleased>
+
+This release is a preparation for a stable 1.0 release.
+
+- Renamed classes to match :pep:`8#class-names` conventions. This does not apply
+  to classes that works on built-in that does not follow :pep:`8#class-names`.
+
+
 Version 0.4.0
 -------------
 Released on 20th March, 2017

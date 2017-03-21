@@ -2,15 +2,16 @@ Custom range types
 ==================
 The built in range types may not suffice for your particular application. It is very easy to extend with your own classes. The only requirement is that the type supports rich comparison :pep:`207` and is immutable.
 
+
 Standard range types
 --------------------
-A normal range can be implemented by extending :class:`spans.types.range_`.
+A normal range can be implemented by extending :class:`spans.types.Range`.
 
 .. code-block:: python
 
-	from spans.types import range_
+	from spans.types import Range
 
-	class floatrange(range_):
+	class floatrange(Range):
 		__slots__ = ()
 		type = float
 
@@ -22,15 +23,16 @@ A normal range can be implemented by extending :class:`spans.types.range_`.
 .. note::
 	The ``__slots__ = ()`` is a performance optimization that is used for all ranges. It lowers the memory footprint for every instance. It is not mandatory but encourgaged.
 
+
 Offsetable range types
 ----------------------
-An offsetable range can be implemented using the mixin :class:`spans.types.offsetablerange`. The class still needs to extend :class:`spans.types.range_`.
+An offsetable range can be implemented using the mixin :class:`spans.types.OffsetableRangeMixin`. The class still needs to extend :class:`spans.types.Range`.
 
 .. code-block:: python
 
-	from spans.types import range_, offsetablerange
+	from spans.types import Range, OffsetableRangeMixin
 
-	class floatrange(range_, offsetablerange):
+	class floatrange(Range, OffsetableRangeMixin):
 		__slots__ = ()
 		type = float
 
@@ -38,10 +40,10 @@ If the offset type is not the same as the range type (such as ``date`` that is o
 
 .. code-block:: python
 
-	from spans.types import discreterange, offsetablerange
+	from spans.types import DiscreteRange, OffsetableRangeMixin
 	from datetime import date, timedelta
 
-	class daterange(discreterange, offsetablerange):
+	class daterange(DiscreteRange, OffsetableRangeMixin):
 		__slots__ = ()
 
 		type = date
@@ -50,39 +52,42 @@ If the offset type is not the same as the range type (such as ``date`` that is o
 	span = daterange(date(2000, 1, 1), date(2000, 2, 1))
 	assert span.offset(timedelta(14)).upper == date(2000, 2, 15)
 
+
 Discrete range types
 --------------------
-Discrete ranges (such as :class:`~spans.types.intrange` and :class:`~spans.types.daterange`) can be implemented by extending :class:`spans.types.discreterange`.
+Discrete ranges (such as :class:`~spans.types.intrange` and :class:`~spans.types.daterange`) can be implemented by extending :class:`spans.types.DiscreteRange`.
 
 .. code-block:: python
 
-	from spans.types import discreterange, offsetablerange
+	from spans.types import DiscreteRange, OffsetableRangeMixin
 
-	class intrange(discreterange, offsetablerange):
+	class intrange(DiscreteRange, OffsetableRangeMixin):
 		__slots__ = ()
 		type = intrange
 		step = 1
 
 	assert list(intrange(1, 5)) == [1, 2, 3, 4]
 
-Note the `step` attribute. It must always be the smallest possible unit. Using `2` for intranges would not have expected behavior.
+Note the ``step`` attribute. It must always be the smallest possible unit. Using ``2`` for intranges would not have expected behavior.
+
 
 Range sets
 ----------
-Range sets are conveinient to implement regardless of the mixins used. This is due to the metaclass
+Range sets are conveinient to implement regardless of the mixins used. This is due to the metaclass :class:`spans.settypes.MetaRangeSet`. The metaclass automatically adds required mixins to the range set type.
 
 .. code-block:: python
 
 	from spans.types import intrange
-	from spans.settypes import rangeset
+	from spans.settypes import RangeSet
 
-	class intrangeset(rangetset):
+	class intrangeset(RangeSet):
 		__slots__ = ()
 		type = intrange
 
 	assert intrangeset(
 		[intrange(1, 5), intrange(10, 15)]).span() == intrange(1, 15)
 
+
 Custom mixins
 -------------
-It is possible to create custom mixins for range sets by adding mappings to :class:`spans.settypes.metarangeset`. The mapping has to be added before the range set class is created or it will not be used.
+It is possible to create custom mixins for range sets by adding mappings to :class:`spans.settypes.MetaRangeSet`. The mapping has to be added before the range set class is created or it will not be used.

@@ -1,7 +1,7 @@
-Welcome to Spans' documentation!
-================================
+Spans |release| documentation
+=============================
 Spans is a pure Python implementation of PostgreSQL's
-`range types <http://www.postgresql.org/docs/9.2/static/rangetypes.html>`_.
+`range types <http://www.postgresql.org/docs/9.6/static/rangetypes.html>`_.
 Range types are conveinent when working with intervals of any kind. Every time
 you've found yourself working with date_start and date_end, an interval may have
 been what you were actually looking for.
@@ -59,6 +59,7 @@ Introduction
 .. toctree::
    :maxdepth: 2
 
+   self
    introduction
    ranges
    custom_types

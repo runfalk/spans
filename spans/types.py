@@ -24,15 +24,15 @@ _empty_internal_range = _internal_range(None, None, False, False, True)
 
 
 @sane_total_ordering
-class range_(PicklableSlotMixin):
+class Range(PicklableSlotMixin):
     """
     Abstract base class of all ranges.
 
-    Initialize a new range object. Ranges are very strict about types. This
-    means that both `lower` or `upper` must be of the given class or subclass or
-    ``None``.
+    Ranges are very strict about types. This means that both `lower` or `upper`
+    must be of the given class or subclass or ``None``.
 
-    All ranges are immutable.
+    All ranges are immutable. No default methods modify the range in place.
+    Instead it returns a new instance.
 
     :param lower: Lower end of range.
     :param upper: Upper end of range.
@@ -42,6 +42,14 @@ class range_(PicklableSlotMixin):
                       is ``False``
     :raises TypeError: If lower or upper bound is not of the correct type.
     :raises ValueError: If upper bound is lower than lower bound.
+
+    .. versionchanged:: 0.5.0
+       Changed name from ``range_`` to ``Range``
+
+    .. note::
+
+       All examples in this class uses :class:`~spans.types.intrange` because
+       this class is abstract.
     """
 
     __slots__ = ("_range",)
@@ -316,7 +324,9 @@ class range_(PicklableSlotMixin):
                  otherwise ``False``.
         :raises TypeError: If given range is of the wrong type.
 
-        .. seealso:: :meth:`~spans.types.range_.contains`
+        .. seealso::
+
+           This method is the inverse of :meth:`~spans.types.Range.contains`
         """
 
         if not self.is_valid_range(other):
@@ -338,7 +348,7 @@ class range_(PicklableSlotMixin):
         :return: ``True`` if ranges intersect, otherwise ``False``.
         :raises TypeError: If `other` is of another type than this range.
 
-        See also :meth:`~spans.types.range_.intersection`.
+        See also :meth:`~spans.types.Range.intersection`.
         """
 
         return not self << other and not other << self
@@ -691,8 +701,10 @@ class range_(PicklableSlotMixin):
     __bool__ = __nonzero__
 
 
-class discreterange(range_):
+class DiscreteRange(Range):
     """
+    DiscreteRange(lower=None, upper=None, lower_inc=None, upper_inc)
+
     Discrete ranges are a subset of ranges that works on discrete types. This
     includes ``int`` and ``datetime.date``.
 
@@ -706,7 +718,7 @@ class discreterange(range_):
 
     .. code-block:: python
 
-        class intrange(discreterange):
+        class intrange(DiscreteRange):
             type = int
             unit = 1
 
@@ -719,12 +731,15 @@ class discreterange(range_):
 
         >>> list(intrange(1, 5))
         [1, 2, 3, 4]
+
+    .. versionchanged:: 0.5.0
+       Changed name from ``discreterange`` to ``DiscreteRange``
     """
 
     __slots__ = ()
 
     def __init__(self, *args, **kwargs):
-        super(discreterange, self).__init__(*args, **kwargs)
+        super(DiscreteRange, self).__init__(*args, **kwargs)
 
         # Normalize the internal range
         if not self._range.empty:
@@ -800,7 +815,7 @@ class discreterange(range_):
         if self.is_valid_scalar(other):
             return self.last == other
         else:
-            return super(discreterange, self).endswith(other)
+            return super(DiscreteRange, self).endswith(other)
 
     def __iter__(self):
         next = self.lower
@@ -809,20 +824,22 @@ class discreterange(range_):
             next = self.next(next)
 
 
-class offsetablerange(object):
+class OffsetableRangeMixin(object):
     """
     Mixin for range types that supports being offset by a value. This value must
     be of the same type as the range boundaries. For date types this will not
-    work and can be solved by explicitly defining an offset_type:
+    work and can be solved by explicitly defining an ``offset_type``:
 
     .. code-block:: python
 
-        class datetimerange(range_, offsetablerange):
+        class datetimerange(Range, OffsetableRangeMixin):
             __slots__ = ()
 
             type = datetime
             offset_type = timedelta
 
+    .. versionchanged:: 0.5.0
+       Changed name from ``offsetablerange`` to ``OffsetableRangeMixin``
     """
 
     __slots__ = ()
@@ -866,15 +883,15 @@ class offsetablerange(object):
         return self.replace(lower=lower, upper=upper)
 
 
-class intrange(discreterange, offsetablerange):
+class intrange(DiscreteRange, OffsetableRangeMixin):
     """
     Range that operates on int.
 
         >>> intrange(1, 5)
         intrange([1,5))
 
-    Inherits methods from :class:`~spans.types.range_`,
-    :class:`~spans.types.discreterange` and :class:`~spans.types.offsetablerange`.
+    Inherits methods from :class:`~spans.types.Range`,
+    :class:`~spans.types.DiscreteRange` and :class:`~spans.types.OffsetableRangeMixin`.
     """
 
     __slots__ = ()
@@ -886,15 +903,15 @@ class intrange(discreterange, offsetablerange):
         return self.upper - self.lower
 
 
-class floatrange(range_, offsetablerange):
+class floatrange(Range, OffsetableRangeMixin):
     """
     Range that operates on float.
 
         >>> floatrange(1.0, 5.0)
         floatrange([1.0,5.0))
 
-    Inherits methods from :class:`~spans.types.range_` and
-    :class:`~spans.types.offsetablerange`.
+    Inherits methods from :class:`~spans.types.Range` and
+    :class:`~spans.types.OffsetableRangeMixin`.
     """
 
     __slots__ = ()
@@ -902,7 +919,7 @@ class floatrange(range_, offsetablerange):
     type = float
 
 
-class strrange(discreterange):
+class strrange(DiscreteRange):
     """
     Range that operates on unicode strings. Next character is determined
     lexicographically. Representation might seem odd due to normalization.
@@ -920,8 +937,8 @@ class strrange(discreterange):
         >>> len(list(strrange(u"aa", u"zz", upper_inc=True))) # doctest: +SKIP
         27852826
 
-    Inherits methods from :class:`~spans.types.range_` and
-    :class:`~spans.types.discreterange`.
+    Inherits methods from :class:`~spans.types.Range` and
+    :class:`~spans.types.DiscreteRange`.
     """
 
     __slots__ = ()
@@ -972,7 +989,7 @@ def _is_valid_date(obj, accept_none=True):
     return isinstance(obj, date) and not isinstance(obj, datetime)
 
 
-class daterange(discreterange, offsetablerange):
+class daterange(DiscreteRange, OffsetableRangeMixin):
     """
     Range that operates on ``datetime.date``.
 
@@ -984,8 +1001,8 @@ class daterange(discreterange, offsetablerange):
         >>> daterange(date(2015, 1, 1), date(2015, 2, 1)).offset(timedelta(14))
         daterange([datetime.date(2015, 1, 15),datetime.date(2015, 2, 15)))
 
-    Inherits methods from :class:`~spans.types.range_`,
-    :class:`~spans.types.discreterange` and :class:`~spans.types.offsetablerange`.
+    Inherits methods from :class:`~spans.types.Range`,
+    :class:`~spans.types.DiscreteRange` and :class:`~spans.types.OffsetableRangeMixin`.
     """
 
     __slots__ = ()
@@ -1159,7 +1176,7 @@ class daterange(discreterange, offsetablerange):
         return (self.upper - self.lower).days
 
 
-class datetimerange(range_, offsetablerange):
+class datetimerange(Range, OffsetableRangeMixin):
     """
     Range that operates on ``datetime.datetime``.
 
@@ -1172,7 +1189,7 @@ class datetimerange(range_, offsetablerange):
         ...     datetime(2015, 1, 1), datetime(2015, 2, 1)).offset(timedelta(14))
         datetimerange([datetime.datetime(2015, 1, 15, 0, 0),datetime.datetime(2015, 2, 15, 0, 0)))
 
-    Inherits methods from :class:`~spans.types.range_` and :class:`~spans.types.offsetablerange`.
+    Inherits methods from :class:`~spans.types.Range` and :class:`~spans.types.OffsetableRangeMixin`.
     """
 
     __slots__ = ()
@@ -1181,7 +1198,7 @@ class datetimerange(range_, offsetablerange):
     offset_type = timedelta
 
 
-class timedeltarange(range_, offsetablerange):
+class timedeltarange(Range, OffsetableRangeMixin):
     """
     Range that operates on datetime's timedelta class.
 
@@ -1193,8 +1210,8 @@ class timedeltarange(range_, offsetablerange):
         >>> timedeltarange(timedelta(1), timedelta(5)).offset(timedelta(14))
         timedeltarange([datetime.timedelta(15),datetime.timedelta(19)))
 
-    Inherits methods from :class:`~spans.types.range_` and
-    :class:`~spans.types.offsetablerange`.
+    Inherits methods from :class:`~spans.types.Range` and
+    :class:`~spans.types.OffsetableRangeMixin`.
     """
 
     __slots__ = ()
@@ -1251,8 +1268,11 @@ class PeriodRange(daterange):
 
     @property
     def daterange(self):
-        # We don't have to consider empty ranges, since a typed date range is
-        # never empty
+        """
+        This ``PeriodRange`` represented as a naive
+        :class:`~spans.types.daterange`.
+        """
+
         return daterange(
             lower=self.lower,
             upper=self.upper,
@@ -1263,9 +1283,10 @@ class PeriodRange(daterange):
         """
         Offset the date range by the given amount of periods.
 
-        This differs from :meth:`~spans.types.offsetablerange.offset` by not
-        accepting a ``timedelta`` object. Instead it expects an integer to
-        adjust the typed date range by. The given value may be negative as well.
+        This differs from :meth:`~spans.types.OffsetableRangeMixin.offset` on
+        :class:`spans.types.daterange` by not accepting a ``timedelta`` object.
+        Instead it expects an integer to adjust the typed date range by. The
+        given value may be negative as well.
 
         :param offset: Number of periods to offset this range by. A period is
                        either a day, week, american week, month, quarter or
@@ -1323,3 +1344,26 @@ class PeriodRange(daterange):
 
     def difference(self, other):
         return self.daterange.difference(other)
+
+
+# Legacy names
+
+#: This alias exist for legacy reasons. It is considered deprecated but will not
+#: likely be removed.
+#:
+#: .. versionadded:: 0.5.0
+range_ = Range
+
+
+#: This alias exist for legacy reasons. It is considered deprecated but will not
+#: likely be removed.
+#:
+#: .. versionadded:: 0.5.0
+discreterange = DiscreteRange
+
+
+#: This alias exist for legacy reasons. It is considered deprecated but will not
+#: likely be removed.
+#:
+#: .. versionadded:: 0.5.0
+offsetablerange = OffsetableRangeMixin

@@ -2,9 +2,9 @@ from itertools import chain
 
 from ._compat import add_metaclass
 from ._utils import sane_total_ordering
-from .types import range_
+from .types import Range
 from .types import *
-from .types import discreterange, offsetablerange
+from .types import DiscreteRange, OffsetableRangeMixin
 
 # Imports needed for doctests in date range sets
 from datetime import *
@@ -20,11 +20,17 @@ __all__ = [
 ]
 
 
-class metarangeset(type):
+class MetaRangeSet(type):
     """
-    A meta class for rangesets. The purpose is to automatically add relevant
-    mixins to the range set class based on what mixins and baseclasses the range
-    class has.
+    A meta class for RangeSets. The purpose is to automatically add relevant
+    mixins to the range set class based on what mixins and base classes the
+    range class has.
+
+    All subclasses of :class:`~spans.settypes.RangeSet` uses this class as its
+    metaclass
+
+    .. versionchanged:: 0.5.0
+       Changed name from ``metarangeset`` to ``MetaRangeSet``
     """
 
     mixin_map = {}
@@ -33,31 +39,49 @@ class metarangeset(type):
         parents = list(bases)
 
         if "type" in attrs:
-            for rangemixin, rangesetmixin in cls.mixin_map.items():
+            for rangemixin, RangeSetmixin in cls.mixin_map.items():
                 if issubclass(attrs["type"], rangemixin):
-                    parents.append(rangesetmixin)
+                    parents.append(RangeSetmixin)
 
-        return super(metarangeset, cls).__new__(cls, name, tuple(parents), attrs)
+        return super(MetaRangeSet, cls).__new__(cls, name, tuple(parents), attrs)
 
     @classmethod
     def add(cls, range_mixin, range_set_mixin):
+        """
+        Register a range set mixin for a range mixin.
+
+        :param range_mixin: Range mixin class
+        :param range_set_mixin: Range set mixin class
+        """
+
         cls.mixin_map[range_mixin] = range_set_mixin
 
     @classmethod
     def register(cls, range_mixin):
+        """
+        Decorator for registering range set mixins for global use. This works
+        the same as :meth:`~spans.settypes.MetaRangeSet.add`
+
+        :param range_mixin: A :class:`~spans.types.Range` mixin class to
+                            to register a decorated range set mixin class for
+        :return: A decorator to use on a range set mixin class
+        """
+
         def decorator(range_set_mixin):
             cls.add(range_mixin, range_set_mixin)
             return range_set_mixin
         return decorator
 
 
-@metarangeset.register(discreterange)
-class discreterangeset(object):
+@MetaRangeSet.register(DiscreteRange)
+class DiscreteRangeSetMixin(object):
     """
     Mixin that adds support for discrete range set operations. Automatically used
-    by rangeset when range type inherits discreterange
+    by :class:`~spans.settypes.RangeSet` when :class:`~spans.types.Range` type
+    inherits :class:`~spans.types.DiscreteRange`.
 
-    See also :class:`~spans.types.discreterange`.
+    .. versionchanged:: 0.5.0
+       Changed name from ``discreterangeset`` to ``DiscreteRangeSetMixin``
     """
 
     __slots__ = ()
@@ -74,13 +98,15 @@ class discreterangeset(object):
         return chain(*self)
 
 
-@metarangeset.register(offsetablerange)
-class offsetablerangeset(object):
+@MetaRangeSet.register(OffsetableRangeMixin)
+class OffsetableRangeSetMixin(object):
     """
-    Mixin that adds support for offsetable range set operations. Automatically used
-    by rangeset when range type inherits offsetablerange.
+    Mixin that adds support for offsetable range set operations. Automatically
+    used by :class:`~spans.settypes.RangeSet` when range type inherits
+    :class:`~spans.settypes.OffsetableRangeMixin`.
 
-    See also :meth:`spans.types.offsetablerange`.
+    .. versionchanged:: 0.5.0
+       Changed name from ``offsetablerangeset`` to ``OffsetableRangeSetMixin``
     """
 
     __slots__ = ()
@@ -102,16 +128,16 @@ class offsetablerangeset(object):
 
 
 @sane_total_ordering
-@add_metaclass(metarangeset)
-class rangeset(object):
+@add_metaclass(MetaRangeSet)
+class RangeSet(object):
     """
     A range set works a lot like a range with some differences:
 
     - All range sets supports ``len()``. Cardinality for a range set means the
       number of distinct ranges required to represent this set. See
-      :meth:`~spans.settypes.rangeset.__len__`.
+      :meth:`~spans.settypes.RangeSet.__len__`.
     - All range sets are iterable. The iterator returns a range for each
-      iteration. See :meth:`~spans.settypes.rangeset.__iter__` for more details.
+      iteration. See :meth:`~spans.settypes.RangeSet.__iter__` for more details.
     - All range sets are invertible using the ``~`` operator. The result is a
       new range set that does not intersect the original range set at all.
 
@@ -122,10 +148,13 @@ class rangeset(object):
       performing set operations such as union, difference or intersection.
 
     .. tip::
-        The ``rangeset`` constructor supports any iterable sequence as argument.
+        The ``RangeSet`` constructor supports any iterable sequence as argument.
 
     :param ranges: A sequence of ranges to add to this set.
     :raises TypeError: If any of the given ranges are of incorrect type.
+
+    .. versionchanged:: 0.5.0
+       Changed name from ``rangeset`` to ``RangeSet``
     """
 
     __slots__ = ("_list",)
@@ -176,7 +205,7 @@ class rangeset(object):
             []
 
         .. versionchanged:: 0.3.0
-           This method used to return an empty range when the rangeset was
+           This method used to return an empty range when the RangeSet was
            empty.
         """
 
@@ -359,7 +388,7 @@ class rangeset(object):
         self._test_type(item)
 
         # If the list currently only have an empty range do nothing since an
-        # empty rangeset can't be removed from anyway.
+        # empty RangeSet can't be removed from anyway.
         if not self:
             return
 
@@ -462,24 +491,24 @@ class rangeset(object):
                  `other`.
         """
 
-        # Initialize output with a reference to this rangeset. When
-        # intersecting against multiple rangesets at once this will be replaced
+        # Initialize output with a reference to this RangeSet. When
+        # intersecting against multiple RangeSets at once this will be replaced
         # after each iteration.
         output = self
 
         for other in others:
-            # Intermediate rangeset containing intersection for this current
+            # Intermediate RangeSet containing intersection for this current
             # iteration.
             intersection = self.__class__([])
 
             # Intersect every range within the current output with every range
-            # within the currently processed other rangeset. All intersecting
+            # within the currently processed other RangeSet. All intersecting
             # parts are added to the intermediate intersection set.
             for a in output:
                 for b in other:
                     intersection.add(a.intersection(b))
 
-            # If the intermediate intersection rangeset is still empty, there
+            # If the intermediate intersection RangeSet is still empty, there
             # where no intersections with at least one of the arguments and
             # we can quit early, since any intersection with the empty set will
             # always be empty.
@@ -503,18 +532,16 @@ class rangeset(object):
     __bool__ = __nonzero__
 
 
-class intrangeset(rangeset):
+class intrangeset(RangeSet):
     """
-    Range set that operates on intranges.
+    Range set that operates on :class:`~spans.types.intrange`.
 
         >>> intrangeset([intrange(1, 5), intrange(10, 15)])
         intrangeset([intrange([1,5)), intrange([10,15))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset`,
-    :class:`~spans.settypes.discreterangeset` and
-    :class:`~spans.settypes.offsetablerangeset`.
-
-    See also :class:`~spans.types.intrange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet`,
+    :class:`~spans.settypes.DiscreteRangeset` and
+    :class:`~spans.settypes.OffsetableRangeMixinset`.
     """
 
     __slots__ = ()
@@ -522,18 +549,16 @@ class intrangeset(rangeset):
     type = intrange
 
 
-class floatrangeset(rangeset):
+class floatrangeset(RangeSet):
     """
-    Range set that operates on floatranges.
+    Range set that operates on :class:`~spans.types.floatrange`.
 
         >>> floatrangeset([floatrange(1.0, 5.0), floatrange(10.0, 15.0)])
         floatrangeset([floatrange([1.0,5.0)), floatrange([10.0,15.0))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset`,
-    :class:`~spans.settypes.discreterangeset` and
-    :class:`~spans.settypes.offsetablerangeset`.
-
-    See also :class:`~spans.types.floatrange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet`,
+    :class:`~spans.settypes.DiscreteRangeset` and
+    :class:`~spans.settypes.OffsetableRangeMixinset`.
     """
 
     __slots__ = ()
@@ -541,19 +566,17 @@ class floatrangeset(rangeset):
     type = floatrange
 
 
-class strrangeset(rangeset):
+class strrangeset(RangeSet):
     """
-    Range set that operates on strranges.
+    Range set that operates on .. seealso:: :class:`~spans.types.strrange`.
 
         >>> strrangeset([
         ...     strrange(u"a", u"f", upper_inc=True),
         ...     strrange(u"0", u"9", upper_inc=True)])
         strrangeset([strrange([u'0',u':')), strrange([u'a',u'g'))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset` and
-    :class:`~spans.settypes.discreterangeset`.
-
-    See also :class:`~spans.types.strrange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet` and
+    :class:`~spans.settypes.DiscreteRangeset`.
     """
 
     __slots__ = ()
@@ -561,20 +584,18 @@ class strrangeset(rangeset):
     type = strrange
 
 
-class daterangeset(rangeset):
+class daterangeset(RangeSet):
     """
-    Range set that operates on dateranges.
+    Range set that operates on :class:`~spans.types.daterange`.
 
         >>> month = daterange(date(2000, 1, 1), date(2000, 2, 1))
         >>> daterangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
         daterangeset([daterange([datetime.date(2000, 1, 1),datetime.date(2000, 2, 1))),
             daterange([datetime.date(2001, 1, 1),datetime.date(2001, 2, 1)))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset`,
-    :class:`~spans.settypes.discreterangeset` and
-    :class:`~spans.settypes.offsetablerangeset`.
-
-    See also :class:`~spans.types.daterange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet`,
+    :class:`~spans.settypes.DiscreteRangeset` and
+    :class:`~spans.settypes.OffsetableRangeMixinset`.
     """
 
     __slots__ = ()
@@ -582,19 +603,17 @@ class daterangeset(rangeset):
     type = daterange
 
 
-class datetimerangeset(rangeset):
+class datetimerangeset(RangeSet):
     """
-    Range set that operates on datetimeranges.
+    Range set that operates on :class:`~spans.types.datetimerange`.
 
         >>> month = datetimerange(datetime(2000, 1, 1), datetime(2000, 2, 1))
         >>> datetimerangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
         datetimerangeset([datetimerange([datetime.datetime(2000, 1, 1, 0, 0),datetime.datetime(2000, 2, 1, 0, 0))),
             datetimerange([datetime.datetime(2001, 1, 1, 0, 0),datetime.datetime(2001, 2, 1, 0, 0)))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset` and
-    :class:`~spans.settypes.offsetablerangeset`.
-
-    See also :class:`~spans.types.datetimerange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet` and
+    :class:`~spans.settypes.OffsetableRangeMixinset`.
     """
 
     __slots__ = ()
@@ -602,20 +621,34 @@ class datetimerangeset(rangeset):
     type = datetimerange
 
 
-class timedeltarangeset(rangeset):
+class timedeltarangeset(RangeSet):
     """
-    Range set that operates on timedeltaranges.
+    Range set that operates on :class:`~spans.types.timedeltarange`.
 
         >>> week = timedeltarange(timedelta(0), timedelta(7))
         >>> timedeltarangeset([week, week.offset(timedelta(7))])
         timedeltarangeset([timedeltarange([datetime.timedelta(0),datetime.timedelta(14)))])
 
-    Inherits methods from :class:`~spans.settypes.rangeset` and
-    :class:`~spans.settypes.offsetablerangeset`.
-
-    See also :class:`~spans.types.timedeltarange`.
+    Inherits methods from :class:`~spans.settypes.RangeSet` and
+    :class:`~spans.settypes.OffsetableRangeMixinset`.
     """
 
     __slots__ = ()
 
     type = timedeltarange
+
+
+# Legacy names
+
+#: This alias exist for legacy reasons. It is considered deprecated but will not
+#: likely be removed.
+#:
+#: .. versionadded:: 0.5.0
+metarangeset = MetaRangeSet
+
+
+#: This alias exist for legacy reasons. It is considered deprecated but will not
+#: likely be removed.
+#:
+#: .. versionadded:: 0.5.0
+rangeset = RangeSet

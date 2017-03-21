@@ -16,6 +16,8 @@ import sys
 import os
 import shlex
 
+from datetime import date
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -50,7 +52,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"Spans"
-copyright = u"2015, Andreas Runfalk"
+copyright = u"{.year}, Andreas Runfalk".format(date.today())
 author = u"Andreas Runfalk"
 
 # The version info for the project you're documenting, acts as replacement for
