@@ -134,9 +134,11 @@ if __name__ == "__main__":
         packages=["spans"],
         extras_require={
             "dev": [
+                "codecov",
                 "pytest>=3.0",
                 "pytest-cov",
-                "codecov",
+                "Sphinx",
+                "sphinx-rtd-theme",
                 "twine",
             ],
         },
