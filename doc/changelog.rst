@@ -8,6 +8,8 @@ Version 0.4.0
 -------------
 Released on 20th March, 2017
 
+This released is called 0.4.1 on PyPI because I messed up the upload.
+
 - Added new argument to :meth:`~spans.types.daterange.from_date` for working
   with different kinds of date intervals. The argument accepts a period of either
   ``"day"`` (default), ``"week"`` (ISO week), ``"american_week"`` (starts on
