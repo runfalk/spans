@@ -313,21 +313,23 @@ def test_not_overlap(a, b):
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(5, 10)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
 ])
 def test_adjacent(a, b):
     assert a.adjacent(b)
+    assert b.adjacent(a)
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5, upper_inc=True), intrange(5, 10)),
-    (intrange(1, 5), intrange(5, 10, lower_inc=False)),
-    (intrange(1, 5), intrange(3, 8)),
-    (intrange(3, 8), intrange(1, 5)),
-    (intrange.empty(), intrange(0, 5)),
+    (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0, lower_inc=False)),
+    (floatrange(1.0, 5.0), floatrange(3.0, 8.0)),
+    (floatrange(3.0, 8.0), floatrange(1.0, 5.0)),
+    (floatrange.empty(), floatrange(0.0, 5.0)),
 ])
 def test_not_adjacent(a, b):
     assert not a.adjacent(b)
+    assert not b.adjacent(a)
 
 
 @pytest.mark.parametrize("value", [
