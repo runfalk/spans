@@ -13,6 +13,7 @@ This release is a preparation for a stable 1.0 release.
 
 - Renamed classes to match :pep:`8#class-names` conventions. This does not apply
   to classes that works on built-in that does not follow :pep:`8#class-names`.
+- Optimized :meth:`~spans.types.Range.union`, 1.3x speedup.
 
 
 Version 0.4.0
