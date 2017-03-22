@@ -351,7 +351,16 @@ class Range(PicklableSlotMixin):
         See also :meth:`~spans.types.Range.intersection`.
         """
 
-        return not self << other and not other << self
+        if self < other:
+            a, b = self, other
+        else:
+            a, b = other, self
+
+        # We need to explicitly handle unbounded ranges since a.upper and b.lower
+        # make the intervals seem adjacent even though they are not
+        if a.upper_inf or b.lower_inf:
+            return True
+        return a.upper > b.lower or a.upper == b.lower and a.upper_inc and b.lower_inc
 
     def adjacent(self, other):
         """

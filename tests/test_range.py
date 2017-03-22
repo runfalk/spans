@@ -291,21 +291,25 @@ def test_within_type_check(value):
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5, upper_inc=True), intrange(5, 10)),
-    (intrange(1, 5), intrange(3, 8)),
-    (intrange(3, 8), intrange(1, 5)),
-    (intrange(1, 10), intrange(5)),
+    (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), floatrange(3.0, 8.0)),
+    (floatrange(1.0, 10.0), floatrange(5.0)),
+    (floatrange(upper=10.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0), floatrange()),
 ])
 def test_overlap(a, b):
     assert a.overlap(b)
+    assert b.overlap(a)
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(5, 10)),
-    (intrange(1, 5), intrange(5, 10, lower_inc=False)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0, lower_inc=False)),
+    (floatrange(upper=5.0), floatrange(5.0)),
 ])
 def test_not_overlap(a, b):
     assert not a.overlap(b)
+    assert not b.overlap(a)
 
 
 @pytest.mark.parametrize("a, b", [
