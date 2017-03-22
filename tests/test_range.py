@@ -337,26 +337,30 @@ def test_adjacent_type_check(value):
 
 
 @pytest.mark.parametrize("a, b, union", [
-    (intrange(1, 5), intrange(5, 10), intrange(1, 10)),
-    (intrange(1, 5), intrange(3, 10), intrange(1, 10)),
-    (intrange(5, 10), intrange(1, 5), intrange(1, 10)),
-    (intrange(3, 10), intrange(1, 5), intrange(1, 10)),
-    (intrange.empty(), intrange(1, 5), intrange(1, 5)),
-    (intrange(1, 5), intrange.empty(), intrange(1, 5)),
+    (floatrange.empty(), floatrange(5.0, 10.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), floatrange.empty(), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0), floatrange(1.0, 10.0)),
+    (floatrange(1.0, 10.0), floatrange(5.0, 15.0), floatrange(1.0, 15.0)),
+    (floatrange(1.0, 10.0, lower_inc=False), floatrange(5.0, 15.0), floatrange(1.0, 15.0, lower_inc=False)),
+    (floatrange(1.0, 10.0), floatrange(5.0, 15.0, upper_inc=True), floatrange(1.0, 15.0, upper_inc=True)),
+    (floatrange(10.0, 15.0), floatrange(1.0, 25.0), floatrange(1.0, 25.0)),
 ])
 def test_union(a, b, union):
     assert a.union(b) == union
+    assert b.union(a) == union
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(5, 10, lower_inc=False)),
-    (intrange(5, 10, lower_inc=False), intrange(1, 5)),
-    (intrange(10, 15), intrange(1, 5)),
-    (intrange(1, 5), intrange(10, 15)),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0, lower_inc=False)),
+    (floatrange(5.0, 10.0, lower_inc=False), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange(10.0, 15.0)),
 ])
 def test_broken_union(a, b):
     with pytest.raises(ValueError):
         a.union(b)
+
+    with pytest.raises(ValueError):
+        b.union(a)
 
 
 @pytest.mark.parametrize("a, b, difference", [

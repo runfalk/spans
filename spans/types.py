@@ -406,35 +406,34 @@ class Range(PicklableSlotMixin):
         :raises ValueError: If `other` can not be merged with this range.
         """
 
-        # Consider empty ranges
+        # Optimize empty ranges
         if not self:
             return other
         elif not other:
             return self
-        elif not self.overlap(other) and not self.adjacent(other):
+
+        # Order ranges to simplify checks
+        if self < other:
+            a, b = self, other
+        else:
+            a, b = other, self
+
+        if a.upper <= b.lower and not a.adjacent(b):
             raise ValueError("Ranges must be either adjacent or overlapping")
 
-        if self.lower == other.lower:
-            lower = self.lower
-            lower_inc = self.lower_inc or other.lower_inc
-        elif self.lower < other.lower:
-            lower = self.lower
-            lower_inc = self.lower_inc
+        # a.lower is guaranteed to be the lower bound, but either a.upper or
+        # b.upper can be the upper bound
+        if a.upper == b.upper:
+            upper = a.upper
+            upper_inc = a.upper_inc or b.upper_inc
+        elif a.upper < b.upper:
+            upper = b.upper
+            upper_inc = b.upper_inc
         else:
-            lower = other.lower
-            lower_inc = other.lower_inc
+            upper = a.upper
+            upper_inc = a.upper_inc
 
-        if self.upper == other.upper:
-            upper = self.upper
-            upper_inc = self.upper_inc or other.upper_inc
-        elif self.upper < other.upper:
-            upper = other.upper
-            upper_inc = other.upper_inc
-        else:
-            upper = self.upper
-            upper_inc = self.upper_inc
-
-        return self.__class__(lower, upper, lower_inc, upper_inc)
+        return self.__class__(a.lower, upper, a.lower_inc, upper_inc)
 
     def difference(self, other):
         """
