@@ -54,24 +54,24 @@ Version 0.3.0
 -------------
 Released on 26th August, 2016
 
-- Added documentation for :meth:`~spans.settypes.rangeset.__iter__`
+- Added documentation for :meth:`~spans.settypes.RangeSet.__iter__`
 - Fixed intersection of multiple range sets not working correctly
   (`bug #3 <https://github.com/runfalk/spans/issues/3>`_)
-- Fixed iteration of :class:`~spans.settypes.rangeset` returning an empty range
-  when ``rangeset`` is empty
+- Fixed iteration of :class:`~spans.settypes.RangeSet` returning an empty range
+  when ``RangeSet`` is empty
   (`bug #4 <https://github.com/runfalk/spans/issues/4>`_)
 
 .. warning::
-   This change is backwards incompatible to code that expect rangesets to always
-   return at least one set when iterating.
+   This change is backwards incompatible to code that expect range sets to
+   always return at least one set when iterating.
 
 
 Version 0.2.1
 -------------
 Released on 27th June, 2016
 
-- Fixed :class:`~spans.settypes.rangeset` not returning ``NotImplemented`` when
-  comparing to classes that are not sub classes of ``rangeset``, pull request
+- Fixed :class:`~spans.settypes.RangeSet` not returning ``NotImplemented`` when
+  comparing to classes that are not sub classes of ``RangeSet``, pull request
   `#2 <https://github.com/runfalk/spans/pull/2>`_
   (`Michael Krahe <https://github.com/der-michik>`_)
 - Updated license in ``setup.py`` to follow
@@ -83,9 +83,9 @@ Version 0.2.0
 -------------
 Released on 22nd December, 2015
 
-- Added :meth:`~spans.settypes.rangeset.__len__` to range sets
+- Added :meth:`~spans.settypes.RangeSet.__len__` to range sets
   (`Michael Krahe <https://github.com/der-michik>`_)
-- Added :meth:`~spans.settypes.rangeset.contains` to range sets
+- Added :meth:`~spans.settypes.RangeSet.contains` to range sets
   (`Michael Krahe <https://github.com/der-michik>`_)
 - Added `Sphinx <http://sphinx-doc.org/>`_ style doc strings to all methods
 - Added proper Sphinx documentation
@@ -117,14 +117,14 @@ Version 0.1.3
 Released on 27th February, 2015
 
 - Added :meth:`~spans.types.OffsetableRangeMixin.offset` to some range types
-- Added :meth:`~spans.settypes.OffsetableRangeMixin.offset` to some range set
+- Added :meth:`~spans.settypes.OffsetableRangeSetMixin.offset` to some range set
   types
 - Added sanity checks to range boundaries
 - Fixed incorrect ``__slots__`` usage, resulting in ``__slots__`` not being used
   on most ranges
 - Fixed pickling of ranges and range sets
-- Simplified creation of new rangesets, by the use of the meta class
-  ``metarangeset``
+- Simplified creation of new range sets, by the use of the meta class
+  :class:`~spans.settypes.MetaRangeSet`
 
 
 Version 0.1.2
