@@ -497,13 +497,12 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                             computed.
         """
 
-        # Consider empty ranges
-        if not self or not other:
+        # Consider empty ranges or no overlap
+        if not self or not other or not self.overlap(other):
             return self
-        elif self == other or self in other:
+        # If self is contained within other, the result is empty
+        elif self in other:
             return self.empty()
-        elif not self.overlap(other):
-            return self
         elif other in self and not (self.startswith(other) or self.endswith(other)):
             raise ValueError("Other range must not be within this range")
         elif self.endsbefore(other):
