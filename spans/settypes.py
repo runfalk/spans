@@ -426,6 +426,15 @@ class RangeSet(PartialOrderingMixin):
             >>> intrangeset([intrange(1, 5), intrange(30, 40)]).span()
             intrange([1,40))
 
+
+        This method can be used to implement the PostgreSQL function
+        ``range_merge(a, b)``:
+
+            >>> a = intrange(1, 5)
+            >>> b = intrange(10, 15)
+            >>> intrangeset([a, b]).span()
+            intrange([1,15))
+
         :return: A new range the contains this entire range set.
         """
 

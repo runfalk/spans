@@ -161,6 +161,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             1
             >>> intrange(upper=5).lower
 
+        This is the same as the ``lower(self)`` in PostgreSQL.
         """
 
         if self:
@@ -176,6 +177,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             5
             >>> intrange(1).upper
 
+        This is the same as the ``upper(self)`` in PostgreSQL.
         """
 
         if self:
@@ -191,6 +193,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1, 5).lower_inc
             True
 
+        This is the same as the ``lower_inc(self)`` in PostgreSQL.
         """
 
         return False if self.lower_inf else self._range.lower_inc
@@ -204,6 +207,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1, 5).upper_inc
             False
 
+        This is the same as the ``upper_inc(self)`` in PostgreSQL.
         """
 
         return False if self.upper_inf else self._range.upper_inc
@@ -218,6 +222,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(upper=5).lower_inf
             True
 
+        This is the same as the ``lower_inf(self)`` in PostgreSQL.
         """
 
         return self._range.lower is None and not self._range.empty
@@ -232,6 +237,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1).upper_inf
             True
 
+        This is the same as the ``upper_inf(self)`` in PostgreSQL.
         """
 
         return self._range.upper is None and not self._range.empty
@@ -299,6 +305,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> 1 in intrange(1, 10)
             True
 
+        This is the same as the ``self @> other`` in PostgreSQL.
+
         :param other: Object to be checked whether it exists within this range
                       or not.
         :return: ``True`` if `other` is completely within this range, otherwise
@@ -338,13 +346,16 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> b.within(a)
             True
 
+        This is the same as the ``self <@ other`` in PostgreSQL. One difference
+        however is that unlike PostgreSQL ``self`` in this can't be a scalar
+        value.
+
         :param other: Range to test against.
         :return: ``True`` if this range is completely within the given range,
                  otherwise ``False``.
         :raises TypeError: If given range is of the wrong type.
 
         .. seealso::
-
            This method is the inverse of :meth:`~spans.types.Range.contains`
         """
 
@@ -363,11 +374,15 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1, 5).overlap(intrange(5, 10))
             False
 
+        This is the same as the ``&&`` operator for two ranges in PostgreSQL.
+
         :param other: Range to test against.
         :return: ``True`` if ranges intersect, otherwise ``False``.
         :raises TypeError: If `other` is of another type than this range.
 
-        See also :meth:`~spans.types.Range.intersection`.
+        .. seealso::
+           If you need to know which part that overlapped, consider using
+           :meth:`~spans.types.Range.intersection`.
         """
 
         # Special case for empty ranges
@@ -396,6 +411,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             False
 
         The empty set is not adjacent to any set.
+
+        This is the same as the ``-|-`` operator for two ranges in PostgreSQL.
 
         :param other: Range to test against.
         :return: ``True`` if this range is adjacent with `other`, otherwise
@@ -432,6 +449,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             ValueError: Ranges must be either adjacent or overlapping
 
         This does not modify the range in place.
+
+        This is the same as the ``+`` operator for two ranges in PostgreSQL.
 
         :param other: Range to merge with.
         :return: A new range that is the union of this and `other`.
@@ -491,6 +510,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         This does not modify the range in place.
 
+        This is the same as the ``-`` operator for two ranges in PostgreSQL.
+
         :param other: Range to difference against.
         :return: A new range that is the difference between this and `other`.
         :raises ValueError: If difference bethween this and `other` can not be
@@ -523,6 +544,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             intrange(empty)
             >>> intrange(1, 10).intersection(intrange(5, 10))
             intrange([5,10))
+
+        This is the same as the ``+`` operator for two ranges in PostgreSQL.
 
         :param other: Range to interect with.
         :return: A new range that is the intersection between this and `other`.
@@ -611,7 +634,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1, 5).startsafter(intrange(0, 5))
             True
 
-        If `other` has the same start as the given
+        If ``other`` has the same start as the given
 
         :param other: Range or scalar to test.
         :return: ``True`` if this range starts after `other`, otherwise ``False``
@@ -669,7 +692,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
     def left_of(self, other):
         """
-        Test if this range `other` is completely left of `other`.
+        Test if this range `other` is strictly left of `other`.
 
             >>> intrange(1, 5).left_of(intrange(5, 10))
             True
@@ -682,6 +705,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             >>> intrange(1, 5) << intrange(5, 10)
             True
 
+        The choice of overloading ``<<`` might seem strange, but it is to mimick
+        PostgreSQL's operators for ranges. As this is not obvious the use of
+        ``<<`` is discouraged.
+
         :param other: Range to test against.
         :return: ``True`` if this range is completely to the left of ``other``.
         """
@@ -690,7 +717,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
     def right_of(self, other):
         """
-        Test if this range `other` is completely right of `other`.
+        Test if this range `other` is strictly right of `other`.
 
             >>> intrange(5, 10).right_of(intrange(1, 5))
             True
@@ -702,6 +729,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
             >>> intrange(5, 10) >> intrange(1, 5)
             True
+
+        The choice of overloading ``>>`` might seem strange, but it is to mimick
+        PostgreSQL's operators for ranges. As this is not obvious the use of
+        ``>>`` is discouraged.
 
         :param other: Range to test against.
         :return: ``True`` if this range is completely to the right of ``other``.

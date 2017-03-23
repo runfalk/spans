@@ -64,5 +64,6 @@ Introduction
    ranges
    custom_types
    recipes
+   postgresql
    api
    changelog
