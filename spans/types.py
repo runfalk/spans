@@ -4,7 +4,7 @@ from collections import namedtuple
 from datetime import date, datetime, timedelta
 
 from ._compat import *
-from ._utils import date_from_iso_week, PicklableSlotMixin, sane_total_ordering
+from ._utils import date_from_iso_week, PartialOrderingMixin, PicklableSlotMixin
 
 
 __all__ = [
@@ -23,8 +23,7 @@ _internal_range = namedtuple(
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
 
-@sane_total_ordering
-class Range(PicklableSlotMixin):
+class Range(PartialOrderingMixin, PicklableSlotMixin):
     """
     Abstract base class of all ranges.
 

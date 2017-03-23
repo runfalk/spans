@@ -8,7 +8,6 @@ __all__ = [
     "date_from_iso_week",
     "find_slots",
     "PicklableSlotMixin",
-    "sane_total_ordering",
 ]
 
 def date_from_iso_week(year, week, day_of_week=None):
@@ -59,37 +58,27 @@ class PicklableSlotMixin(object):
             setattr(self, attr, value)
 
 
-def sane_total_ordering(cls):
-    def __ge__(self, other):
-        gt = self.__gt__(other)
-        if gt is NotImplemented:
-            return NotImplemented
-        elif gt:
-            return True
-
-        eq = self.__eq__(other)
-        if eq is NotImplemented:
-            return NotImplemented
-        return eq
-
+class PartialOrderingMixin(object):
     def __le__(self, other):
         lt = self.__lt__(other)
-        if lt is NotImplemented:
-            return NotImplemented
-        elif lt:
-            return True
-
         eq = self.__eq__(other)
-        if eq is NotImplemented:
+
+        if lt is NotImplemented and eq is NotImplemented:
             return NotImplemented
-        return eq
+        return lt is True or eq is True
 
     def __gt__(self, other):
-        le = __le__(self, other)
+        le = self.__le__(other)
         if le is NotImplemented:
             return NotImplemented
-
         return not le
+
+    def __ge__(self, other):
+        gt = self.__gt__(other)
+        eq = self.__eq__(other)
+        if gt is NotImplemented and eq is NotImplemented:
+            return NotImplemented
+        return gt is True or eq is True
 
     def __ne__(self, other):
         eq = self.__eq__(other)
@@ -97,19 +86,3 @@ def sane_total_ordering(cls):
             return NotImplemented
 
         return not eq
-
-    ops = [(f.__name__, f) for f in [__ge__, __le__, __gt__]]
-    predefined = set(dir(cls))
-
-    if "__lt__" not in predefined:
-        raise ValueError("Must define __lt__")
-
-    for func in [__ge__, __le__, __gt__, __ne__]:
-        name = func.__name__
-
-        # Test if class actually has overridden the default rich comparison
-        # implementation
-        if name not in predefined or getattr(cls, name) is getattr(object, name):
-            setattr(cls, name, func)
-
-    return cls

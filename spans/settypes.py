@@ -1,7 +1,7 @@
 from itertools import chain
 
 from ._compat import add_metaclass
-from ._utils import sane_total_ordering
+from ._utils import PartialOrderingMixin
 from .types import Range
 from .types import *
 from .types import DiscreteRange, OffsetableRangeMixin
@@ -127,9 +127,8 @@ class OffsetableRangeSetMixin(object):
         return self.__class__(r.offset(offset) for r in self)
 
 
-@sane_total_ordering
 @add_metaclass(MetaRangeSet)
-class RangeSet(object):
+class RangeSet(PartialOrderingMixin):
     """
     A range set works a lot like a range with some differences:
 
