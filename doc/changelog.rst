@@ -12,11 +12,14 @@ Released on <unreleased>
 This release is a preparation for a stable 1.0 release.
 
 - Fixed comparison operators when working with empty or unbounded ranges. They
-  would previously raise exceptions.
+  would previously raise exceptions. Ranges are now partially ordered instead of
+  totally ordered
+- Added more unit tests
 - Renamed classes to match :pep:`8#class-names` conventions. This does not apply
   to classes that works on built-in that does not follow :pep:`8#class-names`.
-- Optimized :meth:`~spans.types.Range.overlap`, 1.3x speedup.
-- Optimized :meth:`~spans.types.Range.union`, 1.25x speedup.
+- Refactored :meth:`~spans.types.Range.left_of`
+- Refactored :meth:`~spans.types.Range.overlap`
+- Refactored :meth:`~spans.types.Range.union`
 
 
 Version 0.4.0
@@ -46,6 +49,7 @@ This released is called 0.4.1 on PyPI because I messed up the upload.
 - Removed `Tox <https://tox.readthedocs.io/en/latest/>`_ config
 - Minor documentation tweaks
 
+
 Version 0.3.0
 -------------
 Released on 26th August, 2016
@@ -61,6 +65,7 @@ Released on 26th August, 2016
    This change is backwards incompatible to code that expect rangesets to always
    return at least one set when iterating.
 
+
 Version 0.2.1
 -------------
 Released on 27th June, 2016
@@ -72,6 +77,7 @@ Released on 27th June, 2016
 - Updated license in ``setup.py`` to follow
   `recommendations <https://packaging.python.org/en/latest/distributing/#license>`_
   by PyPA
+
 
 Version 0.2.0
 -------------
@@ -91,6 +97,7 @@ Released on 22nd December, 2015
 - Changed meta class implementation for range sets to allow more mixins for
   custom range sets
 
+
 Version 0.1.4
 -------------
 Released on 15th May, 2015
@@ -103,6 +110,7 @@ Released on 15th May, 2015
 - Improved pickle implementation
 - Made type checking more strict for date ranges to prevent ``datetime`` from
   being allowed in :class:`~spans.types.daterange`
+
 
 Version 0.1.3
 -------------
@@ -117,11 +125,13 @@ Released on 27th February, 2015
 - Simplified creation of new rangesets, by the use of the meta class
   ``metarangeset``
 
+
 Version 0.1.2
 -------------
 Released on 13th June, 2014
 
 - Fix for inproper version detection on Ubuntu's bundled Python interpreter
+
 
 Version 0.1.1
 -------------
@@ -129,6 +139,7 @@ Released on 12th June, 2014
 
 - Readme fixes
 - Syntax highlighting for PyPI page
+
 
 Version 0.1.0
 -------------
