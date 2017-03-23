@@ -102,8 +102,8 @@ Version 0.1.4
 -------------
 Released on 15th May, 2015
 
-- Added :attr:`~spans.types.discreterange.last` property to
-  :class:`~spans.types.discreterange`
+- Added :attr:`~spans.types.DiscreteRange.last` property to
+  :class:`~spans.types.DiscreteRange`
 - Added :meth:`~spans.types.daterange.from_date` helper to
   :class:`~spans.types.daterange`
 - Added more unit tests
@@ -116,8 +116,9 @@ Version 0.1.3
 -------------
 Released on 27th February, 2015
 
-- Added :meth:`~spans.types.offsetablerange.offset` to some range types
-- Added :meth:`~spans.settypes.offsetablerangeset.offset` to some range set types
+- Added :meth:`~spans.types.OffsetableRangeMixin.offset` to some range types
+- Added :meth:`~spans.settypes.OffsetableRangeMixin.offset` to some range set
+  types
 - Added sanity checks to range boundaries
 - Fixed incorrect ``__slots__`` usage, resulting in ``__slots__`` not being used
   on most ranges

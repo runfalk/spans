@@ -19,7 +19,7 @@ By default all ranges include all elements from and including `lower` up to but 
 	>>> intrange(1, 5).last
 	4
 
-Non discrete ranges, such as :class:`~spans.types.floatrange`, do not have the property last :class:`~spans.types.discreterange.last`.
+Non discrete ranges, such as :class:`~spans.types.floatrange`, do not have the property last :class:`~spans.types.DiscreteRange.last`.
 
 Discrete ranges are always normalized, while normal ranges are not.
 
@@ -32,7 +32,7 @@ Discrete ranges are always normalized, while normal ranges are not.
 
 The ``__repr__`` for ranges follows the same format as used by PostgreSQL's ranges. ``[`` and ``]`` means that the boundaries are included in the range and ``(`` and ``)`` means that they are not.
 
-Ranges support set operations such as :class:`~spans.types.range_.union`, :class:`~spans.types.range_.difference` and :class:`~spans.types.range_.intersection`.
+Ranges support set operations such as :class:`~spans.types.Range.union`, :class:`~spans.types.Range.difference` and :class:`~spans.types.Range.intersection`.
 
 .. code-block:: python
 
