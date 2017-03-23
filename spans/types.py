@@ -108,7 +108,6 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
     def is_valid_range(cls, obj):
         return isinstance(obj, cls)
 
-
     @classmethod
     def is_valid_scalar(cls, obj):
         return isinstance(obj, cls.type)
@@ -688,17 +687,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         :return: ``True`` if this range is completely to the left of ``other``.
         """
 
-        if not self or not other:
-            # Handle empty ranges
-            return False
-        elif self.upper_inf or other.lower_inf:
-            return False
-        elif self.upper < other.lower:
-            return True
-        elif self.upper == other.lower:
-            return not self.upper_inc or not other.lower_inc
-        else:
-            return False
+        return self < other and not self.overlap(other)
 
     def right_of(self, other):
         """
