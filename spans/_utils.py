@@ -61,22 +61,28 @@ class PicklableSlotMixin(object):
 
 def sane_total_ordering(cls):
     def __ge__(self, other):
-        lt = self.__lt__(other)
-        if lt is NotImplemented:
+        gt = self.__gt__(other)
+        if gt is NotImplemented:
             return NotImplemented
+        elif gt:
+            return True
 
-        return not lt
+        eq = self.__eq__(other)
+        if eq is NotImplemented:
+            return NotImplemented
+        return eq
 
     def __le__(self, other):
         lt = self.__lt__(other)
         if lt is NotImplemented:
             return NotImplemented
+        elif lt:
+            return True
 
         eq = self.__eq__(other)
         if eq is NotImplemented:
             return NotImplemented
-
-        return lt or eq
+        return eq
 
     def __gt__(self, other):
         le = __le__(self, other)

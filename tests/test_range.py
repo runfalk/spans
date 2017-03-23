@@ -92,22 +92,51 @@ def test_equality():
     assert not intrange() == None
 
 
-def test_less_than():
-    assert intrange(1, 5) < intrange(2, 5)
-    assert intrange(1, 4) < intrange(1, 5)
-    assert not intrange(1, 5) < intrange(1, 5)
-    assert intrange(1, 5) < intrange(1, 5, upper_inc=True)
-    assert not intrange(1, 5, lower_inc=False) < intrange(1, 5)
+@pytest.mark.parametrize("a, b", [
+    (floatrange(1.0, 5.0), floatrange(2.0, 5.0)),
+    (floatrange(1.0, 4.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0, upper_inc=True)),
+    (floatrange(1.0, 5.0), floatrange(1.0)),
+    (floatrange(upper=5.0), floatrange(1.0, 5.0)),
+])
+def test_less_than(a, b):
+    assert a < b
+    assert not b < a
 
-    assert intrange(1, 5) <= intrange(1, 5)
-    assert intrange(1, 4) <= intrange(1, 5)
-    assert not intrange(2, 5) <= intrange(1, 5)
 
+@pytest.mark.parametrize("a, b", [
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 4.0), floatrange(1.0, 5.0)),
+])
+def test_less_equal(a, b):
+    assert a <= b
+
+
+@pytest.mark.parametrize("a, b", [
+    (floatrange.empty(), floatrange.empty()),
+    (floatrange.empty(), floatrange(1.0)),
+    (floatrange(upper=-1.0), floatrange.empty()),
+])
+def test_empty_comparison(a, b):
+    assert not a < b
+    assert not a > b
+
+
+@pytest.mark.parametrize("a, b", [
+    (intrange(), floatrange()),
+    (intrange(), None),
+])
+@pytest.mark.parametrize("op", [
+    "__lt__",
+    "__le__",
+    "__gt__",
+    "__ge__",
+])
+def test_comparison_operator_type_checks(a, b, op):
     # Hack used to work around version differences between Python 2 and 3
     # Python 2 has its own idea of how objects compare to each other.
     # Python 3 raises type error when an operation is not implemented
-    assert intrange().__lt__(floatrange()) is NotImplemented
-    assert intrange().__le__(floatrange()) is NotImplemented
+    assert getattr(a, op)(b) is NotImplemented
 
 
 def test_greater_than():
@@ -116,6 +145,7 @@ def test_greater_than():
     assert not intrange(1, 5) > intrange(1, 5)
     assert intrange(1, 5, upper_inc=True) > intrange(1, 5)
     assert intrange(1, 5, lower_inc=False) > intrange(1, 5)
+    assert intrange(2) > intrange(1, 5)
 
     assert intrange(1, 5) >= intrange(1, 5)
     assert intrange(1, 5) >= intrange(1, 4)

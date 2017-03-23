@@ -246,15 +246,36 @@ class Range(PicklableSlotMixin):
     def __lt__(self, other):
         if not self.is_valid_range(other):
             return NotImplemented
+        # When dealing with empty ranges there is not such thing as order
+        elif not self or not other:
+            return False
         elif self.lower == other.lower:
+            # If lower are equal for both, we need to consider the inclusiveness
+            # of both bounds
             if self.lower_inc != other.lower_inc:
                 return self.lower_inc
+            # If upper bounds are the same, self can only be smaller if it is
+            # not inclusive and other is
             elif self.upper == other.upper:
                 return not self.upper_inc and other.upper_inc
+            elif self.upper_inf or other.upper_inf:
+                return other.upper_inf
             else:
+                # We need consider the case when an upper bound is infinite
                 return self.upper < other.upper
+        elif self.lower_inf or other.lower_inf:
+            # If self.lower is unbound (infinite) it will always be smaller,
+            # unless other.lower is also unbound
+            return not other.lower_inf
         else:
             return self.lower < other.lower
+
+    def __gt__(self, other):
+        if not self.is_valid_range(other):
+            return NotImplemented
+        elif not self or not other:
+            return False
+        return not (self < other or self == other)
 
     def __nonzero__(self):
         return not self._range.empty
@@ -350,6 +371,10 @@ class Range(PicklableSlotMixin):
 
         See also :meth:`~spans.types.Range.intersection`.
         """
+
+        # Special case for empty ranges
+        if not self or not other:
+            return True
 
         if self < other:
             a, b = self, other
@@ -506,19 +531,16 @@ class Range(PicklableSlotMixin):
         :return: A new range that is the intersection between this and `other`.
         """
 
+        # Handle ranges not intersecting
         if not self or not other or not self.overlap(other):
             return self.empty()
-        elif self.contains(other):
-            return other
-        elif self.within(other):
-            return self
 
-        out = self
-        if not self.startsafter(other):
-            out = out.replace(lower=other.lower, lower_inc=other.lower_inc)
-        if not self.endsbefore(other):
-            return out.replace(upper=other.upper, upper_inc=other.upper_inc)
-        return out
+        lower_end_span = self if self.startsafter(other) else other
+        upper_end_span = self if self.endsbefore(other) else other
+
+        return lower_end_span.replace(
+            upper=upper_end_span.upper,
+            upper_inc=upper_end_span.upper_inc)
 
     def startswith(self, other):
         """
