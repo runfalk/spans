@@ -7,7 +7,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 0.5.0
 -------------
-Released on <unreleased>
+Released on 16th April, 2017
 
 This release is a preparation for a stable 1.0 release.
 
