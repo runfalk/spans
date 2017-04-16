@@ -12,6 +12,7 @@ Spans have no requirements but the standard library. It is known to work on the 
 - Python 3.5
 - Python 3.6
 - PyPy
+- PyPy3
 
 It may work on other version as well.
 
