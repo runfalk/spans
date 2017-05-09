@@ -115,6 +115,12 @@ def test_from_quarter(year, quarter, first_day):
         first_day, period="quarter")
 
 
+@pytest.mark.parametrize("quarter", [0, 5])
+def test_from_quarter_value_check(quarter):
+    with pytest.raises(ValueError):
+        assert daterange.from_quarter(2000, quarter)
+
+
 @pytest.mark.parametrize("year", [
     2000,
     2001,
