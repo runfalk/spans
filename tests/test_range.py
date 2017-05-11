@@ -221,7 +221,7 @@ def test_not_endsbefore(a, b):
 
 def test_endsbefore_type_check():
     with pytest.raises(TypeError):
-        intrange(1, 5).startsafter(1.0)
+        intrange(1, 5).endsbefore(1.0)
 
 
 @pytest.mark.parametrize("a, b", [
