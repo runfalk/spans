@@ -83,6 +83,16 @@ def test_from_date_type_check(param):
         daterange.from_date(param)
 
 
+@pytest.mark.parametrize("period", [
+    "Year",
+    "YEAR",
+    "foobar",
+])
+def test_from_date_period_check(period):
+    with pytest.raises(ValueError):
+        daterange.from_date(date(2000, 1, 1), period=period)
+
+
 @pytest.mark.parametrize("year, iso_week, first_day", [
     (2000, 1, date(2000, 1, 3)),
     (2000, 2, date(2000, 1, 10)),
