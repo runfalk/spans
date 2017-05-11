@@ -113,3 +113,8 @@ def test_prev_next_period(a, b):
 def test_offset(a, offset, b):
     assert a.offset(offset) == b
     assert a == b.offset(-offset)
+
+
+def test_zero_offset():
+    period = PeriodRange.from_week(2000, 1)
+    assert period.offset(0) is period
