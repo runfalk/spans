@@ -790,19 +790,18 @@ class DiscreteRange(Range):
         super(DiscreteRange, self).__init__(*args, **kwargs)
 
         # Normalize the internal range
-        if not self._range.empty:
-            lb = self._range.lower
-            if not self.lower_inf and not self._range.lower_inc:
-                lb = self.next(lb)
+        lb = self._range.lower
+        if not self.lower_inf and not self._range.lower_inc:
+            lb = self.next(lb)
 
-            ub = self._range.upper
-            if not self.upper_inf and self._range.upper_inc:
-                ub = self.next(ub)
+        ub = self._range.upper
+        if not self.upper_inf and self._range.upper_inc:
+            ub = self.next(ub)
 
-            if not self.lower_inf and not self.upper_inf and lb >= ub:
-                self._range = _empty_internal_range
-            else:
-                self._range = _internal_range(lb, ub, True, False, False)
+        if not self.lower_inf and not self.upper_inf and lb >= ub:
+            self._range = _empty_internal_range
+        else:
+            self._range = _internal_range(lb, ub, True, False, False)
 
     @classmethod
     def next(cls, curr):
