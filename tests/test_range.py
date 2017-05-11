@@ -267,6 +267,11 @@ def test_not_endswith(a, b):
     assert not a.endswith(b)
 
 
+def test_endswith_type_check():
+    with pytest.raises(TypeError):
+        intrange(1, 5).endswith(5.0)
+
+
 @pytest.mark.parametrize("a, b", [
     (intrange(1, 5), intrange(1, 5)),
     (intrange(1, 10), intrange(1, 5)),
