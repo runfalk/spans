@@ -92,3 +92,24 @@ def test_difference(range_type_a, range_type_b):
     assert span.lower == date(2000, 2, 1)
     assert span.upper == date(2000, 4, 1)
     assert type(span) is daterange
+
+
+@pytest.mark.parametrize("a, b", [
+    (PeriodRange.from_week(1999, 52), PeriodRange.from_week(2000, 1)),
+    (PeriodRange.from_week(2000, 1), PeriodRange.from_week(2000, 2)),
+    (PeriodRange.from_week(2009, 53), PeriodRange.from_week(2010, 1)),
+])
+def test_prev_next_period(a, b):
+    assert a.next_period() == b
+    assert a == b.prev_period()
+
+
+@pytest.mark.parametrize("a, offset, b", [
+    (PeriodRange.from_week(2000, 1), 52, PeriodRange.from_week(2001, 1)),
+    (PeriodRange.from_month(2000, 1), 12, PeriodRange.from_month(2001, 1)),
+    (PeriodRange.from_quarter(2000, 1), 4, PeriodRange.from_quarter(2001, 1)),
+    (PeriodRange.from_year(2000), 10, PeriodRange.from_year(2010)),
+])
+def test_offset(a, offset, b):
+    assert a.offset(offset) == b
+    assert a == b.offset(-offset)
