@@ -751,7 +751,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
 class DiscreteRange(Range):
     """
-    DiscreteRange(lower=None, upper=None, lower_inc=None, upper_inc)
+    DiscreteRange(lower=None, upper=None, lower_inc=None, upper_inc=None)
 
     Discrete ranges are a subset of ranges that works on discrete types. This
     includes ``int`` and ``datetime.date``.
