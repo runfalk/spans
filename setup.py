@@ -149,9 +149,11 @@ if __name__ == "__main__":
                 "codecov",
                 "pytest>=3.0",
                 "pytest-cov",
-                "Sphinx; python_version != '3.3'",
-                "sphinx-rtd-theme; python_version != '3.3'",
                 "twine",
+            ],
+            "dev:python_version!='3.3'": [
+                "Sphinx",
+                "sphinx-rtd-theme",
             ],
         },
         classifiers=(
