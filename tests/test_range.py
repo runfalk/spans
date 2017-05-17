@@ -439,3 +439,7 @@ def test_intersection(a, b, intersection):
 def test_pickling():
     span = intrange(1, 10)
     assert span == pickle.loads(pickle.dumps(span))
+
+
+def test_bug7_overlap_empty():
+    assert not intrange(1, 10).overlap(intrange.empty())

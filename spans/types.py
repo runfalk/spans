@@ -377,7 +377,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         This is the same as the ``&&`` operator for two ranges in PostgreSQL.
 
         :param other: Range to test against.
-        :return: ``True`` if ranges intersect, otherwise ``False``.
+        :return: ``True`` if ranges overlap, otherwise ``False``.
         :raises TypeError: If `other` is of another type than this range.
 
         .. seealso::
@@ -387,7 +387,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         # Special case for empty ranges
         if not self or not other:
-            return True
+            return False
 
         if self < other:
             a, b = self, other

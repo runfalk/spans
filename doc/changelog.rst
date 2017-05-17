@@ -5,6 +5,14 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 1.0.0
+-------------
+Released on <unreleased>
+
+- Fixed overlap with empty range incorrectly returns ``True``
+  (`bug #7 <https://github.com/runfalk/spans/issues/7>`_)
+
+
 Version 0.5.0
 -------------
 Released on 16th April, 2017
