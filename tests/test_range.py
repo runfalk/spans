@@ -158,21 +158,54 @@ def test_greater_than():
     assert intrange().__ge__(floatrange()) is NotImplemented
 
 
-def test_left_of():
-    assert intrange(1, 5).left_of(intrange(5, 10))
-    assert intrange(1, 5).left_of(intrange(10, 15))
-    assert not intrange(1, 5, upper_inc=True).left_of(intrange(5, 10))
-    assert not intrange(5, 10).left_of(intrange(1, 5))
-    assert not intrange.empty().left_of(intrange.empty())
+@pytest.mark.parametrize("a, b", [
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0, lower_inc=False), floatrange(5.0, 10.0, upper_inc=True)),
+])
+def test_left_of(a, b):
+    assert a.left_of(b)
+    assert a << b
 
 
-def test_right_of():
-    assert intrange(5, 10).right_of(intrange(1, 5))
-    assert intrange(5, 10).right_of(intrange(1, 5))
-    assert not intrange(5, 10).right_of(intrange(1, 5, upper_inc=True))
-    assert not intrange(1, 5).right_of(intrange(5, 10))
+@pytest.mark.parametrize("a, b", [
+    (floatrange(5.0, 10.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0)),
+    (floatrange.empty(), floatrange.empty()),
+])
+def test_not_left_of(a, b):
+    assert not a.left_of(b)
+    assert not (a << b)
 
-    assert not intrange.empty().right_of(intrange.empty())
+
+def test_left_of_type_check():
+    with pytest.raises(TypeError):
+        floatrange().left_of(None)
+    assert floatrange().__lshift__(None) is NotImplemented
+
+
+@pytest.mark.parametrize("a, b", [
+    (floatrange(5.0, 10.0), floatrange(1.0, 5.0)),
+    (floatrange(5.0, 10.0, lower_inc=False), floatrange(1.0, 5.0, upper_inc=True)),
+])
+def test_right_of(a, b):
+    assert a.right_of(b)
+    assert a >> b
+
+
+@pytest.mark.parametrize("a, b", [
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
+    (floatrange(5.0, 10.0), floatrange(1.0, 5.0, upper_inc=True)),
+    (floatrange.empty(), floatrange.empty()),
+])
+def test_not_right_of(a, b):
+    assert not a.right_of(b)
+    assert not (a >> b)
+
+
+def test_right_of_type_check():
+    with pytest.raises(TypeError):
+        floatrange().right_of(None)
+    assert floatrange().__rshift__(None) is NotImplemented
 
 
 @pytest.mark.parametrize("a, b", [
@@ -283,6 +316,7 @@ def test_endswith_type_check():
 ])
 def test_contains(a, b):
     assert a.contains(b)
+    assert b in a
 
 
 @pytest.mark.parametrize("a, b", [
@@ -295,6 +329,7 @@ def test_contains(a, b):
 ])
 def test_not_contains(a, b):
     assert not a.contains(b)
+    assert b not in a
 
 
 def test_contains_type_check():
@@ -393,6 +428,8 @@ def test_adjacent_type_check(value):
 def test_union(a, b, union):
     assert a.union(b) == union
     assert b.union(a) == union
+    assert a | b == union
+    assert b | a == union
 
 
 @pytest.mark.parametrize("a, b", [
@@ -407,6 +444,20 @@ def test_broken_union(a, b):
     with pytest.raises(ValueError):
         b.union(a)
 
+    with pytest.raises(ValueError):
+        a | b
+
+    with pytest.raises(ValueError):
+        b | a
+
+
+def test_union_typecheck():
+    a = floatrange(1.0, 5.0)
+    b = intrange(5, 10)
+
+    with pytest.raises(TypeError):
+        a.union(b)
+    assert a.__or__(b) is NotImplemented
 
 @pytest.mark.parametrize("a, b, difference", [
     (intrange(1, 5), intrange.empty(), intrange(1, 5)),
@@ -420,11 +471,24 @@ def test_broken_union(a, b):
 ])
 def test_difference(a, b, difference):
     assert a.difference(b) == difference
+    assert a - b == difference
 
 
 def test_broken_difference():
     with pytest.raises(ValueError):
         intrange(1, 15).difference(intrange(5, 10))
+
+    with pytest.raises(ValueError):
+        intrange(1, 15) - intrange(5, 10)
+
+
+def test_difference_typecheck():
+    a = floatrange(1.0, 10.0)
+    b = intrange(5, 10)
+
+    with pytest.raises(TypeError):
+        a.difference(b)
+    assert a.__sub__(b) is NotImplemented
 
 
 @pytest.mark.parametrize("a, b, intersection", [
@@ -438,6 +502,18 @@ def test_broken_difference():
 ])
 def test_intersection(a, b, intersection):
     assert a.intersection(b) == intersection
+    assert b.intersection(a) == intersection
+    assert a & b == intersection
+    assert b & a == intersection
+
+
+def test_intersection_typecheck():
+    a = floatrange(1.0, 5.0)
+    b = intrange(5, 10)
+
+    with pytest.raises(TypeError):
+        a.intersection(b)
+    assert a.__and__(b) is NotImplemented
 
 
 def test_pickling():

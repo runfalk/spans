@@ -106,10 +106,13 @@ def test_union():
     a = intrangeset([intrange(1, 5), intrange(20, 30)])
     b = intrangeset([intrange(5, 10), intrange(20, 100)])
     union = [intrange(1, 10), intrange(20, 100)]
+
     assert list(a.union(b)) == union
+    assert list(a | b) == union
 
     with pytest.raises(TypeError):
-        intrangeset().union(intrange())
+        intrangeset([]).union(intrange())
+    assert intrangeset([]).__or__(intrange()) is NotImplemented
 
 
 def test_difference():
@@ -118,9 +121,11 @@ def test_difference():
     difference = [intrange(1, 5)]
 
     assert list(a.difference(b)) == difference
+    assert list(a - b) == difference
 
     with pytest.raises(TypeError):
-        intrangeset().difference(intrange())
+        intrangeset([]).difference(intrange())
+    assert intrangeset([]).__sub__(intrange()) is NotImplemented
 
 
 def test_intersection():
@@ -129,11 +134,13 @@ def test_intersection():
     intersection = [intrange(20, 30)]
 
     assert list(a.intersection(b)) == intersection
+    assert list(a & b) == intersection
     assert not intrangeset([intrange(1, 5)]).intersection(
         intrangeset([intrange(5, 10)]))
 
     with pytest.raises(TypeError):
-        intrangeset().intersection(intrange())
+        intrangeset([]).intersection(intrange())
+    assert intrangeset([]).__and__(intrange()) is NotImplemented
 
 
 def test_values():

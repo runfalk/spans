@@ -9,8 +9,24 @@ Version 1.0.0
 -------------
 Released on <unreleased>
 
+- Added ``NotImplemented`` for ``<<`` and ``>>`` operators when there is a type
+  mismatch
+- Added ``|`` operator for unions of :class:`~spans.types.Range` and
+  ``NotImplemented`` support for :class:`~spans.settypes.RangeSet`
+- Added ``&`` operator for intersections of :class:`~spans.types.Range` and
+  ``NotImplemented`` support for :class:`~spans.settypes.RangeSet`
+- Added ``-`` operator for differences of :class:`~spans.types.Range` and
+  ``NotImplemented`` support for :class:`~spans.settypes.RangeSet`
 - Fixed overlap with empty range incorrectly returns ``True``
   (`bug #7 <https://github.com/runfalk/spans/issues/7>`_)
+- Fixed issue with :meth:`~spans.types.Range.contains` for scalars on unbounded
+  ranges
+- Fixed type check for :meth:`~spans.types.Range.right_of`
+- Fixed type check for :meth:`~spans.settypes.RangeSet.union`
+- Fixed type check for :meth:`~spans.settypes.RangeSet.intersection`
+- Fixed type check for :meth:`~spans.settypes.RangeSet.difference`
+- Fixed infinite iterators not being supported for
+  :class:`~spans.types.intrange`
 
 
 Version 0.5.0

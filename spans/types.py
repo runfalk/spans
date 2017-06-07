@@ -3,6 +3,7 @@ import sys
 
 from collections import namedtuple
 from datetime import date, datetime, timedelta
+from functools import wraps
 
 from ._compat import *
 from ._utils import date_from_iso_week, PartialOrderingMixin, PicklableSlotMixin
@@ -467,6 +468,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         :raises ValueError: If `other` can not be merged with this range.
         """
 
+        if not self.is_valid_range(other):
+            msg = "Unsupported type to test for union '{.__class__.__name__}'"
+            raise TypeError(msg.format(other))
+
         # Optimize empty ranges
         if not self:
             return other
@@ -528,6 +533,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                             computed.
         """
 
+        if not self.is_valid_range(other):
+            msg = "Unsupported type to test for difference '{.__class__.__name__}'"
+            raise TypeError(msg.format(other))
+
         # Consider empty ranges or no overlap
         if not self or not other or not self.overlap(other):
             return self
@@ -560,6 +569,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         :param other: Range to interect with.
         :return: A new range that is the intersection between this and `other`.
         """
+
+        if not self.is_valid_range(other):
+            msg = "Unsupported type to test for intersection '{.__class__.__name__}'"
+            raise TypeError(msg.format(other))
 
         # Handle ranges not intersecting
         if not self or not other or not self.overlap(other):
@@ -723,6 +736,12 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         :return: ``True`` if this range is completely to the left of ``other``.
         """
 
+        if not self.is_valid_range(other):
+            msg = (
+                "Left of is not supported for '{}', provide a proper range "
+                "class").format(other.__class__.__name__)
+            raise TypeError(msg)
+
         return self < other and not self.overlap(other)
 
     def right_of(self, other):
@@ -748,12 +767,46 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         :return: ``True`` if this range is completely to the right of ``other``.
         """
 
+        if not self.is_valid_range(other):
+            msg = (
+                "Right of is not supported for '{}', provide a proper range "
+                "class").format(other.__class__.__name__)
+            raise TypeError(msg)
+
         return other.left_of(self)
 
-    # TODO: Properly implement NotImplemented
+    def __lshift__(self, other):
+        try:
+            return self.left_of(other)
+        except TypeError:
+            return NotImplemented
+
+    def __rshift__(self, other):
+        try:
+            return self.right_of(other)
+        except TypeError:
+            return NotImplemented
+
+    def __or__(self, other):
+        try:
+            return self.union(other)
+        except TypeError:
+            return NotImplemented
+
+    def __and__(self, other):
+        try:
+            return self.intersection(other)
+        except TypeError:
+            return NotImplemented
+
+    def __sub__(self, other):
+        try:
+            return self.difference(other)
+        except TypeError:
+            return NotImplemented
+
+    # ``in`` operator support
     __contains__ = contains
-    __lshift__ = left_of
-    __rshift__ = right_of
 
     # Python 3 support
     __bool__ = __nonzero__
@@ -875,10 +928,13 @@ class DiscreteRange(Range):
             return super(DiscreteRange, self).endswith(other)
 
     def __iter__(self):
-        next = self.lower
-        while next < self.upper:
-            yield next
-            next = self.next(next)
+        if self.lower_inf:
+            raise TypeError("Range with no lower bound can't be iterated over")
+
+        value = self.lower
+        while self.upper_inf or value < self.upper:
+            yield value
+            value = self.next(value)
 
 
 class OffsetableRangeMixin(object):

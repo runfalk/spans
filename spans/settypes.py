@@ -249,8 +249,24 @@ class RangeSet(PartialOrderingMixin):
 
         return self.__class__([self.type()]).difference(self)
 
-    def _test_type(self, item):
-        if not isinstance(item, self.type):
+    @classmethod
+    def is_valid_rangeset(cls, obj):
+        return isinstance(obj, cls)
+
+    @classmethod
+    def is_valid_range(cls, obj):
+        return isinstance(obj, cls.type)
+
+    def _test_rangeset_type(self, item):
+        if not self.is_valid_rangeset(item):
+            raise TypeError((
+                "Invalid range type '{range_type.__name__}' expected "
+                "'{expected_type.__name__}'").format(
+                    expected_type=self.type,
+                    range_type=item.__class__))
+
+    def _test_range_type(self, item):
+        if not self.is_valid_range(item):
             raise TypeError((
                 "Invalid range type '{range_type.__name__}' expected "
                 "'{expected_type.__name__}'").format(
@@ -308,7 +324,7 @@ class RangeSet(PartialOrderingMixin):
         # All range sets contain the empty range. However, we must verify the
         # type of what is being passed as well to make sure we indeed got an
         # empty set of the correct type.
-        if isinstance(item, self.type) and not item:
+        if not item and self.is_valid_range(item):
             return True
 
         for r in self._list:
@@ -337,7 +353,7 @@ class RangeSet(PartialOrderingMixin):
         :raises TypeError: If any of the given ranges are of incorrect type.
         """
 
-        self._test_type(item)
+        self._test_range_type(item)
 
         # If item is empty, do not add it
         if not item:
@@ -384,7 +400,7 @@ class RangeSet(PartialOrderingMixin):
         :param item: Range to remove from this set.
         """
 
-        self._test_type(item)
+        self._test_range_type(item)
 
         # If the list currently only have an empty range do nothing since an
         # empty RangeSet can't be removed from anyway.
@@ -462,6 +478,7 @@ class RangeSet(PartialOrderingMixin):
         # Make a copy of self and add all its ranges to the copy
         union = self.copy()
         for other in others:
+            self._test_rangeset_type(other)
             for r in other:
                 union.add(r)
         return union
@@ -482,6 +499,7 @@ class RangeSet(PartialOrderingMixin):
         # Make a copy of self and remove all its ranges from the copy
         difference = self.copy()
         for other in others:
+            self._test_rangeset_type(other)
             for r in other:
                 difference.remove(r)
         return difference
@@ -505,6 +523,8 @@ class RangeSet(PartialOrderingMixin):
         output = self
 
         for other in others:
+            self._test_rangeset_type(other)
+
             # Intermediate RangeSet containing intersection for this current
             # iteration.
             intersection = self.__class__([])
@@ -528,13 +548,26 @@ class RangeSet(PartialOrderingMixin):
 
         return output
 
-    __contains__ = contains
+    def __or__(self, other):
+        try:
+            return self.union(other)
+        except TypeError:
+            return NotImplemented
 
-    # Some operators that set() has:
-    # TODO: Use NotImplemented
-    __or__ = union
-    __and__ = intersection
-    __sub__ = difference
+    def __and__(self, other):
+        try:
+            return self.intersection(other)
+        except TypeError:
+            return NotImplemented
+
+    def __sub__(self, other):
+        try:
+            return self.difference(other)
+        except TypeError:
+            return NotImplemented
+
+    # ``in`` operator support
+    __contains__ = contains
 
     # Python 3 support
     __bool__ = __nonzero__

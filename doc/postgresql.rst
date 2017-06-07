@@ -27,9 +27,9 @@ Operators
 Most operators are not overloaded in Python to their PostgreSQL equivalents.
 Instead Spans implements the functionality using methods.
 
-===============================  ========================  ===============================
+===============================  ========================  ==================================
 Operator                         PostgreSQL                Python
-===============================  ========================  ===============================
+===============================  ========================  ==================================
 Equal                            ``a = b``                 ``a == b``
 Not equal                        ``a != b`` or ``a <> b``  ``a != b``
 Less than                        ``a < b``                 ``a < b``
@@ -44,10 +44,10 @@ Strictly right of                ``a >> b``                ``a.right_of(b)`` or 
 Does not extend to the right of  ``a &< b``                ``a.endsbefore(b)``
 Does not extend to the left of   ``a &> b``                ``a.startsafter(b)``
 Is adjacent to                   ``a -|- b``               ``a.adjacent(b)``
-Union                            ``a + b``                 ``a.union(b)``
-Intersection                     ``a * b``                 ``a.intersection(b)``
-Difference                       ``a - b``                 ``a.difference(b)``
-===============================  ========================  ===============================
+Union                            ``a + b``                 ``a.union(b)`` or ``a | b``
+Intersection                     ``a * b``                 ``a.intersection(b)`` or ``a & b``
+Difference                       ``a - b``                 ``a.difference(b)`` or ``a - b``
+===============================  ========================  ==================================
 
 
 Functions
