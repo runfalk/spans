@@ -17,6 +17,7 @@ Released on <unreleased>
   ``NotImplemented`` support for :class:`~spans.settypes.RangeSet`
 - Added ``-`` operator for differences of :class:`~spans.types.Range` and
   ``NotImplemented`` support for :class:`~spans.settypes.RangeSet`
+- Added ``reversed()`` iterator support for :class:`~spans.types.DiscreteRange`
 - Fixed overlap with empty range incorrectly returns ``True``
   (`bug #7 <https://github.com/runfalk/spans/issues/7>`_)
 - Fixed issue with :meth:`~spans.types.Range.contains` for scalars on unbounded
@@ -26,7 +27,7 @@ Released on <unreleased>
 - Fixed type check for :meth:`~spans.settypes.RangeSet.intersection`
 - Fixed type check for :meth:`~spans.settypes.RangeSet.difference`
 - Fixed infinite iterators not being supported for
-  :class:`~spans.types.intrange`
+  :class:`~spans.types.DiscreteRange`
 
 
 Version 0.5.0

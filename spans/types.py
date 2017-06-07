@@ -936,6 +936,15 @@ class DiscreteRange(Range):
             yield value
             value = self.next(value)
 
+    def __reversed__(self):
+        if self.upper_inf:
+            raise TypeError("Range with no upper bound can't be iterated over")
+
+        value = self.last
+        while self.lower_inf or value >= self.lower:
+            yield value
+            value = self.prev(value)
+
 
 class OffsetableRangeMixin(object):
     """
