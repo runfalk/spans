@@ -364,7 +364,6 @@ class RangeSet(PartialOrderingMixin):
         while i < len(self._list):
             r = self._list[i]
 
-            #import pdb; pdb.set_trace()
             if r.overlap(item) or r.adjacent(item):
                 buffer.append(self._list.pop(i))
                 continue
