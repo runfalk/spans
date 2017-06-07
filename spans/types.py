@@ -1,3 +1,4 @@
+import operator
 import sys
 
 from collections import namedtuple
@@ -322,14 +323,23 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             else:
                 return False
         elif self.is_valid_scalar(other):
-            if self.lower_inc and self.upper_inc:
-                return self.lower <= other <= self.upper
-            elif self.lower_inc:
-                return self.lower <= other < self.upper
-            elif self.upper_inc:
-                return self.lower < other <= self.upper
-            else:
-                return self.lower < other < self.upper
+            # If the lower bounary is not unbound we can safely perform the
+            # comparison. Otherwise we'll try to compare a scalar to None, which
+            # is bad
+            is_within_lower = True
+            if not self.lower_inf:
+                lower_cmp = operator.le if self.lower_inc else operator.lt
+                is_within_lower = lower_cmp(self.lower, other)
+
+            # If the upper bounary is not unbound we can safely perform the
+            # comparison. Otherwise we'll try to compare a scalar to None, which
+            # is bad
+            is_within_upper = True
+            if not self.upper_inf:
+                upper_cmp = operator.ge if self.upper_inc else operator.gt
+                is_within_upper = upper_cmp(self.upper, other)
+
+            return is_within_lower and is_within_upper
         else:
             raise TypeError(
                 "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(

@@ -273,21 +273,25 @@ def test_endswith_type_check():
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(1, 5)),
-    (intrange(1, 10), intrange(1, 5)),
-    (intrange(1, 10), intrange(5, 10)),
-    (intrange(1, 5), 1),
-    (intrange(1, 5), 3),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 10.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 10.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), 1.0),
+    (floatrange(1.0, 5.0), 3.0),
+    (floatrange(1.0), 3.0),
+    (floatrange(upper=5.0), 3.0),
 ])
 def test_contains(a, b):
     assert a.contains(b)
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5, lower_inc=False), intrange(1, 5)),
-    (intrange(1, 5), intrange(1, 5, upper_inc=True)),
-    (intrange(1, 5, lower_inc=False), 1),
-    (intrange(1, 5), 5),
+    (floatrange(1.0, 5.0, lower_inc=False), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0, upper_inc=True)),
+    (floatrange(1.0, 5.0, lower_inc=False), 1.0),
+    (floatrange(1.0, 5.0), 5.0),
+    (floatrange(1.0, lower_inc=False), 1.0),
+    (floatrange(upper=5.0), 5.0),
 ])
 def test_not_contains(a, b):
     assert not a.contains(b)
