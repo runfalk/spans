@@ -1,7 +1,7 @@
 import pickle
 import pytest
 
-from spans import floatrange, intrange, intrangeset
+from spans import floatrange, floatrangeset, intrange, intrangeset
 
 
 def test_empty():
@@ -58,6 +58,14 @@ def test_not_contains(value):
 ])
 def test_contains_empty(rset):
     assert rset.contains(intrange.empty())
+
+
+def test_contains_type_check():
+    with pytest.raises(ValueError):
+        intrangeset([]).contains(1.0)
+
+    with pytest.raises(ValueError):
+        intrangeset([]).contains(floatrangeset([]))
 
 
 def test_add():

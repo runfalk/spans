@@ -23,6 +23,7 @@ Released on <unreleased>
 - Fixed issue with :meth:`~spans.types.Range.contains` for scalars on unbounded
   ranges
 - Fixed type check for :meth:`~spans.types.Range.right_of`
+- Fixed type check for :meth:`~spans.settypes.RangeSet.contains`
 - Fixed type check for :meth:`~spans.settypes.RangeSet.union`
 - Fixed type check for :meth:`~spans.settypes.RangeSet.intersection`
 - Fixed type check for :meth:`~spans.settypes.RangeSet.difference`

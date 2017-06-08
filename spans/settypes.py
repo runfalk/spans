@@ -255,7 +255,11 @@ class RangeSet(PartialOrderingMixin):
 
     @classmethod
     def is_valid_range(cls, obj):
-        return isinstance(obj, cls.type)
+        return cls.type.is_valid_range(obj)
+
+    @classmethod
+    def is_valid_scalar(cls, obj):
+        return cls.type.is_valid_scalar(obj)
 
     def _test_rangeset_type(self, item):
         if not self.is_valid_rangeset(item):
@@ -321,16 +325,17 @@ class RangeSet(PartialOrderingMixin):
         .. versionadded:: 0.2.0
         """
 
-        # All range sets contain the empty range. However, we must verify the
-        # type of what is being passed as well to make sure we indeed got an
-        # empty set of the correct type.
-        if not item and self.is_valid_range(item):
+        # Verify the type here since contains does not validate the type unless
+        # there are items in self._list
+        if not self.is_valid_range(item) and not self.is_valid_scalar(item):
+            msg = "Unsupported item type provided '{}'"
+            raise ValueError(msg.format(item.__class__.__name__))
+
+        # All range sets contain the empty range
+        if not item:
             return True
 
-        for r in self._list:
-            if r.contains(item) is True:
-                return True
-        return False
+        return any(r.contains(item) for r in self._list)
 
     def add(self, item):
         """
