@@ -93,7 +93,7 @@ def role_simplifier(processor, role, argument, content):
         return format.get(role, "``{}``").format(content + extra.get(role, ""))
 
 
-@rst_pre_processor.add_role("pep8")
+@rst_pre_processor.add_role("pep")
 def pep_simplifier(processor, role, argument, content):
     matches = re.match(r"(?P<pep>\d+)(?P<anchor>#[^$]+)?", content)
 
@@ -101,7 +101,6 @@ def pep_simplifier(processor, role, argument, content):
         return "``PEP{}``".format(content)
 
     fmt = "`PEP{pep} <https://www.python.org/dev/peps/pep-{pep:>04}/{anchor}>`_"
-    print(matches.groupdict())
     return fmt.format(**matches.groupdict())
 
 
