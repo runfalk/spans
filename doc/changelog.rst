@@ -7,7 +7,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 1.0.0
 -------------
-Released on <unreleased>
+Released on 8th June, 2017
 
 - Added ``NotImplemented`` for ``<<`` and ``>>`` operators when there is a type
   mismatch
