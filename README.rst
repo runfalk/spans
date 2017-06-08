@@ -4,7 +4,7 @@ Spans
 
 Spans is a pure Python implementation of PostgreSQL's
 `range types <http://www.postgresql.org/docs/9.6/static/rangetypes.html>`_.
-Range types are conveinent when working with intervals of any kind. Every time
+Range types are convenient when working with intervals of any kind. Every time
 you've found yourself working with date_start and date_end, an interval may have
 been what you were actually looking for.
 
