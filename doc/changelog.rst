@@ -5,6 +5,14 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 1.0.1
+-------------
+Released on <unreleased>
+
+- Fixed ``PartialOrderingMixin`` not using ``__slots__``
+  (`bug #10 <https://github.com/runfalk/spans/issues/10>`_)
+
+
 Version 1.0.0
 -------------
 Released on 8th June, 2017
