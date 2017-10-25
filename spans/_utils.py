@@ -59,6 +59,8 @@ class PicklableSlotMixin(object):
 
 
 class PartialOrderingMixin(object):
+    __slots__ = ()
+
     def __le__(self, other):
         lt = self.__lt__(other)
         eq = self.__eq__(other)

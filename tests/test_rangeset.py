@@ -1,7 +1,9 @@
 import pickle
 import pytest
 
-from spans import floatrange, floatrangeset, intrange, intrangeset
+from spans import \
+    daterangeset, datetimerangeset, floatrange, floatrangeset, intrange, \
+    intrangeset, strrangeset, timedeltarangeset
 
 
 def test_empty():
@@ -216,7 +218,26 @@ def test_bug3_intersection():
 
 def test_bug4_empty_set_iteration():
     """
-    `Bug #4 <https://github.com/runfalk/spans/issues/4>`
+    `Bug #4 <https://github.com/runfalk/spans/issues/4>`_
     """
 
     assert list(intrangeset([])) == []
+
+
+@pytest.mark.parametrize("cls", [
+    daterangeset,
+    datetimerangeset,
+    intrangeset,
+    floatrangeset,
+    strrangeset,
+    timedeltarangeset,
+])
+def test_bug10_missing_slots_in_cls_hierarchy(cls):
+    """
+    `Bug #10 <https://github.com/runfalk/spans/issues/10`_
+    """
+
+    for c in cls.mro():
+        if c is object:
+            continue
+        assert hasattr(c, "__slots__")

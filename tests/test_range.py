@@ -1,7 +1,9 @@
 import pickle
 import pytest
 
-from spans import floatrange, intrange
+from spans import \
+    daterange, datetimerange, floatrange, intrange, PeriodRange, strrange, \
+    timedeltarange
 
 
 def test_empty():
@@ -523,3 +525,23 @@ def test_pickling():
 
 def test_bug7_overlap_empty():
     assert not intrange(1, 10).overlap(intrange.empty())
+
+
+@pytest.mark.parametrize("cls", [
+    daterange,
+    datetimerange,
+    intrange,
+    floatrange,
+    PeriodRange,
+    strrange,
+    timedeltarange,
+])
+def test_bug10_missing_slots_in_cls_hierarchy(cls):
+    """
+    `Bug #10 <https://github.com/runfalk/spans/issues/10>`_
+    """
+
+    for c in cls.mro():
+        if c is object:
+            continue
+        assert hasattr(c, "__slots__")
