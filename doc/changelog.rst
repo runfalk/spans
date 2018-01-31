@@ -7,7 +7,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 1.0.1
 -------------
-Released on <unreleased>
+Released on 31st January, 2018
 
 - Fixed ``PartialOrderingMixin`` not using ``__slots__``
   (`bug #10 <https://github.com/runfalk/spans/issues/10>`_)
