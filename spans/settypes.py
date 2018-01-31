@@ -1,6 +1,6 @@
 from itertools import chain
 
-from ._compat import add_metaclass
+from ._compat import add_metaclass, fix_timedelta_repr
 from ._utils import PartialOrderingMixin
 from .types import Range
 from .types import *
@@ -666,6 +666,7 @@ class datetimerangeset(RangeSet):
     type = datetimerange
 
 
+@fix_timedelta_repr
 class timedeltarangeset(RangeSet):
     """
     Range set that operates on :class:`~spans.types.timedeltarange`.

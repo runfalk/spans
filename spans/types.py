@@ -1320,6 +1320,7 @@ class datetimerange(Range, OffsetableRangeMixin):
     offset_type = timedelta
 
 
+@fix_timedelta_repr
 class timedeltarange(Range, OffsetableRangeMixin):
     """
     Range that operates on datetime's timedelta class.

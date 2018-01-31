@@ -1,9 +1,11 @@
 """Compatibility module for python 3"""
 
+import re
 import sys
 
 __all__ = [
     "add_metaclass",
+    "fix_timedelta_repr",
     "is_python2",
     "iter_range",
     "bstr",
@@ -62,3 +64,33 @@ def add_metaclass(metaclass):
 
         return metaclass(cls.__name__, cls.__bases__, orig_vars)
     return wrapper
+
+
+def fix_timedelta_repr(func):
+    """
+    Account repr change for timedelta in Python 3.7 and above in docstrings.
+
+    This is needed to make some doctests pass on Python 3.7 and above. This
+    change was introduced by `bpo-30302 <https://bugs.python.org/issue30302>`_
+    """
+    # We don't need to do anything if we're not on 3.7 or above
+    if version < (3, 7):
+        return func
+
+    def fix_timedelta(match):
+        values = match.group(1).split(", ")
+        param_repr = ", ".join(
+            "{}={}".format(param, value)
+            for param, value in zip(("days", "seconds", "microseconds"), values)
+            if value != "0"
+        )
+
+        # If we have a zero length timedelta it should be represented as
+        # timedelta(0), i.e. without named parameters
+        if not param_repr:
+            param_repr = "0"
+
+        return "timedelta({})".format(param_repr)
+
+    func.__doc__ = re.sub(r"timedelta\(([^)]+)\)", fix_timedelta, func.__doc__)
+    return func
