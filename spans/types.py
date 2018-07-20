@@ -484,7 +484,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         else:
             a, b = other, self
 
-        if a.upper <= b.lower and not a.adjacent(b):
+        if (a.upper < b.lower or a.upper == b.lower and not
+                a.upper_inc and not b.lower_inc) and not a.adjacent(b):
             raise ValueError("Ranges must be either adjacent or overlapping")
 
         # a.lower is guaranteed to be the lower bound, but either a.upper or

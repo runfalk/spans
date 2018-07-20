@@ -5,6 +5,15 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 1.0.2
+-------------
+Released on 20th July, 2018
+
+ - Fixed :meth:`~spans.types.Range.union` when ``upper_inc`` is set to ``True``
+   (`bug #11 <https://github.com/runfalk/spans/issues/11>`_,
+   `Michael Krahe <https://github.com/der-michik>`_)
+
+
 Version 1.0.1
 -------------
 Released on 31st January, 2018
