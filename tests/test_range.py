@@ -545,3 +545,13 @@ def test_bug10_missing_slots_in_cls_hierarchy(cls):
         if c is object:
             continue
         assert hasattr(c, "__slots__")
+
+def test_bug11_valid_union_call_detected_as_invalid():
+    """
+    `Bug #11 <https://github.com/runfalk/spans/issues/11>`_
+    """
+    start, middle, end = 0.0, 1.0, 2.0
+    a = floatrange(start, middle, upper_inc=True)
+    b = floatrange(middle, end)
+
+    assert a.union(b) == floatrange(start, end)
