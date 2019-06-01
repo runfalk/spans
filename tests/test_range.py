@@ -95,6 +95,7 @@ def test_replace():
     rebounded_span = unbounded_span.replace(lower=1.0)
     assert not rebounded_span.lower_inc
 
+
 def test_unbounded():
     range = intrange()
 
@@ -104,6 +105,19 @@ def test_unbounded():
     assert range.lower_inf
     assert range.upper_inf
 
+
+@pytest.mark.parametrize("value, rep", [
+    (floatrange(), "floatrange()"),
+    (floatrange.empty(), "floatrange.empty()"),
+    (floatrange(1.0), "floatrange(1.0)"),
+    (floatrange(1.0, 10.0), "floatrange(1.0, 10.0)"),
+    (floatrange(None, 1.0), "floatrange(upper=1.0)"),
+    (floatrange(1.0, lower_inc=False), "floatrange(1.0, lower_inc=False)"),
+    (floatrange(upper=10.0, upper_inc=True), "floatrange(upper=10.0, upper_inc=True)"),
+    (intrange(1, 10), "intrange(1, 10)"),
+])
+def test_repr(value, rep):
+    assert repr(value) == rep
 
 def test_immutable():
     range = intrange()

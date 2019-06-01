@@ -116,9 +116,9 @@ class OffsetableRangeSetMixin(object):
         Shift the range set to the left or right with the given offset
 
             >>> intrangeset([intrange(0, 5), intrange(10, 15)]).offset(5)
-            intrangeset([intrange([5,10)), intrange([15,20))])
+            intrangeset([intrange(5, 10), intrange(15, 20)])
             >>> intrangeset([intrange(5, 10), intrange(15, 20)]).offset(-5)
-            intrangeset([intrange([0,5)), intrange([10,15))])
+            intrangeset([intrange(0, 5), intrange(10, 15)])
 
         This function returns an offset copy of the original set, i.e. updating
         is not done in place.
@@ -141,7 +141,7 @@ class RangeSet(PartialOrderingMixin):
       new range set that does not intersect the original range set at all.
 
           >>> ~intrangeset([intrange(1, 5)])
-          intrangeset([intrange((,1)), intrange([5,))])
+          intrangeset([intrange(upper=1), intrange(5)])
 
     - Contrary to ranges. A range set may be split into multiple ranges when
       performing set operations such as union, difference or intersection.
@@ -196,7 +196,7 @@ class RangeSet(PartialOrderingMixin):
 
             >>> list(intrangeset(
             ...     [intrange(1, 5), intrange(5, 10), intrange(15, 20)]))
-            [intrange([1,10)), intrange([15,20))]
+            [intrange(1, 10), intrange(15, 20)]
 
         If the set is empty an empty iterator is returned.
 
@@ -243,7 +243,7 @@ class RangeSet(PartialOrderingMixin):
         values this contains.
 
             >>> ~intrangeset([intrange(1, 5)])
-            intrangeset([intrange((,1)), intrange([5,))])
+            intrangeset([intrange(upper=1), intrange(5)])
 
         """
 
@@ -344,13 +344,13 @@ class RangeSet(PartialOrderingMixin):
             >>> rs = intrangeset([])
             >>> rs.add(intrange(1, 10))
             >>> rs
-            intrangeset([intrange([1,10))])
+            intrangeset([intrange(1, 10)])
             >>> rs.add(intrange(5, 15))
             >>> rs
-            intrangeset([intrange([1,15))])
+            intrangeset([intrange(1, 15)])
             >>> rs.add(intrange(20, 30))
             >>> rs
-            intrangeset([intrange([1,15)), intrange([20,30))])
+            intrangeset([intrange(1, 15), intrange(20, 30)])
 
         This operation updates the set in place.
 
@@ -399,7 +399,7 @@ class RangeSet(PartialOrderingMixin):
             >>> rs = intrangeset([intrange(1, 15)])
             >>> rs.remove(intrange(5, 10))
             >>> rs
-            intrangeset([intrange([1,5)), intrange([10,15))])
+            intrangeset([intrange(1, 5), intrange(10, 15)])
 
         :param item: Range to remove from this set.
         """
@@ -444,7 +444,7 @@ class RangeSet(PartialOrderingMixin):
         with no gaps.
 
             >>> intrangeset([intrange(1, 5), intrange(30, 40)]).span()
-            intrange([1,40))
+            intrange(1, 40)
 
 
         This method can be used to implement the PostgreSQL function
@@ -453,7 +453,7 @@ class RangeSet(PartialOrderingMixin):
             >>> a = intrange(1, 5)
             >>> b = intrange(10, 15)
             >>> intrangeset([a, b]).span()
-            intrange([1,15))
+            intrange(1, 15)
 
         :return: A new range the contains this entire range set.
         """
@@ -473,7 +473,7 @@ class RangeSet(PartialOrderingMixin):
 
             >>> intrangeset([intrange(1, 5)]).union(
             ...     intrangeset([intrange(5, 10)]))
-            intrangeset([intrange([1,10))])
+            intrangeset([intrange(1, 10)])
 
         :param other: Range set to merge with.
         :return: A new range set that is the union of this and `other`.
@@ -494,7 +494,7 @@ class RangeSet(PartialOrderingMixin):
 
             >>> intrangeset([intrange(1, 15)]).difference(
             ...     intrangeset([intrange(5, 10)]))
-            intrangeset([intrange([1,5)), intrange([10,15))])
+            intrangeset([intrange(1, 5), intrange(10, 15)])
 
         :param other: Range set to compute difference against.
         :return: A new range set that is the difference between this and `other`.
@@ -514,7 +514,7 @@ class RangeSet(PartialOrderingMixin):
 
             >>> intrangeset([intrange(1, 15)]).intersection(
             ...     intrangeset([intrange(5, 10)]))
-            intrangeset([intrange([5,10))])
+            intrangeset([intrange(5, 10)])
 
         :param other: Range set to intersect this range set with.
         :return: A new range set that is the intersection between this and
@@ -582,7 +582,7 @@ class intrangeset(RangeSet):
     Range set that operates on :class:`~spans.types.intrange`.
 
         >>> intrangeset([intrange(1, 5), intrange(10, 15)])
-        intrangeset([intrange([1,5)), intrange([10,15))])
+        intrangeset([intrange(1, 5), intrange(10, 15)])
 
     Inherits methods from :class:`~spans.settypes.RangeSet`,
     :class:`~spans.settypes.DiscreteRangeset` and
@@ -599,7 +599,7 @@ class floatrangeset(RangeSet):
     Range set that operates on :class:`~spans.types.floatrange`.
 
         >>> floatrangeset([floatrange(1.0, 5.0), floatrange(10.0, 15.0)])
-        floatrangeset([floatrange([1.0,5.0)), floatrange([10.0,15.0))])
+        floatrangeset([floatrange(1.0, 5.0), floatrange(10.0, 15.0)])
 
     Inherits methods from :class:`~spans.settypes.RangeSet`,
     :class:`~spans.settypes.DiscreteRangeset` and
@@ -618,7 +618,7 @@ class strrangeset(RangeSet):
         >>> strrangeset([
         ...     strrange(u"a", u"f", upper_inc=True),
         ...     strrange(u"0", u"9", upper_inc=True)])
-        strrangeset([strrange([u'0',u':')), strrange([u'a',u'g'))])
+        strrangeset([strrange(u'0', u':'), strrange(u'a', u'g')])
 
     Inherits methods from :class:`~spans.settypes.RangeSet` and
     :class:`~spans.settypes.DiscreteRangeset`.
@@ -635,8 +635,8 @@ class daterangeset(RangeSet):
 
         >>> month = daterange(date(2000, 1, 1), date(2000, 2, 1))
         >>> daterangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
-        daterangeset([daterange([datetime.date(2000, 1, 1),datetime.date(2000, 2, 1))),
-            daterange([datetime.date(2001, 1, 1),datetime.date(2001, 2, 1)))])
+        daterangeset([daterange(datetime.date(2000, 1, 1), datetime.date(2000, 2, 1)),
+            daterange(datetime.date(2001, 1, 1), datetime.date(2001, 2, 1))])
 
     Inherits methods from :class:`~spans.settypes.RangeSet`,
     :class:`~spans.settypes.DiscreteRangeset` and
@@ -654,8 +654,8 @@ class datetimerangeset(RangeSet):
 
         >>> month = datetimerange(datetime(2000, 1, 1), datetime(2000, 2, 1))
         >>> datetimerangeset([month, month.offset(timedelta(366))]) # doctest: +NORMALIZE_WHITESPACE
-        datetimerangeset([datetimerange([datetime.datetime(2000, 1, 1, 0, 0),datetime.datetime(2000, 2, 1, 0, 0))),
-            datetimerange([datetime.datetime(2001, 1, 1, 0, 0),datetime.datetime(2001, 2, 1, 0, 0)))])
+        datetimerangeset([datetimerange(datetime.datetime(2000, 1, 1, 0, 0), datetime.datetime(2000, 2, 1, 0, 0)),
+            datetimerange(datetime.datetime(2001, 1, 1, 0, 0), datetime.datetime(2001, 2, 1, 0, 0))])
 
     Inherits methods from :class:`~spans.settypes.RangeSet` and
     :class:`~spans.settypes.OffsetableRangeMixinset`.
@@ -673,7 +673,7 @@ class timedeltarangeset(RangeSet):
 
         >>> week = timedeltarange(timedelta(0), timedelta(7))
         >>> timedeltarangeset([week, week.offset(timedelta(7))])
-        timedeltarangeset([timedeltarange([datetime.timedelta(0),datetime.timedelta(14)))])
+        timedeltarangeset([timedeltarange(datetime.timedelta(0), datetime.timedelta(14))])
 
     Inherits methods from :class:`~spans.settypes.RangeSet` and
     :class:`~spans.settypes.OffsetableRangeMixinset`.

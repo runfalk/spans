@@ -192,11 +192,11 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         takes the exact same arguments as the constructor.
 
             >>> intrange(1, 5).replace(upper=10)
-            intrange([1,10))
+            intrange(1, 10)
             >>> intrange(1, 10).replace(lower_inc=False)
-            intrange([2,10))
+            intrange(2, 10)
             >>> intrange(1, 10).replace(5)
-            intrange([5,10))
+            intrange(5, 10)
 
         Note that range objects are immutable and are never modified in place.
         """
@@ -224,14 +224,30 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
     def __repr__(self):
         if not self:
-            return "{0.__class__.__name__}(empty)".format(self)
-        else:
-            return "{instance.__class__.__name__}({lb}{lower},{upper}{ub})".format(
-                instance=self,
-                lb="[" if self.lower_inc else "(",
-                lower="" if self.lower is None else repr(self.lower),
-                upper="" if self.upper is None else repr(self.upper),
-                ub="]" if self.upper_inc else ")")
+            return "{0.__class__.__name__}.empty()".format(self)
+        urepr = lambda value: u"{!r}".format(value)
+        out = [
+            ustr(self.__class__.__name__),
+            u"(",
+        ]
+        if self.lower is not None:
+            out.append(urepr(self.lower))
+            if self.upper is not None:
+                out.append(u", ")
+        elif self.upper is not None:
+            out.append(u"upper=")
+
+        if self.upper is not None:
+            out.append(urepr(self.upper))
+
+        if not self.lower_inc and not self.lower_inf:
+            out.append(u", lower_inc=False")
+
+        if self.upper_inc:
+            out.append(u", upper_inc=True")
+
+        out.append(u")")
+        return u"".join(out)
 
     @property
     def _lower_bound(self):
@@ -524,9 +540,9 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         Merges this range with a given range.
 
             >>> intrange(1, 5).union(intrange(5, 10))
-            intrange([1,10))
+            intrange(1, 10)
             >>> intrange(1, 10).union(intrange(5, 15))
-            intrange([1,15))
+            intrange(1, 15)
 
         Two ranges can not be merged if the resulting range would be split in
         two. This happens when the two sets are neither adjacent nor overlaps.
@@ -572,13 +588,13 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         Compute the difference between this and a given range.
 
             >>> intrange(1, 10).difference(intrange(10, 15))
-            intrange([1,10))
+            intrange(1, 10)
             >>> intrange(1, 10).difference(intrange(5, 10))
-            intrange([1,5))
+            intrange(1, 5)
             >>> intrange(1, 5).difference(intrange(5, 10))
-            intrange([1,5))
+            intrange(1, 5)
             >>> intrange(1, 5).difference(intrange(1, 10))
-            intrange(empty)
+            intrange.empty()
 
         The difference can not be computed if the resulting range would be split
         in two separate ranges. This happens when the given range is completely
@@ -625,11 +641,11 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         points are shared an empty range is returned.
 
             >>> intrange(1, 5).intersection(intrange(1, 10))
-            intrange([1,5))
+            intrange(1, 5)
             >>> intrange(1, 5).intersection(intrange(5, 10))
-            intrange(empty)
+            intrange.empty()
             >>> intrange(1, 10).intersection(intrange(5, 10))
-            intrange([5,10))
+            intrange(5, 10)
 
         This is the same as the ``+`` operator for two ranges in PostgreSQL.
 
@@ -889,7 +905,7 @@ class DiscreteRange(Range):
     includes ``int`` and ``datetime.date``.
 
         >>> intrange(0, 5, lower_inc=False)
-        intrange([1,5))
+        intrange(1, 5)
         >>> intrange(0, 5, lower_inc=False).lower_inc
         True
 
@@ -905,7 +921,7 @@ class DiscreteRange(Range):
     A range where no values can fit is considered empty:
 
         >>> intrange(0, 1, lower_inc=False)
-        intrange(empty)
+        intrange.empty()
 
     Discrete ranges are iterable.
 
@@ -1042,11 +1058,11 @@ class OffsetableRangeMixin(object):
         Shift the range to the left or right with the given offset
 
             >>> intrange(0, 5).offset(5)
-            intrange([5,10))
+            intrange(5, 10)
             >>> intrange(5, 10).offset(-5)
-            intrange([0,5))
+            intrange(0, 5)
             >>> intrange.empty().offset(5)
-            intrange(empty)
+            intrange.empty()
 
         Note that range objects are immutable and are never modified in place.
 
@@ -1079,7 +1095,7 @@ class intrange(DiscreteRange, OffsetableRangeMixin):
     Range that operates on int.
 
         >>> intrange(1, 5)
-        intrange([1,5))
+        intrange(1, 5)
 
     Inherits methods from :class:`~spans.types.Range`,
     :class:`~spans.types.DiscreteRange` and :class:`~spans.types.OffsetableRangeMixin`.
@@ -1099,7 +1115,9 @@ class floatrange(Range, OffsetableRangeMixin):
     Range that operates on float.
 
         >>> floatrange(1.0, 5.0)
-        floatrange([1.0,5.0))
+        floatrange(1.0, 5.0)
+        >>> floatrange(None, 10.0, upper_inc=True)
+        floatrange(upper=10.0, upper_inc=True)
 
     Inherits methods from :class:`~spans.types.Range` and
     :class:`~spans.types.OffsetableRangeMixin`.
@@ -1116,9 +1134,9 @@ class strrange(DiscreteRange):
     lexicographically. Representation might seem odd due to normalization.
 
         >>> strrange(u"a", u"z")
-        strrange([u'a',u'z'))
+        strrange(u'a', u'z')
         >>> strrange(u"a", u"z", upper_inc=True)
-        strrange([u'a',u'{'))
+        strrange(u'a', u'{')
 
     Iteration over a strrange is only sensible when having single character
     boundaries.
@@ -1185,12 +1203,12 @@ class daterange(DiscreteRange, OffsetableRangeMixin):
     Range that operates on ``datetime.date``.
 
         >>> daterange(date(2015, 1, 1), date(2015, 2, 1))
-        daterange([datetime.date(2015, 1, 1),datetime.date(2015, 2, 1)))
+        daterange(datetime.date(2015, 1, 1), datetime.date(2015, 2, 1))
 
     Offsets are done using ``datetime.timedelta``.
 
         >>> daterange(date(2015, 1, 1), date(2015, 2, 1)).offset(timedelta(14))
-        daterange([datetime.date(2015, 1, 15),datetime.date(2015, 2, 15)))
+        daterange(datetime.date(2015, 1, 15), datetime.date(2015, 2, 15))
 
     Inherits methods from :class:`~spans.types.Range`,
     :class:`~spans.types.DiscreteRange` and :class:`~spans.types.OffsetableRangeMixin`.
@@ -1225,7 +1243,7 @@ class daterange(DiscreteRange, OffsetableRangeMixin):
         Create a day long daterange from for the given date.
 
             >>> daterange.from_date(date(2000, 1, 1))
-            daterange([datetime.date(2000, 1, 1),datetime.date(2000, 1, 2)))
+            daterange(datetime.date(2000, 1, 1), datetime.date(2000, 1, 2))
 
         :param date: A date to convert.
         :param period: The period to normalize date to. A period may be one of:
@@ -1372,13 +1390,13 @@ class datetimerange(Range, OffsetableRangeMixin):
     Range that operates on ``datetime.datetime``.
 
         >>> datetimerange(datetime(2015, 1, 1), datetime(2015, 2, 1))
-        datetimerange([datetime.datetime(2015, 1, 1, 0, 0),datetime.datetime(2015, 2, 1, 0, 0)))
+        datetimerange(datetime.datetime(2015, 1, 1, 0, 0), datetime.datetime(2015, 2, 1, 0, 0))
 
     Offsets are done using ``datetime.timedelta``.
 
         >>> datetimerange(
         ...     datetime(2015, 1, 1), datetime(2015, 2, 1)).offset(timedelta(14))
-        datetimerange([datetime.datetime(2015, 1, 15, 0, 0),datetime.datetime(2015, 2, 15, 0, 0)))
+        datetimerange(datetime.datetime(2015, 1, 15, 0, 0), datetime.datetime(2015, 2, 15, 0, 0))
 
     Inherits methods from :class:`~spans.types.Range` and :class:`~spans.types.OffsetableRangeMixin`.
     """
@@ -1395,12 +1413,12 @@ class timedeltarange(Range, OffsetableRangeMixin):
     Range that operates on datetime's timedelta class.
 
         >>> timedeltarange(timedelta(1), timedelta(5))
-        timedeltarange([datetime.timedelta(1),datetime.timedelta(5)))
+        timedeltarange(datetime.timedelta(1), datetime.timedelta(5))
 
     Offsets are done using ``datetime.timedelta``.
 
         >>> timedeltarange(timedelta(1), timedelta(5)).offset(timedelta(14))
-        timedeltarange([datetime.timedelta(15),datetime.timedelta(19)))
+        timedeltarange(datetime.timedelta(15), datetime.timedelta(19))
 
     Inherits methods from :class:`~spans.types.Range` and
     :class:`~spans.types.OffsetableRangeMixin`.
@@ -1458,6 +1476,11 @@ class PeriodRange(daterange):
 
         return new_span
 
+    def __repr__(self):
+        parent_repr = super(PeriodRange, self).__repr__()
+        return u"{}, period={!r})".format(parent_repr[:-1], self.period)
+
+
     @property
     def daterange(self):
         """
@@ -1501,7 +1524,7 @@ class PeriodRange(daterange):
 
             >>> span = PeriodRange.from_date(date(2000, 1, 1), period="month")
             >>> span.prev_period()
-            PeriodRange([datetime.date(1999, 12, 1),datetime.date(2000, 1, 1)))
+            PeriodRange(datetime.date(1999, 12, 1), datetime.date(2000, 1, 1), period='month')
 
         :return: A new :class:`~spans.types.PeriodRange` for the period
                  before this period
@@ -1515,7 +1538,7 @@ class PeriodRange(daterange):
 
             >>> span = PeriodRange.from_date(date(2000, 1, 1), period="month")
             >>> span.next_period()
-            PeriodRange([datetime.date(2000, 2, 1),datetime.date(2000, 3, 1)))
+            PeriodRange(datetime.date(2000, 2, 1), datetime.date(2000, 3, 1), period='month')
 
         :return: A new :class:`~spans.types.PeriodRange` for the period after
                  this period

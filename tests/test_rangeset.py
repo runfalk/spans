@@ -160,7 +160,7 @@ def test_values():
 
 @pytest.mark.parametrize("span, repr_str", [
     (intrangeset([]), "intrangeset([])"),
-    (intrangeset([intrange(1)]), "intrangeset([intrange([1,))])"),
+    (intrangeset([intrange(1)]), "intrangeset([intrange(1)])"),
 ])
 def test_repr(span, repr_str):
     assert repr(span) == repr_str

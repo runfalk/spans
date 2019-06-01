@@ -13,6 +13,9 @@ This release changes a lot of internal implementation details that should
 prevent methods from not handling unbounded ranges correctly in the future.
 
 - Added validation to ensure unbounded ranges are never inclusive
+- Changed ``__repr__`` for ranges to be more similar to proper Python syntax.
+  The old representation looked like mismatched parentheses. For instance
+  ``floatrange((,10.0])`` becomes ``floatrange(upper=10.0, upper_inc=True)``
 - Dropped Python 3.3 support since it's been EOL for almost two years. It
   probably still works but it is no longer tested
 - Fixed :meth:`~spans.types.Range.union` not working properly with unbounded
