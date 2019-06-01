@@ -25,6 +25,70 @@ _internal_range = namedtuple(
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
 
+class _Bound(PartialOrderingMixin):
+    __slots__ = ("value", "inc", "is_lower")
+
+    def __init__(self, value, inc, is_lower):
+        self.value = value
+        self.inc = inc
+        self.is_lower = is_lower
+
+    def __repr__(self):
+        rep = "_Bound({0.value!r}, inc={0.inc!r}, is_lower={0.is_lower!r})"
+        return rep.format(self)
+
+    def __lt__(self, other):
+        # We need special cases when dealing with infinities
+        if self.value is None:
+            # If we are lower infinity we are always less than other, unless
+            # other is also lower infinity. If we are upper infinity nothing
+            # we can never be smaller than anything
+            if self.is_lower:
+                return other.value is not None or not other.is_lower
+            else:
+                return False
+
+        if other.value is None:
+            if other.is_lower:
+                return False
+            else:
+                return self.value is not None or self.is_lower
+
+        if self.value < other.value:
+            return True
+        elif self.value == other.value:
+            if self.is_lower:
+                if self.inc:
+                    return other.is_lower ^ other.inc
+                else:
+                    return not other.is_lower and other.inc
+            else:
+                if self.inc:
+                    return other.is_lower and not other.inc
+                else:
+                    return other.is_lower or other.inc
+        else:
+            return False
+
+    def __eq__(self, other):
+        return all(
+            getattr(self, attr) == getattr(other, attr)
+            for attr in _Bound.__slots__
+        )
+
+    def adjacent(self, other):
+        if self.value is None or other.value is None:
+            return False
+
+        if self.value != other.value:
+            return False
+
+        if self.is_lower == other.is_lower:
+            return False
+
+        return self.inc != other.inc
+
+
 class Range(PartialOrderingMixin, PicklableSlotMixin):
     """
     Abstract base class of all ranges.
@@ -80,10 +144,16 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         # Handle default values for lower_inc and upper_inc
         if lower_inc is None:
-            lower_inc = True
+            lower_inc = lower is not None
 
         if upper_inc is None:
             upper_inc = False
+
+        if lower is None and lower_inc:
+            raise ValueError("Lower bound can not be inclusive when infinite")
+
+        if upper is None and upper_inc:
+            raise ValueError("Upper bound can not be inclusive when infinite")
 
         self._range = _internal_range(
             lower, upper, lower_inc, upper_inc, False)
@@ -153,6 +223,14 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 lower="" if self.lower is None else repr(self.lower),
                 upper="" if self.upper is None else repr(self.upper),
                 ub="]" if self.upper_inc else ")")
+
+    @property
+    def _lower_bound(self):
+        return _Bound(self.lower, self.lower_inc, is_lower=True)
+
+    @property
+    def _upper_bound(self):
+        return _Bound(self.upper, self.upper_inc, is_lower=False)
 
     @property
     def lower(self):
@@ -252,36 +330,29 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
     def __lt__(self, other):
         if not self.is_valid_range(other):
             return NotImplemented
+
         # When dealing with empty ranges there is not such thing as order
-        elif not self or not other:
+        if not self or not other:
             return False
-        elif self.lower == other.lower:
-            # If lower are equal for both, we need to consider the inclusiveness
-            # of both bounds
-            if self.lower_inc != other.lower_inc:
-                return self.lower_inc
-            # If upper bounds are the same, self can only be smaller if it is
-            # not inclusive and other is
-            elif self.upper == other.upper:
-                return not self.upper_inc and other.upper_inc
-            elif self.upper_inf or other.upper_inf:
-                return other.upper_inf
-            else:
-                # We need consider the case when an upper bound is infinite
-                return self.upper < other.upper
-        elif self.lower_inf or other.lower_inf:
-            # If self.lower is unbound (infinite) it will always be smaller,
-            # unless other.lower is also unbound
-            return not other.lower_inf
+
+        if self._lower_bound == other._lower_bound:
+            return self._upper_bound < other._upper_bound
         else:
-            return self.lower < other.lower
+            return self._lower_bound < other._lower_bound
 
     def __gt__(self, other):
+        # We need to implement __gt__ even though we inherit from
+        # PartialOrderingMixin since ranges are partially ordered (we can't
+        # order empty ranges)
         if not self.is_valid_range(other):
             return NotImplemented
-        elif not self or not other:
+
+        # When dealing with empty ranges there is not such thing as order
+        if not self or not other:
             return False
-        return not (self < other or self == other)
+
+        # Use PartialOrderingMixin's implementation
+        return super(Range, self).__gt__(other)
 
     def __nonzero__(self):
         return not self._range.empty
@@ -317,12 +388,12 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if self.is_valid_range(other):
-            if not self:
+            if not self or not other:
                 return not other
-            elif not other or other.startsafter(self) and other.endsbefore(self):
-                return True
-            else:
-                return False
+            return (
+                self._lower_bound <= other._lower_bound and
+                other._upper_bound <= self._upper_bound
+            )
         elif self.is_valid_scalar(other):
             # If the lower bounary is not unbound we can safely perform the
             # comparison. Otherwise we'll try to compare a scalar to None, which
@@ -400,16 +471,12 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         if not self or not other:
             return False
 
-        if self < other:
-            a, b = self, other
-        else:
-            a, b = other, self
+        sl = self._lower_bound
+        su = self._upper_bound
+        ol = other._lower_bound
+        ou = other._upper_bound
 
-        # We need to explicitly handle unbounded ranges since a.upper and b.lower
-        # make the intervals seem adjacent even though they are not
-        if a.upper_inf or b.lower_inf:
-            return True
-        return a.upper > b.lower or a.upper == b.lower and a.upper_inc and b.lower_inc
+        return sl < ou and ol < su
 
     def adjacent(self, other):
         """
@@ -439,8 +506,9 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         elif not self or not other:
             return False
         return (
-            (self.lower == other.upper and self.lower_inc != other.upper_inc) or
-            (self.upper == other.lower and self.upper_inc != other.lower_inc))
+            self._lower_bound.adjacent(other._upper_bound) or
+            self._upper_bound.adjacent(other._lower_bound)
+        )
 
     def union(self, other):
         """
@@ -478,29 +546,17 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         elif not other:
             return self
 
-        # Order ranges to simplify checks
-        if self < other:
-            a, b = self, other
-        else:
-            a, b = other, self
-
-        if (a.upper < b.lower or a.upper == b.lower and not
-                a.upper_inc and not b.lower_inc) and not a.adjacent(b):
+        if not self.overlap(other) and not self.adjacent(other):
             raise ValueError("Ranges must be either adjacent or overlapping")
 
-        # a.lower is guaranteed to be the lower bound, but either a.upper or
-        # b.upper can be the upper bound
-        if a.upper == b.upper:
-            upper = a.upper
-            upper_inc = a.upper_inc or b.upper_inc
-        elif a.upper < b.upper:
-            upper = b.upper
-            upper_inc = b.upper_inc
-        else:
-            upper = a.upper
-            upper_inc = a.upper_inc
-
-        return self.__class__(a.lower, upper, a.lower_inc, upper_inc)
+        lower_bound = min(self._lower_bound, other._lower_bound)
+        upper_bound = max(self._upper_bound, other._upper_bound)
+        return self.__class__(
+            lower_bound.value,
+            upper_bound.value,
+            lower_bound.inc,
+            upper_bound.inc,
+        )
 
     def difference(self, other):
         """
@@ -541,6 +597,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         # Consider empty ranges or no overlap
         if not self or not other or not self.overlap(other):
             return self
+
         # If self is contained within other, the result is empty
         elif self in other:
             return self.empty()
@@ -579,12 +636,14 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         if not self or not other or not self.overlap(other):
             return self.empty()
 
-        lower_end_span = self if self.startsafter(other) else other
-        upper_end_span = self if self.endsbefore(other) else other
-
-        return lower_end_span.replace(
-            upper=upper_end_span.upper,
-            upper_inc=upper_end_span.upper_inc)
+        lower_bound = max(self._lower_bound, other._lower_bound)
+        upper_bound = min(self._upper_bound, other._upper_bound)
+        return self.__class__(
+            lower_bound.value,
+            upper_bound.value,
+            lower_bound.inc,
+            upper_bound.inc,
+        )
 
     def startswith(self, other):
         """
@@ -666,16 +725,16 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if self.is_valid_range(other):
-            if self.lower == other.lower:
-                return other.lower_inc or not self.lower_inc
-            elif self.lower_inf:
+            if not self or not other:
                 return False
-            elif other.lower_inf:
+            return self._lower_bound >= other._lower_bound
+        elif self.is_valid_scalar(other):
+            if not self:
+                return False
+            elif self.lower_inf:
                 return True
             else:
-                return self.lower > other.lower
-        elif self.is_valid_scalar(other):
-            return self.lower >= other
+                return self.lower >= other
         else:
             raise TypeError(
                 "Unsupported type to test for starts after '{}'".format(
@@ -699,16 +758,16 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if self.is_valid_range(other):
-            if self.upper == other.upper:
-                return not self.upper_inc or other.upper_inc
-            elif self.upper_inf:
+            if not self or not other:
                 return False
-            elif other.upper_inf:
+            return self._upper_bound <= other._upper_bound
+        elif self.is_valid_scalar(other):
+            if not self:
+                return False
+            elif self.upper_inf:
                 return True
             else:
-                return self.upper <= other.upper
-        elif self.is_valid_scalar(other):
-            return self.upper <= other
+                return self.upper <= other
         else:
             raise TypeError(
                 "Unsupported type to test for ends before '{}'".format(
@@ -743,7 +802,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 "class").format(other.__class__.__name__)
             raise TypeError(msg)
 
-        return self < other and not self.overlap(other)
+        return self._upper_bound < other._lower_bound
 
     def right_of(self, other):
         """

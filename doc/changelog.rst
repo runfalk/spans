@@ -5,9 +5,24 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 1.1.0
+-------------
+Released on <unreleased>
+
+This release changes a lot of internal implementation details that should
+prevent methods from not handling unbounded ranges correctly in the future.
+
+- Added validation to ensure unbounded ranges are never inclusive
+- Fixed :meth:`~spans.types.Range.union` not working properly with unbounded
+  ranges
+- Fixed lowerly unbounded ranges improperly being lower inclusive
+- Fixed :meth:`~spans.types.Range.startswith` and
+  :meth:`~spans.types.Range.endsbefore` being not handling empty ranges
+
+
 Version 1.0.2
 -------------
-Released on 22th Februay, 2019
+Released on 22th February, 2019
 
 - Fixed :meth:`~spans.types.Range.union` when ``upper_inc`` is set to ``True``
   (`bug #11 <https://github.com/runfalk/spans/issues/11>`_,

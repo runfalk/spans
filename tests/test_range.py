@@ -1,33 +1,79 @@
 import pickle
 import pytest
 
-from spans import \
-    daterange, datetimerange, floatrange, intrange, PeriodRange, strrange, \
-    timedeltarange
+from spans import (
+    daterange,
+    datetimerange,
+    floatrange,
+    intrange,
+    PeriodRange,
+    strrange,
+    timedeltarange,
+)
+from spans.types import _Bound
 
 
 def test_empty():
-    range = intrange.empty()
+    empty_range = intrange.empty()
 
-    assert not range
-    assert range.lower is None
-    assert range.upper is None
+    assert not empty_range
+    assert empty_range.lower is None
+    assert empty_range.upper is None
+    assert not empty_range.lower_inc
+    assert not empty_range.upper_inc
+    assert not empty_range.lower_inf
+    assert not empty_range.upper_inf
 
 
 def test_non_empty():
     assert intrange()
 
 
-def test_default_bounds():
-    inf_range = intrange()
+def test_bound_helper():
+    # This is technically an implementation detail, but since it's used
+    # everywhere it's good to exhaustively test it
+    assert _Bound(1, inc=False, is_lower=False) < _Bound(1, inc=False, is_lower=True)
+    assert _Bound(1, inc=False, is_lower=False) < _Bound(1, inc=True, is_lower=True)
+    assert _Bound(1, inc=False, is_lower=False) < _Bound(1, inc=True, is_lower=False)
+
+    assert _Bound(1, inc=False, is_lower=True) < _Bound(1, inc=True, is_lower=False)
+
+    assert _Bound(1, inc=True, is_lower=False) < _Bound(1, inc=False, is_lower=True)
+
+    assert _Bound(1, inc=True, is_lower=True) < _Bound(1, inc=True, is_lower=False)
+    assert _Bound(1, inc=True, is_lower=True) < _Bound(1, inc=False, is_lower=True)
+
+
+@pytest.mark.parametrize("range_type, lower, upper, lower_inc, upper_inc, exc_type", [
+    (floatrange, 1, None, None, None, TypeError),
+    (floatrange, None, 10, None, None, TypeError),
+    (floatrange, 10.0, 1.0, None, None, ValueError),
+    (floatrange, None, 10.0, True, None, ValueError),
+    (floatrange, 10.0, None, None, True, ValueError),
+    (intrange, 1.0, None, None, None, TypeError),
+    (intrange, None, 10.0, None, None, TypeError),
+    (intrange, 10, 1, None, None, ValueError),
+    (intrange, None, 1, True, None, ValueError),
+])
+def test_invalid_construction(range_type, lower, upper, lower_inc, upper_inc, exc_type):
+    with pytest.raises(exc_type):
+        range_type(lower, upper, lower_inc, upper_inc)
+
+
+@pytest.mark.parametrize("range_type, lower, upper", [
+    (floatrange, 1.0, 10.0),
+    (intrange, 1, 10),
+])
+def test_default_bounds(range_type, lower, upper):
+    inf_range = range_type()
     assert not inf_range.lower_inc
     assert not inf_range.upper_inc
 
-    bounded_range = intrange(1, 10)
+    bounded_range = range_type(lower, upper)
     assert bounded_range.lower_inc
     assert not bounded_range.upper_inc
 
-    rebound_range = intrange().replace(lower=1, upper=10)
+    rebound_range = bounded_range.replace(lower, upper)
     assert rebound_range.lower_inc
     assert not rebound_range.upper_inc
 
@@ -91,6 +137,7 @@ def test_equality():
     assert intrange(1, 5) == intrange(1, 5)
     assert intrange.empty() == intrange.empty()
     assert intrange(1, 5) != intrange(1, 5, upper_inc=True)
+    assert floatrange() == floatrange()
     assert not intrange() == None
 
 
@@ -164,9 +211,11 @@ def test_greater_than():
     (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
     (floatrange(1.0, 5.0, lower_inc=False), floatrange(5.0, 10.0, upper_inc=True)),
 ])
-def test_left_of(a, b):
+def test_left_or_right_of(a, b):
     assert a.left_of(b)
     assert a << b
+    assert b.right_of(a)
+    assert b >> a
 
 
 @pytest.mark.parametrize("a, b", [
@@ -174,34 +223,17 @@ def test_left_of(a, b):
     (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0)),
     (floatrange.empty(), floatrange.empty()),
 ])
-def test_not_left_of(a, b):
+def test_not_left_or_right_of(a, b):
     assert not a.left_of(b)
     assert not (a << b)
+    assert not b.right_of(a)
+    assert not (b >> a)
 
 
 def test_left_of_type_check():
     with pytest.raises(TypeError):
         floatrange().left_of(None)
     assert floatrange().__lshift__(None) is NotImplemented
-
-
-@pytest.mark.parametrize("a, b", [
-    (floatrange(5.0, 10.0), floatrange(1.0, 5.0)),
-    (floatrange(5.0, 10.0, lower_inc=False), floatrange(1.0, 5.0, upper_inc=True)),
-])
-def test_right_of(a, b):
-    assert a.right_of(b)
-    assert a >> b
-
-
-@pytest.mark.parametrize("a, b", [
-    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
-    (floatrange(5.0, 10.0), floatrange(1.0, 5.0, upper_inc=True)),
-    (floatrange.empty(), floatrange.empty()),
-])
-def test_not_right_of(a, b):
-    assert not a.right_of(b)
-    assert not (a >> b)
 
 
 def test_right_of_type_check():
@@ -211,20 +243,23 @@ def test_right_of_type_check():
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(1, 5)),
-    (intrange(1, 5), intrange(1, 10)),
-    (intrange(5, 10), intrange(5, 10)),
-    (intrange(1, 10), intrange(upper=5)),
-    (intrange(1, 5), 0),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange(1.0, 10.0)),
+    (floatrange(5.0, 10.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 10.0), floatrange(upper=5.0)),
+    (floatrange(1.0, 5.0), 0.0),
 ])
 def test_startsafter(a, b):
     assert a.startsafter(b)
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(5, 10)),
-    (intrange(1, 5), intrange(1, 5, lower_inc=False)),
-    (intrange(1, 10), intrange(5)),
+    (floatrange.empty(), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange.empty()),
+    (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0, lower_inc=False)),
+    (floatrange(1.0, 10.0), floatrange(5.0)),
+    (floatrange.empty(), 1.0),
 ])
 def test_not_startsafter(a, b):
     assert not a.startsafter(b)
@@ -236,19 +271,23 @@ def test_startsafter_type_check():
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(1, 5), intrange(1, 5)),
-    (intrange(5, 10), intrange(1, 10)),
-    (intrange(1, 10), intrange(5)),
-    (intrange(1, 5), 5),
+    (floatrange(1.0, 5.0), floatrange(1.0, 5.0)),
+    (floatrange(5.0, 10.0), floatrange(1.0, 10.0)),
+    (floatrange(1.0, 10.0), floatrange(5.0)),
+    (floatrange(1.0, 5.0), 5.0),
 ])
 def test_endsbefore(a, b):
     assert a.endsbefore(b)
 
 
 @pytest.mark.parametrize("a, b", [
-    (intrange(5, 10), intrange(1, 5)),
-    (intrange(1, 5, upper_inc=True), intrange(1, 5)),
-    (intrange(1, 10), intrange(upper=5)),
+    (floatrange.empty(), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 5.0), floatrange.empty()),
+    (floatrange(5.0, 10.0), floatrange(1.0, 5.0)),
+    (floatrange(5.0, 10.0), floatrange.empty()),
+    (floatrange(1.0, 5.0, upper_inc=True), floatrange(1.0, 5.0)),
+    (floatrange(1.0, 10.0), floatrange(upper=5.0)),
+    (floatrange.empty(), 1.0),
 ])
 def test_not_endsbefore(a, b):
     assert not a.endsbefore(b)
@@ -369,6 +408,7 @@ def test_within_type_check(value):
 @pytest.mark.parametrize("a, b", [
     (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0)),
     (floatrange(1.0, 5.0), floatrange(3.0, 8.0)),
+    (floatrange(1.0, 10.0), floatrange(2.0, 8.0)),
     (floatrange(1.0, 10.0), floatrange(5.0)),
     (floatrange(upper=10.0), floatrange(1.0, 5.0)),
     (floatrange(1.0), floatrange()),
@@ -426,6 +466,7 @@ def test_adjacent_type_check(value):
     (floatrange(1.0, 10.0, lower_inc=False), floatrange(5.0, 15.0), floatrange(1.0, 15.0, lower_inc=False)),
     (floatrange(1.0, 10.0), floatrange(5.0, 15.0, upper_inc=True), floatrange(1.0, 15.0, upper_inc=True)),
     (floatrange(10.0, 15.0), floatrange(1.0, 25.0), floatrange(1.0, 25.0)),
+    (floatrange(0.0), floatrange(upper=10.0), floatrange()),
 ])
 def test_union(a, b, union):
     assert a.union(b) == union
