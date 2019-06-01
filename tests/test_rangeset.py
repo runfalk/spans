@@ -241,3 +241,27 @@ def test_bug10_missing_slots_in_cls_hierarchy(cls):
         if c is object:
             continue
         assert hasattr(c, "__slots__")
+
+
+def test_bug14_pickle_not_working_for_rangesets():
+    """
+    `Bug #14 <https://github.com/runfalk/spans/issues/14`_
+    """
+    # If __getstate__ returns a falsy value __setstate__ will not be called
+    # when loading the value again, which is why this bug occured
+    range_set = floatrangeset([])
+    pickled = pickle.dumps(range_set, protocol=1)
+    pickle.loads(pickled)
+    assert range_set == pickle.loads(pickled)
+
+    # We need to ensure that code pickled using protocol 1 by spans versions
+    # before 1.1.0 still loads
+    old_data = (
+        b"ccopy_reg\n_reconstructor\nq\x00(cspans.settypes\nfloatrangeset\n"
+        b"q\x01c__builtin__\nobject\nq\x02Ntq\x03Rq\x04]q\x05h\x00(cspans."
+        b"types\nfloatrange\nq\x06h\x02Ntq\x07Rq\x08}q\tX\x06\x00\x00\x00_"
+        b"rangeq\nh\x00(cspans.types\n_internal_range\nq\x0bc__builtin__\n"
+        b"tuple\nq\x0c(G?\xf0\x00\x00\x00\x00\x00\x00NI01\nI00\nI00\ntq\rtq"
+        b"\x0eRq\x0fsbab."
+    )
+    assert pickle.loads(old_data) == floatrangeset([floatrange(1.0)])

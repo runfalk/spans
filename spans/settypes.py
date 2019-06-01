@@ -171,10 +171,17 @@ class RangeSet(PartialOrderingMixin):
 
     # Support pickling using the default ancient pickling protocol for Python 2.7
     def __getstate__(self):
-        return self._list
+        # We wrap the list in a tuple to prevent it from being falsy as that
+        # causes Python to not use our value when deserializing
+        return (self._list,)
 
     def __setstate__(self, state):
-        self._list = state
+        # Since __getstate__ used to return a list we allow allow loading data
+        # serialized by an older version of spans
+        if isinstance(state, tuple):
+            self._list = state[0]
+        else:
+            self._list = state
 
     def __nonzero__(self):
         """

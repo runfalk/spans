@@ -18,6 +18,8 @@ prevent methods from not handling unbounded ranges correctly in the future.
   ``floatrange((,10.0])`` becomes ``floatrange(upper=10.0, upper_inc=True)``
 - Dropped Python 3.3 support since it's been EOL for almost two years. It
   probably still works but it is no longer tested
+- Fixed pickling of empty range sets not working
+  (`bug #14 <https://github.com/runfalk/spans/issues/14>`_)
 - Fixed :meth:`~spans.types.Range.union` not working properly with unbounded
   ranges
 - Fixed lowerly unbounded ranges improperly being lower inclusive
