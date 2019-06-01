@@ -7,7 +7,7 @@ changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 Version 1.1.0
 -------------
-Released on <unreleased>
+Released on 2nd June, 2019
 
 This release changes a lot of internal implementation details that should
 prevent methods from not handling unbounded ranges correctly in the future.
