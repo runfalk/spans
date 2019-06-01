@@ -78,6 +78,23 @@ def test_default_bounds(range_type, lower, upper):
     assert not rebound_range.upper_inc
 
 
+def test_replace():
+    span = floatrange(1.0, 10.0)
+    assert span.lower_inc
+    assert not span.upper_inc
+
+    unbounded_span = span.replace(None)
+    assert unbounded_span.lower_inf
+    assert not unbounded_span.lower_inc
+    assert not unbounded_span.upper_inf
+    assert not unbounded_span.upper_inc
+
+    # It's a bit confusing that the replace doesn't remember that the range
+    # used to be lower_inc. However, we don't have a way of telling that the
+    # value has not been user specified
+    rebounded_span = unbounded_span.replace(lower=1.0)
+    assert not rebounded_span.lower_inc
+
 def test_unbounded():
     range = intrange()
 

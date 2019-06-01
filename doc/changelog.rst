@@ -13,6 +13,8 @@ This release changes a lot of internal implementation details that should
 prevent methods from not handling unbounded ranges correctly in the future.
 
 - Added validation to ensure unbounded ranges are never inclusive
+- Dropped Python 3.3 support since it's been EOL for almost two years. It
+  probably still works but it is no longer tested
 - Fixed :meth:`~spans.types.Range.union` not working properly with unbounded
   ranges
 - Fixed lowerly unbounded ranges improperly being lower inclusive

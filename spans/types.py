@@ -201,15 +201,24 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         Note that range objects are immutable and are never modified in place.
         """
 
+        params = {
+            k: v
+            for k, v in zip(("lower", "upper", "lower_inc", "upper_inc"), args)
+        }
+        params.update(kwargs)
+
+        has_lower = "lower" in params
+        has_lower_inc = "lower_inc" in params
+        if not has_lower_inc and has_lower and params.get("lower") is None:
+            params["lower_inc"] = False
+
         replacements = {
             "lower" : self.lower,
             "upper" : self.upper,
             "lower_inc" : self.lower_inc,
-            "upper_inc" : self.upper_inc
+            "upper_inc" : self.upper_inc,
         }
-        replacements.update(
-            dict(zip(("lower", "upper", "lower_inc", "upper_inc"), args)))
-        replacements.update(kwargs)
+        replacements.update(params)
 
         return self.__class__(**replacements)
 
