@@ -454,6 +454,7 @@ def test_overlap(a, b):
     (floatrange(1.0, 5.0), floatrange(5.0, 10.0)),
     (floatrange(1.0, 5.0), floatrange(5.0, 10.0, lower_inc=False)),
     (floatrange(upper=5.0), floatrange(5.0)),
+    (floatrange(1.0, 5.0, upper_inc=True), floatrange(5.0, 10.0, lower_inc=False))
 ])
 def test_not_overlap(a, b):
     assert not a.overlap(b)
