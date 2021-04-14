@@ -1,4 +1,5 @@
 import pickle
+import itertools
 import pytest
 
 from spans import (
@@ -627,3 +628,17 @@ def test_bug11_valid_union_call_detected_as_invalid():
     b = floatrange(middle, end)
 
     assert a.union(b) == floatrange(start, end)
+
+@pytest.mark.parametrize("value, empty", [
+    (floatrange(5.0, 5.0, lower_inc=True, upper_inc=True), False),
+    (floatrange(5.0, 5.0, lower_inc=True, upper_inc=False), True),
+    (floatrange(5.0, 5.0, lower_inc=True, upper_inc=False), True), 
+    (floatrange(5.0, 5.0, lower_inc=False, upper_inc=True), True),
+    (floatrange(0.0, 5.0, upper_inc=True).intersection(
+        floatrange(5.0, lower_inc=False)), True)
+])
+def test_bug18_range_not_normalized_to_empty(value, empty):
+    """
+    `Bug #18 <https://github.com/runfalk/spans/issues/18>`_
+    """
+    assert bool(value) is not empty
