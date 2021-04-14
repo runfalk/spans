@@ -37,7 +37,9 @@ def test_bound_helper():
     assert _Bound(1, inc=False, is_lower=False) < _Bound(1, inc=True, is_lower=True)
     assert _Bound(1, inc=False, is_lower=False) < _Bound(1, inc=True, is_lower=False)
 
-    assert _Bound(1, inc=False, is_lower=True) < _Bound(1, inc=True, is_lower=False)
+    # In this case first bound is a little greater than 1,
+    # the second is exactly 1, so A !< B
+    # assert _Bound(1, inc=False, is_lower=True) < _Bound(1, inc=True, is_lower=False)
 
     assert _Bound(1, inc=True, is_lower=False) < _Bound(1, inc=False, is_lower=True)
 

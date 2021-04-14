@@ -60,13 +60,11 @@ class _Bound(PartialOrderingMixin):
             if self.is_lower:
                 if self.inc:
                     return other.is_lower ^ other.inc
-                else:
-                    return not other.is_lower and other.inc
+                return False
             else:
                 if self.inc:
                     return other.is_lower and not other.inc
-                else:
-                    return other.is_lower or other.inc
+                return other.is_lower or other.inc
         else:
             return False
 
