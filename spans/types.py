@@ -60,13 +60,11 @@ class _Bound(PartialOrderingMixin):
             if self.is_lower:
                 if self.inc:
                     return other.is_lower ^ other.inc
-                else:
-                    return not other.is_lower and other.inc
+                return False
             else:
                 if self.inc:
                     return other.is_lower and not other.inc
-                else:
-                    return other.is_lower or other.inc
+                return other.is_lower or other.inc
         else:
             return False
 
@@ -154,6 +152,11 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         if upper is None and upper_inc:
             raise ValueError("Upper bound can not be inclusive when infinite")
+        
+        # Handle normalization to empty ranges
+        if lower is not None and lower == upper and not (lower_inc and upper_inc):
+            self._range = _empty_internal_range
+            return
 
         self._range = _internal_range(
             lower, upper, lower_inc, upper_inc, False)
@@ -936,6 +939,11 @@ class DiscreteRange(Range):
 
     def __init__(self, *args, **kwargs):
         super(DiscreteRange, self).__init__(*args, **kwargs)
+
+        if self._range.empty:
+            # If the range has already been normalized,
+            # then we return here
+            return
 
         # Normalize the internal range
         lb = self._range.lower
