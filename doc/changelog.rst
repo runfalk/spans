@@ -5,6 +5,16 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 1.1.1
+-------------
+Released on 21st April, 2021
+
+- Normalize ranges to be empty when start and end is the same and either bound
+  is exclusive
+  (`bug #18 <https://github.com/runfalk/spans/issues/18>`_,
+  `lgharibashvili <https://github.com/lgharibashvili>`_)
+
+
 Version 1.1.0
 -------------
 Released on 2nd June, 2019
