@@ -30,8 +30,6 @@ Discrete ranges are always normalized, while normal ranges are not.
 	>>> floatrange(1.0, 5.0, upper_inc=True)
 	floatrange(1.0, 5.0, upper_inc=True)
 
-The ``__repr__`` for ranges follows the same format as used by PostgreSQL's ranges. ``[`` and ``]`` means that the boundaries are included in the range and ``(`` and ``)`` means that they are not.
-
 Ranges support set operations such as :class:`~spans.types.Range.union`, :class:`~spans.types.Range.difference` and :class:`~spans.types.Range.intersection`.
 
 .. code-block:: python
