@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Spans documentation &#8212; Spans  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction" href="introduction.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="spans-release-documentation">
+<h1>Spans  documentation<a class="headerlink" href="#spans-release-documentation" title="Permalink to this heading">¶</a></h1>
+<p>Spans is a pure Python implementation of PostgreSQL’s
+<a class="reference external" href="http://www.postgresql.org/docs/9.6/static/rangetypes.html">range types</a>.
+Range types are conveinent when working with intervals of any kind. Every time
+you’ve found yourself working with date_start and date_end, an interval may have
+been what you were actually looking for.</p>
+<p>Spans has successfully been used in production since its first release
+30th August, 2013.</p>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h2>
+<p>Imagine you are building a calendar and want to display all weeks that overlaps
+the current month. Normally you have to do some date trickery to achieve this,
+since the month’s bounds may be any day of the week. With Spans’ set-like
+operations and shortcuts the problem becomes a breeze.</p>
+<p>We start by importing <code class="docutils literal notranslate"><span class="pre">date</span></code> and <code class="docutils literal notranslate"><span class="pre">daterange</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spans</span> <span class="kn">import</span> <span class="n">daterange</span>
+</pre></div>
+</div>
+<p>Using <code class="docutils literal notranslate"><span class="pre">daterange.from_month</span></code> we can get range representing January in the year
+2000</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">month</span> <span class="o">=</span> <span class="n">daterange</span><span class="o">.</span><span class="n">from_month</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">month</span>
+<span class="go">daterange(datetime.date(2000, 1, 1), datetime.date(2000, 2, 1))</span>
+</pre></div>
+</div>
+<p>Now we can calculate the ranges for the weeks where the first and last day of
+month are</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">start_week</span> <span class="o">=</span> <span class="n">daterange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">month</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;week&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_week</span> <span class="o">=</span> <span class="n">daterange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">month</span><span class="o">.</span><span class="n">last</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;week&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start_week</span>
+<span class="go">daterange(datetime.date(1999, 12, 27), datetime.date(2000, 1, 3))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_week</span>
+<span class="go">daterange(datetime.date(2000, 1, 31), datetime.date(2000, 2, 7))</span>
+</pre></div>
+</div>
+<p>Using a union we can express the calendar view.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">start_week</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">end_week</span><span class="p">)</span>
+<span class="go">daterange(datetime.date(1999, 12, 27), datetime.date(2000, 2, 7))</span>
+</pre></div>
+</div>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#using-with-psycopg">Using with Psycopg</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ranges.html">Ranges</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ranges.html#available-range-types">Available range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ranges.html#range-sets">Range sets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="custom_types.html">Custom range types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="custom_types.html#standard-range-types">Standard range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_types.html#offsetable-range-types">Offsetable range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_types.html#discrete-range-types">Discrete range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_types.html#range-sets">Range sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="custom_types.html#custom-mixins">Custom mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#check-if-two-employees-work-at-the-same-time">Check if two employees work at the same time</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="postgresql.html#range-types">Range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="postgresql.html#operators">Operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="postgresql.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ranges">Ranges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#range-sets">Range sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#legacy-names">Legacy names</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-1">Version 1.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-1-0">Version 1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-2">Version 1.0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-1">Version 1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-1-0-0">Version 1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-5-0">Version 0.5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-4-0">Version 0.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-3-0">Version 0.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-2-1">Version 0.2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-2-0">Version 0.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-4">Version 0.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-3">Version 0.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-2">Version 0.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-1">Version 0.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-1-0">Version 0.1.0</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">Spans</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ranges.html">Ranges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_types.html">Custom range types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="introduction.html" title="next chapter">Introduction</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Andreas Runfalk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

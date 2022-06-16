@@ -1,0 +1,1808 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>API documentation &#8212; Spans  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="PostgreSQL analogies" href="postgresql.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="module-spans"></span><section id="api-documentation">
+<h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading">¶</a></h1>
+<p>This is the API reference for all public classes and functions in Spans.</p>
+<section id="ranges">
+<h2>Ranges<a class="headerlink" href="#ranges" title="Permalink to this heading">¶</a></h2>
+<section id="range-class">
+<h3>Range class<a class="headerlink" href="#range-class" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.Range">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">Range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class of all ranges.</p>
+<p>Ranges are very strict about types. This means that both <cite>lower</cite> or <cite>upper</cite>
+must be of the given class or subclass or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>All ranges are immutable. No default methods modify the range in place.
+Instead it returns a new instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> – Lower end of range.</p></li>
+<li><p><strong>upper</strong> – Upper end of range.</p></li>
+<li><p><strong>lower_inc</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> if lower end should be included in range. Default
+is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>upper_inc</strong> – <code class="docutils literal notranslate"><span class="pre">True</span></code> if upper end should be included in range. Default
+is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – If lower or upper bound is not of the correct type.</p></li>
+<li><p><strong>ValueError</strong> – If upper bound is lower than lower bound.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">range_</span></code> to <code class="docutils literal notranslate"><span class="pre">Range</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All examples in this class uses <a class="reference internal" href="#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a> because
+this class is abstract.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.adjacent">
+<span class="sig-name descname"><span class="pre">adjacent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.adjacent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if ranges are directly next to each other but does not
+overlap.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">adjacent</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">adjacent</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>The empty set is not adjacent to any set.</p>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">-|-</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to test against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range is adjacent with <cite>other</cite>, otherwise
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If given argument is of invalid type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.contains">
+<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if this contains other. Other may be either range of same
+type or scalar of same type as the boundaries.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Contains can also be called using the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="ow">in</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">&#64;&gt;</span> <span class="pre">other</span></code> in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Object to be checked whether it exists within this range
+or not.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if <cite>other</cite> is completely within this range, otherwise
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is not of the correct type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.difference">
+<span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the difference between this and a given range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange.empty()</span>
+</pre></div>
+</div>
+<p>The difference can not be computed if the resulting range would be split
+in two separate ranges. This happens when the given range is completely
+within this range and does not start or end at the same value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">Other range must not be within this range</span>
+</pre></div>
+</div>
+<p>This does not modify the range in place.</p>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">-</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to difference against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the difference between this and <cite>other</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If difference bethween this and <cite>other</cite> can not be
+computed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.empty">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an empty set. An empty set is unbounded and only contain the
+empty set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span> <span class="ow">in</span> <span class="n">intrange</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>It is unbounded but the boundaries are not infinite. Its boundaries are
+returned as <code class="docutils literal notranslate"><span class="pre">None</span></code>. Every set contains the empty set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.endsbefore">
+<span class="sig-name descname"><span class="pre">endsbefore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.endsbefore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range ends before <cite>other</cite>. <cite>other</cite> may be either range or
+scalar. This only takes the upper end of the ranges into consideration.
+If the scalar or the upper end of the given range is less than or equal
+to this range’s upper end, <code class="docutils literal notranslate"><span class="pre">True</span></code> is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">endsbefore</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">endsbefore</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range or scalar to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range ends before <cite>other</cite>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of the wrong type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.endswith">
+<span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.endswith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range ends with <cite>other</cite>. <cite>other</cite> may be either range or
+scalar.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range or scalar to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range ends with <cite>other</cite>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of the wrong type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new range containing all points shared by both ranges. If no
+points are shared an empty range is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange.empty()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(5, 10)</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to interect with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the intersection between this and <cite>other</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.left_of">
+<span class="sig-name descname"><span class="pre">left_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.left_of" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range <cite>other</cite> is strictly left of <cite>other</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">left_of</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">left_of</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>The bitwise right shift operator <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> is overloaded for this operation
+too.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The choice of overloading <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> might seem strange, but it is to mimick
+PostgreSQL’s operators for ranges. As this is not obvious the use of
+<code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> is discouraged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to test against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range is completely to the left of <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.lower">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lower</span></span><a class="headerlink" href="#spans.types.Range.lower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lower boundary or None if it is unbounded.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">lower(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.lower_inc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lower_inc</span></span><a class="headerlink" href="#spans.types.Range.lower_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if lower bound is included in range. If lower bound is
+unbounded this returns False.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">lower_inc</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">lower_inc(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.lower_inf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lower_inf</span></span><a class="headerlink" href="#spans.types.Range.lower_inf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if lower bound is unbounded.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">lower_inf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">lower_inf</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">lower_inf(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.overlap">
+<span class="sig-name descname"><span class="pre">overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if both ranges share any points.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">&amp;&amp;</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to test against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if ranges overlap, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of another type than this range.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>If you need to know which part that overlapped, consider using
+<a class="reference internal" href="#spans.types.Range.intersection" title="spans.types.Range.intersection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">intersection()</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance of self with the given arguments replaced. It
+takes the exact same arguments as the constructor.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lower_inc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">intrange(2, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange(5, 10)</span>
+</pre></div>
+</div>
+<p>Note that range objects are immutable and are never modified in place.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.right_of">
+<span class="sig-name descname"><span class="pre">right_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.right_of" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range <cite>other</cite> is strictly right of <cite>other</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">right_of</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">right_of</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>The bitwise right shift operator <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> is overloaded for this operation
+too.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The choice of overloading <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> might seem strange, but it is to mimick
+PostgreSQL’s operators for ranges. As this is not obvious the use of
+<code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> is discouraged.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to test against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range is completely to the right of <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.startsafter">
+<span class="sig-name descname"><span class="pre">startsafter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.startsafter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range starts after <cite>other</cite>. <cite>other</cite> may be either range or
+scalar. This only takes the lower end of the ranges into consideration.
+If the scalar or the lower end of the given range is greater than or
+equal to this range’s lower end, <code class="docutils literal notranslate"><span class="pre">True</span></code> is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">startsafter</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">startsafter</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">other</span></code> has the same start as the given</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range or scalar to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range starts after <cite>other</cite>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of the wrong type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.startswith">
+<span class="sig-name descname"><span class="pre">startswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.startswith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range starts with <cite>other</cite>. <cite>other</cite> may be either range or
+scalar.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range or scalar to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range starts with <cite>other</cite>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of the wrong type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges this range with a given range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(1, 15)</span>
+</pre></div>
+</div>
+<p>Two ranges can not be merged if the resulting range would be split in
+two. This happens when the two sets are neither adjacent nor overlaps.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">Ranges must be either adjacent or overlapping</span>
+</pre></div>
+</div>
+<p>This does not modify the range in place.</p>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to merge with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the union of this and <cite>other</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If <cite>other</cite> can not be merged with this range.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.upper">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">upper</span></span><a class="headerlink" href="#spans.types.Range.upper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the upper boundary or None if it is unbounded.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">upper(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.upper_inc">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">upper_inc</span></span><a class="headerlink" href="#spans.types.Range.upper_inc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if upper bound is included in range. If upper bound is
+unbounded this returns False.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">upper_inc</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">upper_inc(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.Range.upper_inf">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">upper_inf</span></span><a class="headerlink" href="#spans.types.Range.upper_inf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if upper bound is unbounded.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">upper_inf</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">upper_inf</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">upper_inf(self)</span></code> in PostgreSQL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.Range.within">
+<span class="sig-name descname"><span class="pre">within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.Range.within" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests if this range is within <cite>other</cite>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">&lt;&#64;</span> <span class="pre">other</span></code> in PostgreSQL. One difference
+however is that unlike PostgreSQL <code class="docutils literal notranslate"><span class="pre">self</span></code> in this can’t be a scalar
+value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to test against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range is completely within the given range,
+otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If given range is of the wrong type.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>This method is the inverse of <a class="reference internal" href="#spans.types.Range.contains" title="spans.types.Range.contains"><code class="xref py py-meth docutils literal notranslate"><span class="pre">contains()</span></code></a></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="discrete-range">
+<h3>Discrete range<a class="headerlink" href="#discrete-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.DiscreteRange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">DiscreteRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.DiscreteRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discrete ranges are a subset of ranges that works on discrete types. This
+includes <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lower_inc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">lower_inc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">lower_inc</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>All discrete ranges must provide a unit attribute containing the step
+length. For intrange this would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">intrange</span><span class="p">(</span><span class="n">DiscreteRange</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="nb">int</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>A range where no values can fit is considered empty:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lower_inc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">intrange.empty()</span>
+</pre></div>
+</div>
+<p>Discrete ranges are iterable.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="go">[1, 2, 3, 4]</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">discreterange</span></code> to <code class="docutils literal notranslate"><span class="pre">DiscreteRange</span></code></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.DiscreteRange.endswith">
+<span class="sig-name descname"><span class="pre">endswith</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.DiscreteRange.endswith" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range ends with <cite>other</cite>. <cite>other</cite> may be either range or
+scalar.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range or scalar to test.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">True</span></code> if this range ends with <cite>other</cite>, otherwise <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If <cite>other</cite> is of the wrong type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.DiscreteRange.last">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last</span></span><a class="headerlink" href="#spans.types.DiscreteRange.last" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the last element within this range. If the range has no upper
+limit <code class="docutils literal notranslate"><span class="pre">None</span></code> is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+<span class="go">9</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">last</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Last element within this range.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.1.4.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.DiscreteRange.next">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.DiscreteRange.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increment the given value with the step defined for this class.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>curr</strong> – Value to increment.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Incremented value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.DiscreteRange.prev">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">prev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">curr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.DiscreteRange.prev" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrement the given value with the step defined for this class.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="o">.</span><span class="n">prev</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>curr</strong> – Value to decrement.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Decremented value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="offsetable-range-mixin">
+<h3>Offsetable range mixin<a class="headerlink" href="#offsetable-range-mixin" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.OffsetableRangeMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">OffsetableRangeMixin</span></span><a class="headerlink" href="#spans.types.OffsetableRangeMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mixin for range types that supports being offset by a value. This value must
+be of the same type as the range boundaries. For date types this will not
+work and can be solved by explicitly defining an <code class="docutils literal notranslate"><span class="pre">offset_type</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">datetimerange</span><span class="p">(</span><span class="n">Range</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="nb">type</span> <span class="o">=</span> <span class="n">datetime</span>
+    <span class="n">offset_type</span> <span class="o">=</span> <span class="n">timedelta</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">offsetablerange</span></code> to <code class="docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.OffsetableRangeMixin.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.OffsetableRangeMixin.offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift the range to the left or right with the given offset</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange(5, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange(0, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange.empty()</span>
+</pre></div>
+</div>
+<p>Note that range objects are immutable and are never modified in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>offset</strong> – Scalar to offset by.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.1.3.</span></p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="integer-range">
+<h3>Integer range<a class="headerlink" href="#integer-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.intrange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">intrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.intrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on int.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange(1, 5)</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a>,
+<a class="reference internal" href="#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a> and <a class="reference internal" href="#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="float-range">
+<h3>Float range<a class="headerlink" href="#float-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.floatrange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">floatrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.floatrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on float.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">floatrange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+<span class="go">floatrange(1.0, 5.0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floatrange</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">floatrange(upper=10.0, upper_inc=True)</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<a class="reference internal" href="#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="string-range">
+<h3>String range<a class="headerlink" href="#string-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.strrange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">strrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.strrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on unicode strings. Next character is determined
+lexicographically. Representation might seem odd due to normalization.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<span class="go">strrange(u&#39;a&#39;, u&#39;z&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">strrange(u&#39;a&#39;, u&#39;{&#39;)</span>
+</pre></div>
+</div>
+<p>Iteration over a strrange is only sensible when having single character
+boundaries.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="go">[u&#39;a&#39;, u&#39;b&#39;, u&#39;c&#39;, u&#39;d&#39;, u&#39;e&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;aa&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;zz&quot;</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span> 
+<span class="go">27852826</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<a class="reference internal" href="#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="date-range">
+<h3>Date range<a class="headerlink" href="#date-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.daterange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">daterange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on <code class="docutils literal notranslate"><span class="pre">datetime.date</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">daterange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">daterange(datetime.date(2015, 1, 1), datetime.date(2015, 2, 1))</span>
+</pre></div>
+</div>
+<p>Offsets are done using <code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">daterange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">14</span><span class="p">))</span>
+<span class="go">daterange(datetime.date(2015, 1, 15), datetime.date(2015, 2, 15))</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a>,
+<a class="reference internal" href="#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a> and <a class="reference internal" href="#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns number of dates in range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">daterange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">)))</span>
+<span class="go">7</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.from_date">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.from_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a day long daterange from for the given date.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">daterange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">daterange(datetime.date(2000, 1, 1), datetime.date(2000, 1, 2))</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – A date to convert.</p></li>
+<li><p><strong>period</strong> – The period to normalize date to. A period may be one of:
+<code class="docutils literal notranslate"><span class="pre">day</span></code> (default), <code class="docutils literal notranslate"><span class="pre">week</span></code>, <code class="docutils literal notranslate"><span class="pre">american_week</span></code>,
+<code class="docutils literal notranslate"><span class="pre">month</span></code>, <code class="docutils literal notranslate"><span class="pre">quarter</span></code> or <code class="docutils literal notranslate"><span class="pre">year</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that contains the given date.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>There are convenience methods for most period types:
+<a class="reference internal" href="#spans.types.daterange.from_week" title="spans.types.daterange.from_week"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_week()</span></code></a>,
+<a class="reference internal" href="#spans.types.daterange.from_month" title="spans.types.daterange.from_month"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_month()</span></code></a>,
+<a class="reference internal" href="#spans.types.daterange.from_quarter" title="spans.types.daterange.from_quarter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_quarter()</span></code></a> and
+<a class="reference internal" href="#spans.types.daterange.from_year" title="spans.types.daterange.from_year"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_year()</span></code></a>.</p>
+<p><a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a> has the same interface but is
+period aware. This means it is possible to get things like next week
+or month.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.4.0: </span>Added the period parameter.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.from_month">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_month</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.from_month" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">daterange</span></code> based on a year and amonth</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year</strong> – Year as an integer</p></li>
+<li><p><strong>iso_week</strong> – Month as an integer between 1 and 12</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">daterange</span></code> for the given month</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.4.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.from_quarter">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_quarter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.from_quarter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">daterange</span></code> based on a year and quarter.</p>
+<p>A quarter is considered to be:</p>
+<ul class="simple">
+<li><p>January through March (Q1),</p></li>
+<li><p>April through June (Q2),</p></li>
+<li><p>July through September (Q3) or,</p></li>
+<li><p>October through December (Q4)</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year</strong> – Year as an integer</p></li>
+<li><p><strong>quarter</strong> – Quarter as an integer between 1 and 4</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">daterange</span></code> for the given quarter</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.4.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.from_week">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_week</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iso_week</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.from_week" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">daterange</span></code> based on a year and an ISO week</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year</strong> – Year as an integer</p></li>
+<li><p><strong>iso_week</strong> – ISO week number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">daterange</span></code> for the given week</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.4.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.daterange.from_year">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_year</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.daterange.from_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create <code class="docutils literal notranslate"><span class="pre">daterange</span></code> based on a year</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>year</strong> – Year as an integer</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">daterange</span></code> for the given year</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.4.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spans.types.daterange.offset_type">
+<span class="sig-name descname"><span class="pre">offset_type</span></span><a class="headerlink" href="#spans.types.daterange.offset_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spans.types.daterange.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#spans.types.daterange.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="period-range">
+<h3>Period range<a class="headerlink" href="#period-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.PeriodRange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">PeriodRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>A type aware version of <a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>.</p>
+<p>Type aware refers to being aware of what kind of range it represents.
+Available types are the same as the <code class="docutils literal notranslate"><span class="pre">period</span></code> argument for to
+<a class="reference internal" href="#spans.types.daterange.from_date" title="spans.types.daterange.from_date"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_date()</span></code></a>.</p>
+<p>Some methods are unavailable due since they don’t make sense for
+<a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a>, and some may return a normal
+<a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a> since they may modifify the range in ways
+not compatible with its type.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.4.0.</span></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This class does not have its own range set implementation, but can be
+used with <a class="reference internal" href="#spans.settypes.daterangeset" title="spans.settypes.daterangeset"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterangeset</span></code></a>.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.daterange">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">daterange</span></span><a class="headerlink" href="#spans.types.PeriodRange.daterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>This <code class="docutils literal notranslate"><span class="pre">PeriodRange</span></code> represented as a naive
+<a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.difference">
+<span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the difference between this and a given range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange.empty()</span>
+</pre></div>
+</div>
+<p>The difference can not be computed if the resulting range would be split
+in two separate ranges. This happens when the given range is completely
+within this range and does not start or end at the same value.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">Other range must not be within this range</span>
+</pre></div>
+</div>
+<p>This does not modify the range in place.</p>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">-</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to difference against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the difference between this and <cite>other</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If difference bethween this and <cite>other</cite> can not be
+computed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.empty">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">empty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.empty" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – since typed date ranges must never be empty</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.from_date">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">day</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.from_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a day long daterange from for the given date.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">daterange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">daterange(datetime.date(2000, 1, 1), datetime.date(2000, 1, 2))</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – A date to convert.</p></li>
+<li><p><strong>period</strong> – The period to normalize date to. A period may be one of:
+<code class="docutils literal notranslate"><span class="pre">day</span></code> (default), <code class="docutils literal notranslate"><span class="pre">week</span></code>, <code class="docutils literal notranslate"><span class="pre">american_week</span></code>,
+<code class="docutils literal notranslate"><span class="pre">month</span></code>, <code class="docutils literal notranslate"><span class="pre">quarter</span></code> or <code class="docutils literal notranslate"><span class="pre">year</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that contains the given date.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>There are convenience methods for most period types:
+<a class="reference internal" href="#spans.types.daterange.from_week" title="spans.types.daterange.from_week"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_week()</span></code></a>,
+<a class="reference internal" href="#spans.types.daterange.from_month" title="spans.types.daterange.from_month"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_month()</span></code></a>,
+<a class="reference internal" href="#spans.types.daterange.from_quarter" title="spans.types.daterange.from_quarter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_quarter()</span></code></a> and
+<a class="reference internal" href="#spans.types.daterange.from_year" title="spans.types.daterange.from_year"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_year()</span></code></a>.</p>
+<p><a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a> has the same interface but is
+period aware. This means it is possible to get things like next week
+or month.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.4.0: </span>Added the period parameter.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new range containing all points shared by both ranges. If no
+points are shared an empty range is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange.empty()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(5, 10)</span>
+</pre></div>
+</div>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to interect with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the intersection between this and <cite>other</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.next_period">
+<span class="sig-name descname"><span class="pre">next_period</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.next_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>The period after this range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">span</span> <span class="o">=</span> <span class="n">PeriodRange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">next_period</span><span class="p">()</span>
+<span class="go">PeriodRange(datetime.date(2000, 2, 1), datetime.date(2000, 3, 1), period=&#39;month&#39;)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new <a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a> for the period after
+this period</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Offset the date range by the given amount of periods.</p>
+<p>This differs from <a class="reference internal" href="#spans.types.OffsetableRangeMixin.offset" title="spans.types.OffsetableRangeMixin.offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">offset()</span></code></a> on
+<a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.types.daterange</span></code></a> by not accepting a <code class="docutils literal notranslate"><span class="pre">timedelta</span></code> object.
+Instead it expects an integer to adjust the typed date range by. The
+given value may be negative as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>offset</strong> – Number of periods to offset this range by. A period is
+either a day, week, american week, month, quarter or
+year, depending on this range’s period type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New offset <a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.prev_period">
+<span class="sig-name descname"><span class="pre">prev_period</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.prev_period" title="Permalink to this definition">¶</a></dt>
+<dd><p>The period before this range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">span</span> <span class="o">=</span> <span class="n">PeriodRange</span><span class="o">.</span><span class="n">from_date</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">period</span><span class="o">=</span><span class="s2">&quot;month&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">prev_period</span><span class="p">()</span>
+<span class="go">PeriodRange(datetime.date(1999, 12, 1), datetime.date(2000, 1, 1), period=&#39;month&#39;)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new <a class="reference internal" href="#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a> for the period
+before this period</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.replace">
+<span class="sig-name descname"><span class="pre">replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.replace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance of self with the given arguments replaced. It
+takes the exact same arguments as the constructor.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">lower_inc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">intrange(2, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrange(5, 10)</span>
+</pre></div>
+</div>
+<p>Note that range objects are immutable and are never modified in place.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.types.PeriodRange.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.PeriodRange.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merges this range with a given range.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(1, 15)</span>
+</pre></div>
+</div>
+<p>Two ranges can not be merged if the resulting range would be split in
+two. This happens when the two sets are neither adjacent nor overlaps.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">Ranges must be either adjacent or overlapping</span>
+</pre></div>
+</div>
+<p>This does not modify the range in place.</p>
+<p>This is the same as the <code class="docutils literal notranslate"><span class="pre">+</span></code> operator for two ranges in PostgreSQL.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range to merge with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range that is the union of this and <cite>other</cite>.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If <cite>other</cite> can not be merged with this range.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="datetime-range">
+<h3>Datetime range<a class="headerlink" href="#datetime-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.datetimerange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">datetimerange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.datetimerange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">datetimerange</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="go">datetimerange(datetime.datetime(2015, 1, 1, 0, 0), datetime.datetime(2015, 2, 1, 0, 0))</span>
+</pre></div>
+</div>
+<p>Offsets are done using <code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">datetimerange</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">14</span><span class="p">))</span>
+<span class="go">datetimerange(datetime.datetime(2015, 1, 15, 0, 0), datetime.datetime(2015, 2, 15, 0, 0))</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and <a class="reference internal" href="#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></a>.</p>
+</dd></dl>
+
+</section>
+<section id="timedelta-range">
+<h3>Timedelta range<a class="headerlink" href="#timedelta-range" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.types.timedeltarange">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">timedeltarange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_inc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.types.timedeltarange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range that operates on datetime’s timedelta class.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timedeltarange</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">timedeltarange(datetime.timedelta(days=1), datetime.timedelta(days=5))</span>
+</pre></div>
+</div>
+<p>Offsets are done using <code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timedeltarange</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">14</span><span class="p">))</span>
+<span class="go">timedeltarange(datetime.timedelta(days=15), datetime.timedelta(days=19))</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<a class="reference internal" href="#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code></a>.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="range-sets">
+<h2>Range sets<a class="headerlink" href="#range-sets" title="Permalink to this heading">¶</a></h2>
+<section id="range-set">
+<h3>Range set<a class="headerlink" href="#range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">RangeSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>A range set works a lot like a range with some differences:</p>
+<ul>
+<li><p>All range sets supports <code class="docutils literal notranslate"><span class="pre">len()</span></code>. Cardinality for a range set means the
+number of distinct ranges required to represent this set. See
+<a class="reference internal" href="#spans.settypes.RangeSet.__len__" title="spans.settypes.RangeSet.__len__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__len__()</span></code></a>.</p></li>
+<li><p>All range sets are iterable. The iterator returns a range for each
+iteration. See <a class="reference internal" href="#spans.settypes.RangeSet.__iter__" title="spans.settypes.RangeSet.__iter__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__iter__()</span></code></a> for more details.</p></li>
+<li><p>All range sets are invertible using the <code class="docutils literal notranslate"><span class="pre">~</span></code> operator. The result is a
+new range set that does not intersect the original range set at all.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="o">~</span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="go">intrangeset([intrange(upper=1), intrange(5)])</span>
+</pre></div>
+</div>
+</li>
+<li><p>Contrary to ranges. A range set may be split into multiple ranges when
+performing set operations such as union, difference or intersection.</p></li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">RangeSet</span></code> constructor supports any iterable sequence as argument.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ranges</strong> – A sequence of ranges to add to this set.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If any of the given ranges are of incorrect type.</p>
+</dd>
+</dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">rangeset</span></code> to <code class="docutils literal notranslate"><span class="pre">RangeSet</span></code></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator over all ranges within this set. Note that this
+iterates over the normalized version of the range set:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)]))</span>
+<span class="go">[intrange(1, 10), intrange(15, 20)]</span>
+</pre></div>
+</div>
+<p>If the set is empty an empty iterator is returned.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">([]))</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.3.0: </span>This method used to return an empty range when the RangeSet was
+empty.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the cardinality of the set which is 0 for the empty set or else
+the number of ranges used to represent this range set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">([]))</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]))</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">)]))</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.2.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a range to the set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="n">intrangeset</span><span class="p">([])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span>
+<span class="go">intrangeset([intrange(1, 10)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span>
+<span class="go">intrangeset([intrange(1, 15)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span>
+<span class="go">intrangeset([intrange(1, 15), intrange(20, 30)])</span>
+</pre></div>
+</div>
+<p>This operation updates the set in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> – Range to add to this set.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> – If any of the given ranges are of incorrect type.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.contains">
+<span class="sig-name descname"><span class="pre">contains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if this range
+Return True if one range within the set contains elem, which may be
+either a range of the same type or a scalar of the same type as the
+ranges within the set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)])</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">)])</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>Contains can also be called using the <code class="docutils literal notranslate"><span class="pre">in</span></code> operator.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">3</span> <span class="ow">in</span> <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>This operation is <cite>O(n)</cite> where <cite>n</cite> is the number of ranges within this
+range set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> – Range or scalar to test for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if element is contained within this set.</p>
+</dd>
+</dl>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.2.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a copy of this set. This copy is not deep since ranges are
+immutable.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs_copy</span> <span class="o">=</span> <span class="n">rs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">==</span> <span class="n">rs_copy</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="ow">is</span> <span class="n">rs_copy</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new range set with the same ranges as this range set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.difference">
+<span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">others</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns this set stripped of every subset that are in the other given
+sets.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]))</span>
+<span class="go">intrangeset([intrange(1, 5), intrange(10, 15)])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range set to compute difference against.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range set that is the difference between this and <cite>other</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">others</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new set of all subsets that exist in this and every given set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]))</span>
+<span class="go">intrangeset([intrange(5, 10)])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range set to intersect this range set with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range set that is the intersection between this and
+<cite>other</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a range from the set. This operation updates the set in place.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span>
+<span class="go">intrangeset([intrange(1, 5), intrange(10, 15)])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>item</strong> – Range to remove from this set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.span">
+<span class="sig-name descname"><span class="pre">span</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.span" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a range that spans from the first point to the last point in this
+set. This means the smallest range containing all elements of this set
+with no gaps.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">)])</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+<span class="go">intrange(1, 40)</span>
+</pre></div>
+</div>
+<p>This method can be used to implement the PostgreSQL function
+<code class="docutils literal notranslate"><span class="pre">range_merge(a,</span> <span class="pre">b)</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span><span class="o">.</span><span class="n">span</span><span class="p">()</span>
+<span class="go">intrange(1, 15)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A new range the contains this entire range set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.RangeSet.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">others</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.RangeSet.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns this set combined with every given set into a super set for each
+given set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]))</span>
+<span class="go">intrangeset([intrange(1, 10)])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> – Range set to merge with.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new range set that is the union of this and <cite>other</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="discrete-range-set-mixin">
+<h3>Discrete range set mixin<a class="headerlink" href="#discrete-range-set-mixin" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.DiscreteRangeSetMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">DiscreteRangeSetMixin</span></span><a class="headerlink" href="#spans.settypes.DiscreteRangeSetMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mixin that adds support for discrete range set operations. Automatically used
+by <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> when <a class="reference internal" href="#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> type
+inherits <a class="reference internal" href="#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">discreterangeset</span></code> to <code class="docutils literal notranslate"><span class="pre">DiscreteRangeSetMixin</span></code></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.DiscreteRangeSetMixin.values">
+<span class="sig-name descname"><span class="pre">values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.DiscreteRangeSetMixin.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator over each value in this range set.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="go">[1, 2, 3, 4, 10, 11, 12, 13, 14]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="offsetable-range-set-mixin">
+<h3>Offsetable range set mixin<a class="headerlink" href="#offsetable-range-set-mixin" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.OffsetableRangeSetMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">OffsetableRangeSetMixin</span></span><a class="headerlink" href="#spans.settypes.OffsetableRangeSetMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mixin that adds support for offsetable range set operations. Automatically
+used by <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> when range type inherits
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixin</span></code>.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">offsetablerangeset</span></code> to <code class="docutils literal notranslate"><span class="pre">OffsetableRangeSetMixin</span></code></p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="spans.settypes.OffsetableRangeSetMixin.offset">
+<span class="sig-name descname"><span class="pre">offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.OffsetableRangeSetMixin.offset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shift the range set to the left or right with the given offset</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrangeset([intrange(5, 10), intrange(15, 20)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)])</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">intrangeset([intrange(0, 5), intrange(10, 15)])</span>
+</pre></div>
+</div>
+<p>This function returns an offset copy of the original set, i.e. updating
+is not done in place.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="integer-range-set">
+<h3>Integer range set<a class="headerlink" href="#integer-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.intrangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">intrangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.intrangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on <a class="reference internal" href="#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span>
+<span class="go">intrangeset([intrange(1, 5), intrange(10, 15)])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRangeset</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixinset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="float-range-set">
+<h3>Float range set<a class="headerlink" href="#float-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.floatrangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">floatrangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.floatrangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on <a class="reference internal" href="#spans.types.floatrange" title="spans.types.floatrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">floatrange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">floatrangeset</span><span class="p">([</span><span class="n">floatrange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">floatrange</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">)])</span>
+<span class="go">floatrangeset([floatrange(1.0, 5.0), floatrange(10.0, 15.0)])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRangeset</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixinset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="string-range-set">
+<h3>String range set<a class="headerlink" href="#string-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.strrangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">strrangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.strrangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on .. seealso:: <a class="reference internal" href="#spans.types.strrange" title="spans.types.strrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">strrange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">strrangeset</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">strrange</span><span class="p">(</span><span class="sa">u</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="sa">u</span><span class="s2">&quot;9&quot;</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span>
+<span class="go">strrangeset([strrange(u&#39;0&#39;, u&#39;:&#39;), strrange(u&#39;a&#39;, u&#39;g&#39;)])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRangeset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="date-range-set">
+<h3>Date range set<a class="headerlink" href="#date-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.daterangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">daterangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.daterangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on <a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">month</span> <span class="o">=</span> <span class="n">daterange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">daterangeset</span><span class="p">([</span><span class="n">month</span><span class="p">,</span> <span class="n">month</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">366</span><span class="p">))])</span> 
+<span class="go">daterangeset([daterange(datetime.date(2000, 1, 1), datetime.date(2000, 2, 1)),</span>
+<span class="go">    daterange(datetime.date(2001, 1, 1), datetime.date(2001, 2, 1))])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRangeset</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixinset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="datetime-range-set">
+<h3>Datetime range set<a class="headerlink" href="#datetime-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.datetimerangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">datetimerangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.datetimerangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on <a class="reference internal" href="#spans.types.datetimerange" title="spans.types.datetimerange"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetimerange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">month</span> <span class="o">=</span> <span class="n">datetimerange</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datetimerangeset</span><span class="p">([</span><span class="n">month</span><span class="p">,</span> <span class="n">month</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">366</span><span class="p">))])</span> 
+<span class="go">datetimerangeset([datetimerange(datetime.datetime(2000, 1, 1, 0, 0), datetime.datetime(2000, 2, 1, 0, 0)),</span>
+<span class="go">    datetimerange(datetime.datetime(2001, 1, 1, 0, 0), datetime.datetime(2001, 2, 1, 0, 0))])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixinset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="timedelta-range-set">
+<h3>Timedelta range set<a class="headerlink" href="#timedelta-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.timedeltarangeset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">timedeltarangeset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ranges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.timedeltarangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Range set that operates on <a class="reference internal" href="#spans.types.timedeltarange" title="spans.types.timedeltarange"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedeltarange</span></code></a>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">week</span> <span class="o">=</span> <span class="n">timedeltarange</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timedeltarangeset</span><span class="p">([</span><span class="n">week</span><span class="p">,</span> <span class="n">week</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">))])</span>
+<span class="go">timedeltarangeset([timedeltarange(datetime.timedelta(0), datetime.timedelta(days=14))])</span>
+</pre></div>
+</div>
+<p>Inherits methods from <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">OffsetableRangeMixinset</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="meta-range-set">
+<h3>Meta range set<a class="headerlink" href="#meta-range-set" title="Permalink to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="spans.settypes.MetaRangeSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">MetaRangeSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spans.settypes.MetaRangeSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>A meta class for RangeSets. The purpose is to automatically add relevant
+mixins to the range set class based on what mixins and base classes the
+range class has.</p>
+<p>All subclasses of <a class="reference internal" href="#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> uses this class as its
+metaclass</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 0.5.0: </span>Changed name from <code class="docutils literal notranslate"><span class="pre">metarangeset</span></code> to <code class="docutils literal notranslate"><span class="pre">MetaRangeSet</span></code></p>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="legacy-names">
+<h2>Legacy names<a class="headerlink" href="#legacy-names" title="Permalink to this heading">¶</a></h2>
+<p>Historically some internal Spans classes had all lowercase names. This was changed in version 0.5.0. The reason some classes still have lowercase names is to match the Python built-ins they map to. <code class="docutils literal notranslate"><span class="pre">date</span></code>’s range type is and will always be <a class="reference internal" href="#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>. However, it doesn’t make much sense to maintain this convention for the more hidden classes in Spans.</p>
+<span class="target" id="module-spans.types"></span><dl class="py attribute">
+<dt class="sig sig-object py" id="spans.types.discreterange">
+<span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">discreterange</span></span><a class="headerlink" href="#spans.types.discreterange" title="Permalink to this definition">¶</a></dt>
+<dd><p>This alias exist for legacy reasons. It is considered deprecated but will not
+likely be removed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spans.types.offsetablerange">
+<span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">offsetablerange</span></span><a class="headerlink" href="#spans.types.offsetablerange" title="Permalink to this definition">¶</a></dt>
+<dd><p>This alias exist for legacy reasons. It is considered deprecated but will not
+likely be removed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spans.types.range_">
+<span class="sig-prename descclassname"><span class="pre">spans.types.</span></span><span class="sig-name descname"><span class="pre">range_</span></span><a class="headerlink" href="#spans.types.range_" title="Permalink to this definition">¶</a></dt>
+<dd><p>This alias exist for legacy reasons. It is considered deprecated but will not
+likely be removed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5.0.</span></p>
+</div>
+</dd></dl>
+
+<span class="target" id="module-spans.settypes"></span><dl class="py attribute">
+<dt class="sig sig-object py" id="spans.settypes.metarangeset">
+<span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">metarangeset</span></span><a class="headerlink" href="#spans.settypes.metarangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This alias exist for legacy reasons. It is considered deprecated but will not
+likely be removed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5.0.</span></p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spans.settypes.rangeset">
+<span class="sig-prename descclassname"><span class="pre">spans.settypes.</span></span><span class="sig-name descname"><span class="pre">rangeset</span></span><a class="headerlink" href="#spans.settypes.rangeset" title="Permalink to this definition">¶</a></dt>
+<dd><p>This alias exist for legacy reasons. It is considered deprecated but will not
+likely be removed.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 0.5.0.</span></p>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Spans</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ranges.html">Ranges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_types.html">Custom range types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ranges">Ranges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#range-sets">Range sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#legacy-names">Legacy names</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="postgresql.html" title="previous chapter">PostgreSQL analogies</a></li>
+      <li>Next: <a href="changelog.html" title="next chapter">Changelog</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Andreas Runfalk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

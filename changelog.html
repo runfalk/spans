@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Changelog &#8212; Spans  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="API documentation" href="api.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
+<p>Version are structured like the following: <code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;.&lt;bugfix&gt;</span></code>. The
+first <cite>0.1</cite> release does not properly adhere to this. Unless explicitly stated,
+changes are made by <a class="reference external" href="https://github.com/runfalk">Andreas Runfalk</a>.</p>
+<section id="version-1-1-1">
+<h2>Version 1.1.1<a class="headerlink" href="#version-1-1-1" title="Permalink to this heading">¶</a></h2>
+<p>Released on 21st April, 2021</p>
+<ul class="simple">
+<li><p>Normalize ranges to be empty when start and end is the same and either bound
+is exclusive
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/18">bug #18</a>,
+<a class="reference external" href="https://github.com/lgharibashvili">lgharibashvili</a>)</p></li>
+</ul>
+</section>
+<section id="version-1-1-0">
+<h2>Version 1.1.0<a class="headerlink" href="#version-1-1-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 2nd June, 2019</p>
+<p>This release changes a lot of internal implementation details that should
+prevent methods from not handling unbounded ranges correctly in the future.</p>
+<ul class="simple">
+<li><p>Added validation to ensure unbounded ranges are never inclusive</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">__repr__</span></code> for ranges to be more similar to proper Python syntax.
+The old representation looked like mismatched parentheses. For instance
+<code class="docutils literal notranslate"><span class="pre">floatrange((,10.0])</span></code> becomes <code class="docutils literal notranslate"><span class="pre">floatrange(upper=10.0,</span> <span class="pre">upper_inc=True)</span></code></p></li>
+<li><p>Dropped Python 3.3 support since it’s been EOL for almost two years. It
+probably still works but it is no longer tested</p></li>
+<li><p>Fixed pickling of empty range sets not working
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/14">bug #14</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="api.html#spans.types.Range.union" title="spans.types.Range.union"><code class="xref py py-meth docutils literal notranslate"><span class="pre">union()</span></code></a> not working properly with unbounded
+ranges</p></li>
+<li><p>Fixed lowerly unbounded ranges improperly being lower inclusive</p></li>
+<li><p>Fixed <a class="reference internal" href="api.html#spans.types.Range.startswith" title="spans.types.Range.startswith"><code class="xref py py-meth docutils literal notranslate"><span class="pre">startswith()</span></code></a> and
+<a class="reference internal" href="api.html#spans.types.Range.endsbefore" title="spans.types.Range.endsbefore"><code class="xref py py-meth docutils literal notranslate"><span class="pre">endsbefore()</span></code></a> being not handling empty ranges</p></li>
+</ul>
+</section>
+<section id="version-1-0-2">
+<h2>Version 1.0.2<a class="headerlink" href="#version-1-0-2" title="Permalink to this heading">¶</a></h2>
+<p>Released on 22th February, 2019</p>
+<ul class="simple">
+<li><p>Fixed <a class="reference internal" href="api.html#spans.types.Range.union" title="spans.types.Range.union"><code class="xref py py-meth docutils literal notranslate"><span class="pre">union()</span></code></a> when <code class="docutils literal notranslate"><span class="pre">upper_inc</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/11">bug #11</a>,
+<a class="reference external" href="https://github.com/der-michik">Michael Krahe</a>)</p></li>
+</ul>
+</section>
+<section id="version-1-0-1">
+<h2>Version 1.0.1<a class="headerlink" href="#version-1-0-1" title="Permalink to this heading">¶</a></h2>
+<p>Released on 31st January, 2018</p>
+<ul class="simple">
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">PartialOrderingMixin</span></code> not using <code class="docutils literal notranslate"><span class="pre">__slots__</span></code>
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/10">bug #10</a>)</p></li>
+</ul>
+</section>
+<section id="version-1-0-0">
+<h2>Version 1.0.0<a class="headerlink" href="#version-1-0-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 8th June, 2017</p>
+<ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> for <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> operators when there is a type
+mismatch</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">|</span></code> operator for unions of <a class="reference internal" href="api.html#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> support for <a class="reference internal" href="api.html#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a></p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">&amp;</span></code> operator for intersections of <a class="reference internal" href="api.html#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> support for <a class="reference internal" href="api.html#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a></p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">-</span></code> operator for differences of <a class="reference internal" href="api.html#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">Range</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> support for <a class="reference internal" href="api.html#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a></p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">reversed()</span></code> iterator support for <a class="reference internal" href="api.html#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a></p></li>
+<li><p>Fixed overlap with empty range incorrectly returns <code class="docutils literal notranslate"><span class="pre">True</span></code>
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/7">bug #7</a>)</p></li>
+<li><p>Fixed issue with <a class="reference internal" href="api.html#spans.types.Range.contains" title="spans.types.Range.contains"><code class="xref py py-meth docutils literal notranslate"><span class="pre">contains()</span></code></a> for scalars on unbounded
+ranges</p></li>
+<li><p>Fixed type check for <a class="reference internal" href="api.html#spans.types.Range.right_of" title="spans.types.Range.right_of"><code class="xref py py-meth docutils literal notranslate"><span class="pre">right_of()</span></code></a></p></li>
+<li><p>Fixed type check for <a class="reference internal" href="api.html#spans.settypes.RangeSet.contains" title="spans.settypes.RangeSet.contains"><code class="xref py py-meth docutils literal notranslate"><span class="pre">contains()</span></code></a></p></li>
+<li><p>Fixed type check for <a class="reference internal" href="api.html#spans.settypes.RangeSet.union" title="spans.settypes.RangeSet.union"><code class="xref py py-meth docutils literal notranslate"><span class="pre">union()</span></code></a></p></li>
+<li><p>Fixed type check for <a class="reference internal" href="api.html#spans.settypes.RangeSet.intersection" title="spans.settypes.RangeSet.intersection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">intersection()</span></code></a></p></li>
+<li><p>Fixed type check for <a class="reference internal" href="api.html#spans.settypes.RangeSet.difference" title="spans.settypes.RangeSet.difference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">difference()</span></code></a></p></li>
+<li><p>Fixed infinite iterators not being supported for
+<a class="reference internal" href="api.html#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a></p></li>
+</ul>
+</section>
+<section id="version-0-5-0">
+<h2>Version 0.5.0<a class="headerlink" href="#version-0-5-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 16th April, 2017</p>
+<p>This release is a preparation for a stable 1.0 release.</p>
+<ul class="simple">
+<li><p>Fixed comparison operators when working with empty or unbounded ranges. They
+would previously raise exceptions. Ranges are now partially ordered instead of
+totally ordered</p></li>
+<li><p>Added more unit tests</p></li>
+<li><p>Renamed classes to match <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0008/#class-names"><strong>PEP 8#class-names</strong></a> conventions. This does not apply
+to classes that works on built-in that does not follow <span class="target" id="index-1"></span><a class="pep reference external" href="https://peps.python.org/pep-0008/#class-names"><strong>PEP 8#class-names</strong></a>.</p></li>
+<li><p>Refactored <a class="reference internal" href="api.html#spans.types.Range.left_of" title="spans.types.Range.left_of"><code class="xref py py-meth docutils literal notranslate"><span class="pre">left_of()</span></code></a></p></li>
+<li><p>Refactored <a class="reference internal" href="api.html#spans.types.Range.overlap" title="spans.types.Range.overlap"><code class="xref py py-meth docutils literal notranslate"><span class="pre">overlap()</span></code></a></p></li>
+<li><p>Refactored <a class="reference internal" href="api.html#spans.types.Range.union" title="spans.types.Range.union"><code class="xref py py-meth docutils literal notranslate"><span class="pre">union()</span></code></a></p></li>
+</ul>
+</section>
+<section id="version-0-4-0">
+<h2>Version 0.4.0<a class="headerlink" href="#version-0-4-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 20th March, 2017</p>
+<p>This release is called 0.4.1 on PyPI because I messed up the upload.</p>
+<ul class="simple">
+<li><p>Added new argument to <a class="reference internal" href="api.html#spans.types.daterange.from_date" title="spans.types.daterange.from_date"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_date()</span></code></a> for working
+with different kinds of date intervals. The argument accepts a period of either
+<code class="docutils literal notranslate"><span class="pre">&quot;day&quot;</span></code> (default), <code class="docutils literal notranslate"><span class="pre">&quot;week&quot;</span></code> (ISO week), <code class="docutils literal notranslate"><span class="pre">&quot;american_week&quot;</span></code> (starts on
+sunday), <code class="docutils literal notranslate"><span class="pre">&quot;month&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;quarter&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;year&quot;</span></code>.</p></li>
+<li><p>Added new methods to <a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a> for working with different
+kinds of date intervals:
+<a class="reference internal" href="api.html#spans.types.daterange.from_week" title="spans.types.daterange.from_week"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_week()</span></code></a>,
+<a class="reference internal" href="api.html#spans.types.daterange.from_month" title="spans.types.daterange.from_month"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_month()</span></code></a>,
+<a class="reference internal" href="api.html#spans.types.daterange.from_quarter" title="spans.types.daterange.from_quarter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_quarter()</span></code></a> and
+<a class="reference internal" href="api.html#spans.types.daterange.from_year" title="spans.types.daterange.from_year"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_year()</span></code></a>.</p></li>
+<li><p>Added a new class <a class="reference internal" href="api.html#spans.types.PeriodRange" title="spans.types.PeriodRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodRange</span></code></a> for working with periods
+like weeks, months, quarters or years. It inherits all methods from
+<a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a> and is aware of its own period type. It
+allows things like getting the previous or next week.</p></li>
+<li><p>Fixed <a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a> not accepting subclasses of <code class="docutils literal notranslate"><span class="pre">date</span></code>
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/5">bug #5</a>)</p></li>
+<li><p>Fixed some broken doctests</p></li>
+<li><p>Moved unit tests to <a class="reference external" href="http://docs.pytest.org/en/latest/">pytest</a></p></li>
+<li><p>Removed <a class="reference external" href="https://tox.readthedocs.io/en/latest/">Tox</a> config</p></li>
+<li><p>Minor documentation tweaks</p></li>
+</ul>
+</section>
+<section id="version-0-3-0">
+<h2>Version 0.3.0<a class="headerlink" href="#version-0-3-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 26th August, 2016</p>
+<ul class="simple">
+<li><p>Added documentation for <a class="reference internal" href="api.html#spans.settypes.RangeSet.__iter__" title="spans.settypes.RangeSet.__iter__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__iter__()</span></code></a></p></li>
+<li><p>Fixed intersection of multiple range sets not working correctly
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/3">bug #3</a>)</p></li>
+<li><p>Fixed iteration of <a class="reference internal" href="api.html#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> returning an empty range
+when <code class="docutils literal notranslate"><span class="pre">RangeSet</span></code> is empty
+(<a class="reference external" href="https://github.com/runfalk/spans/issues/4">bug #4</a>)</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This change is backwards incompatible to code that expect range sets to
+always return at least one set when iterating.</p>
+</div>
+</section>
+<section id="version-0-2-1">
+<h2>Version 0.2.1<a class="headerlink" href="#version-0-2-1" title="Permalink to this heading">¶</a></h2>
+<p>Released on 27th June, 2016</p>
+<ul class="simple">
+<li><p>Fixed <a class="reference internal" href="api.html#spans.settypes.RangeSet" title="spans.settypes.RangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">RangeSet</span></code></a> not returning <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> when
+comparing to classes that are not sub classes of <code class="docutils literal notranslate"><span class="pre">RangeSet</span></code>, pull request
+<a class="reference external" href="https://github.com/runfalk/spans/pull/2">#2</a>
+(<a class="reference external" href="https://github.com/der-michik">Michael Krahe</a>)</p></li>
+<li><p>Updated license in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> to follow
+<a class="reference external" href="https://packaging.python.org/en/latest/distributing/#license">recommendations</a>
+by PyPA</p></li>
+</ul>
+</section>
+<section id="version-0-2-0">
+<h2>Version 0.2.0<a class="headerlink" href="#version-0-2-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 22nd December, 2015</p>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="api.html#spans.settypes.RangeSet.__len__" title="spans.settypes.RangeSet.__len__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__len__()</span></code></a> to range sets
+(<a class="reference external" href="https://github.com/der-michik">Michael Krahe</a>)</p></li>
+<li><p>Added <a class="reference internal" href="api.html#spans.settypes.RangeSet.contains" title="spans.settypes.RangeSet.contains"><code class="xref py py-meth docutils literal notranslate"><span class="pre">contains()</span></code></a> to range sets
+(<a class="reference external" href="https://github.com/der-michik">Michael Krahe</a>)</p></li>
+<li><p>Added <a class="reference external" href="http://sphinx-doc.org/">Sphinx</a> style doc strings to all methods</p></li>
+<li><p>Added proper Sphinx documentation</p></li>
+<li><p>Added unit tests for uncovered parts, mostly error checking</p></li>
+<li><p>Added <a class="reference external" href="https://www.python.org/dev/peps/pep-0427/">wheel</a> to PyPI along with
+source distribution</p></li>
+<li><p>Fixed a potential bug where comparing ranges of different types would result
+in an infinite loop</p></li>
+<li><p>Changed meta class implementation for range sets to allow more mixins for
+custom range sets</p></li>
+</ul>
+</section>
+<section id="version-0-1-4">
+<h2>Version 0.1.4<a class="headerlink" href="#version-0-1-4" title="Permalink to this heading">¶</a></h2>
+<p>Released on 15th May, 2015</p>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="api.html#spans.types.DiscreteRange.last" title="spans.types.DiscreteRange.last"><code class="xref py py-attr docutils literal notranslate"><span class="pre">last</span></code></a> property to
+<a class="reference internal" href="api.html#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscreteRange</span></code></a></p></li>
+<li><p>Added <a class="reference internal" href="api.html#spans.types.daterange.from_date" title="spans.types.daterange.from_date"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_date()</span></code></a> helper to
+<a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a></p></li>
+<li><p>Added more unit tests</p></li>
+<li><p>Improved pickle implementation</p></li>
+<li><p>Made type checking more strict for date ranges to prevent <code class="docutils literal notranslate"><span class="pre">datetime</span></code> from
+being allowed in <a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a></p></li>
+</ul>
+</section>
+<section id="version-0-1-3">
+<h2>Version 0.1.3<a class="headerlink" href="#version-0-1-3" title="Permalink to this heading">¶</a></h2>
+<p>Released on 27th February, 2015</p>
+<ul class="simple">
+<li><p>Added <a class="reference internal" href="api.html#spans.types.OffsetableRangeMixin.offset" title="spans.types.OffsetableRangeMixin.offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">offset()</span></code></a> to some range types</p></li>
+<li><p>Added <a class="reference internal" href="api.html#spans.settypes.OffsetableRangeSetMixin.offset" title="spans.settypes.OffsetableRangeSetMixin.offset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">offset()</span></code></a> to some range set
+types</p></li>
+<li><p>Added sanity checks to range boundaries</p></li>
+<li><p>Fixed incorrect <code class="docutils literal notranslate"><span class="pre">__slots__</span></code> usage, resulting in <code class="docutils literal notranslate"><span class="pre">__slots__</span></code> not being used
+on most ranges</p></li>
+<li><p>Fixed pickling of ranges and range sets</p></li>
+<li><p>Simplified creation of new range sets, by the use of the meta class
+<a class="reference internal" href="api.html#spans.settypes.MetaRangeSet" title="spans.settypes.MetaRangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetaRangeSet</span></code></a></p></li>
+</ul>
+</section>
+<section id="version-0-1-2">
+<h2>Version 0.1.2<a class="headerlink" href="#version-0-1-2" title="Permalink to this heading">¶</a></h2>
+<p>Released on 13th June, 2014</p>
+<ul class="simple">
+<li><p>Fix for inproper version detection on Ubuntu’s bundled Python interpreter</p></li>
+</ul>
+</section>
+<section id="version-0-1-1">
+<h2>Version 0.1.1<a class="headerlink" href="#version-0-1-1" title="Permalink to this heading">¶</a></h2>
+<p>Released on 12th June, 2014</p>
+<ul class="simple">
+<li><p>Readme fixes</p></li>
+<li><p>Syntax highlighting for PyPI page</p></li>
+</ul>
+</section>
+<section id="version-0-1-0">
+<h2>Version 0.1.0<a class="headerlink" href="#version-0-1-0" title="Permalink to this heading">¶</a></h2>
+<p>Released on 30th August, 2013</p>
+<ul class="simple">
+<li><p>Initial release</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Spans</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ranges.html">Ranges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_types.html">Custom range types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-1">Version 1.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-0">Version 1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-2">Version 1.0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-1">Version 1.0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0">Version 1.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-0">Version 0.5.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-0">Version 0.4.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-2-1">Version 0.2.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-4">Version 0.1.4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-3">Version 0.1.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-2">Version 0.1.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-1">Version 0.1.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-0">Version 0.1.0</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="api.html" title="previous chapter">API documentation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Andreas Runfalk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/changelog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

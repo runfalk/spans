@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Custom range types &#8212; Spans  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Recipes" href="recipes.html" />
+    <link rel="prev" title="Ranges" href="ranges.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="custom-range-types">
+<h1>Custom range types<a class="headerlink" href="#custom-range-types" title="Permalink to this heading">¶</a></h1>
+<p>The built in range types may not suffice for your particular application. It is very easy to extend with your own classes. The only requirement is that the type supports rich comparison <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0207/"><strong>PEP 207</strong></a> and is immutable.</p>
+<section id="standard-range-types">
+<h2>Standard range types<a class="headerlink" href="#standard-range-types" title="Permalink to this heading">¶</a></h2>
+<p>A normal range can be implemented by extending <a class="reference internal" href="api.html#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.types.Range</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spans.types</span> <span class="kn">import</span> <span class="n">Range</span>
+
+<span class="k">class</span> <span class="nc">floatrange</span><span class="p">(</span><span class="n">Range</span><span class="p">):</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span>
+
+<span class="n">span</span> <span class="o">=</span> <span class="n">floatrange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">span</span><span class="o">.</span><span class="n">lower</span> <span class="o">==</span> <span class="mf">1.0</span>
+<span class="k">assert</span> <span class="n">span</span><span class="o">.</span><span class="n">upper</span> <span class="o">==</span> <span class="mf">5.0</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">__slots__</span> <span class="pre">=</span> <span class="pre">()</span></code> is a performance optimization that is used for all ranges. It lowers the memory footprint for every instance. It is not mandatory but encourgaged.</p>
+</div>
+</section>
+<section id="offsetable-range-types">
+<h2>Offsetable range types<a class="headerlink" href="#offsetable-range-types" title="Permalink to this heading">¶</a></h2>
+<p>An offsetable range can be implemented using the mixin <a class="reference internal" href="api.html#spans.types.OffsetableRangeMixin" title="spans.types.OffsetableRangeMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.types.OffsetableRangeMixin</span></code></a>. The class still needs to extend <a class="reference internal" href="api.html#spans.types.Range" title="spans.types.Range"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.types.Range</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spans.types</span> <span class="kn">import</span> <span class="n">Range</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span>
+
+<span class="k">class</span> <span class="nc">floatrange</span><span class="p">(</span><span class="n">Range</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span><span class="p">):</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="nb">float</span>
+</pre></div>
+</div>
+<p>If the offset type is not the same as the range type (such as <code class="docutils literal notranslate"><span class="pre">date</span></code> that is offsetable with <code class="docutils literal notranslate"><span class="pre">timedelta</span></code>) the attribute <code class="docutils literal notranslate"><span class="pre">offset_type</span></code> can be used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spans.types</span> <span class="kn">import</span> <span class="n">DiscreteRange</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="k">class</span> <span class="nc">daterange</span><span class="p">(</span><span class="n">DiscreteRange</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span><span class="p">):</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">date</span>
+        <span class="n">offset_type</span> <span class="o">=</span> <span class="n">timedelta</span>
+
+<span class="n">span</span> <span class="o">=</span> <span class="n">daterange</span><span class="p">(</span><span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="k">assert</span> <span class="n">span</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">14</span><span class="p">))</span><span class="o">.</span><span class="n">upper</span> <span class="o">==</span> <span class="n">date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="discrete-range-types">
+<h2>Discrete range types<a class="headerlink" href="#discrete-range-types" title="Permalink to this heading">¶</a></h2>
+<p>Discrete ranges (such as <a class="reference internal" href="api.html#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a> and <a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>) can be implemented by extending <a class="reference internal" href="api.html#spans.types.DiscreteRange" title="spans.types.DiscreteRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.types.DiscreteRange</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spans.types</span> <span class="kn">import</span> <span class="n">DiscreteRange</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span>
+
+<span class="k">class</span> <span class="nc">intrange</span><span class="p">(</span><span class="n">DiscreteRange</span><span class="p">,</span> <span class="n">OffsetableRangeMixin</span><span class="p">):</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">intrange</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span> <span class="o">==</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">step</span></code> attribute. It must always be the smallest possible unit. Using <code class="docutils literal notranslate"><span class="pre">2</span></code> for intranges would not have expected behavior.</p>
+</section>
+<section id="range-sets">
+<h2>Range sets<a class="headerlink" href="#range-sets" title="Permalink to this heading">¶</a></h2>
+<p>Range sets are conveinient to implement regardless of the mixins used. This is due to the metaclass <a class="reference internal" href="api.html#spans.settypes.MetaRangeSet" title="spans.settypes.MetaRangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.settypes.MetaRangeSet</span></code></a>. The metaclass automatically adds required mixins to the range set type.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">spans.types</span> <span class="kn">import</span> <span class="n">intrange</span>
+<span class="kn">from</span> <span class="nn">spans.settypes</span> <span class="kn">import</span> <span class="n">RangeSet</span>
+
+<span class="k">class</span> <span class="nc">intrangeset</span><span class="p">(</span><span class="n">RangeSet</span><span class="p">):</span>
+        <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="n">intrange</span>
+
+<span class="k">assert</span> <span class="n">intrangeset</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span><span class="o">.</span><span class="n">span</span><span class="p">()</span> <span class="o">==</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-mixins">
+<h2>Custom mixins<a class="headerlink" href="#custom-mixins" title="Permalink to this heading">¶</a></h2>
+<p>It is possible to create custom mixins for range sets by adding mappings to <a class="reference internal" href="api.html#spans.settypes.MetaRangeSet" title="spans.settypes.MetaRangeSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">spans.settypes.MetaRangeSet</span></code></a>. The mapping has to be added before the range set class is created or it will not be used.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Spans</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ranges.html">Ranges</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Custom range types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#standard-range-types">Standard range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#offsetable-range-types">Offsetable range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discrete-range-types">Discrete range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#range-sets">Range sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-mixins">Custom mixins</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="ranges.html" title="previous chapter">Ranges</a></li>
+      <li>Next: <a href="recipes.html" title="next chapter">Recipes</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Andreas Runfalk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/custom_types.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

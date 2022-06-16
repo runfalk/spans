@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Ranges &#8212; Spans  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Custom range types" href="custom_types.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="ranges">
+<h1>Ranges<a class="headerlink" href="#ranges" title="Permalink to this heading">¶</a></h1>
+<p>Ranges are like <a class="reference external" href="https://en.wikipedia.org/wiki/Interval_%28mathematics%29">intervals in mathematics</a>. They have a start and end. Every value between the enpoints is included in the range. Integer ranges (<a class="reference internal" href="api.html#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a>) will be used for all examples. Built in range types are listed in <a class="reference internal" href="#available-range-types">Available range types</a>.</p>
+<p>A simple range:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">span</span> <span class="o">=</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">lower</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">upper</span>
+<span class="go">5</span>
+</pre></div>
+</div>
+<p>By default all ranges include all elements from and including <cite>lower</cite> up to but not including <cite>upper</cite>. This means that the last element included in the discrete <a class="reference internal" href="api.html#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a> is <cite>4</cite>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<p>Non discrete ranges, such as <a class="reference internal" href="api.html#spans.types.floatrange" title="spans.types.floatrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">floatrange</span></code></a>, do not have the property last <a class="reference internal" href="api.html#spans.types.DiscreteRange.last" title="spans.types.DiscreteRange.last"><code class="xref py py-class docutils literal notranslate"><span class="pre">last</span></code></a>.</p>
+<p>Discrete ranges are always normalized, while normal ranges are not.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">intrange(1, 6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">floatrange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">upper_inc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">floatrange(1.0, 5.0, upper_inc=True)</span>
+</pre></div>
+</div>
+<p>Ranges support set operations such as <a class="reference internal" href="api.html#spans.types.Range.union" title="spans.types.Range.union"><code class="xref py py-class docutils literal notranslate"><span class="pre">union</span></code></a>, <a class="reference internal" href="api.html#spans.types.Range.difference" title="spans.types.Range.difference"><code class="xref py py-class docutils literal notranslate"><span class="pre">difference</span></code></a> and <a class="reference internal" href="api.html#spans.types.Range.intersection" title="spans.types.Range.intersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">intersection</span></code></a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="go">intrange(1, 10)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(1, 5)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="go">intrange(5, 10)</span>
+</pre></div>
+</div>
+<p>Unions and differences that would result in two sets will result in a <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. To perform such operations <a class="reference internal" href="#range-sets">Range sets</a> must be used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">Ranges must be either adjacent or overlapping</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This behavior is for consistency with PostgreSQL.</p>
+</div>
+<section id="available-range-types">
+<h2>Available range types<a class="headerlink" href="#available-range-types" title="Permalink to this heading">¶</a></h2>
+<p>The following range types are built in:</p>
+<ul class="simple">
+<li><p>Integer range (<a class="reference internal" href="api.html#spans.types.intrange" title="spans.types.intrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">intrange</span></code></a>)</p></li>
+<li><p>Float range (<a class="reference internal" href="api.html#spans.types.floatrange" title="spans.types.floatrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">floatrange</span></code></a>)</p></li>
+<li><p>String range (<a class="reference internal" href="api.html#spans.types.strrange" title="spans.types.strrange"><code class="xref py py-class docutils literal notranslate"><span class="pre">strrange</span></code></a>) which operate on unicode strings</p></li>
+<li><p>Date range (<a class="reference internal" href="api.html#spans.types.daterange" title="spans.types.daterange"><code class="xref py py-class docutils literal notranslate"><span class="pre">daterange</span></code></a>)</p></li>
+<li><p>Datetime range (<a class="reference internal" href="api.html#spans.types.datetimerange" title="spans.types.datetimerange"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetimerange</span></code></a>)</p></li>
+<li><p>Timedelta range (<a class="reference internal" href="api.html#spans.types.timedeltarange" title="spans.types.timedeltarange"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedeltarange</span></code></a>)</p></li>
+</ul>
+</section>
+<section id="range-sets">
+<h2>Range sets<a class="headerlink" href="#range-sets" title="Permalink to this heading">¶</a></h2>
+<p>Range sets are sets of intervals, where each element must be represented by one and only one range. Range sets are the solution to the problem when an operation will result in two separate ranges.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">intrange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">)])</span>
+<span class="go">intrangeset([intrange(1, 5), intrange(10, 15)])</span>
+</pre></div>
+</div>
+<p>Like ranges, range sets support <code class="xref py py-class docutils literal notranslate"><span class="pre">union</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">difference</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">intersection</span></code>. Contrary to Python’s built in sets these operations do not modify the range set in place. Instead it returns a new set. Unchanged ranges are reused to conserve memory since ranges are immutable.</p>
+<p>Range sets are however mutable structures. To modify an existing set in place the <code class="xref py py-class docutils literal notranslate"><span class="pre">add</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">remove</span></code> methods are used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">span</span> <span class="o">=</span> <span class="n">intrangeset</span><span class="p">([</span><span class="n">intrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span>
+<span class="go">intrangeset([intrange(1, 10)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">intrange</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">span</span>
+<span class="go">intrangeset([intrange(1, 3), intrange(7, 10)])</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Spans</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Spans  documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ranges</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#available-range-types">Available range types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#range-sets">Range sets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="custom_types.html">Custom range types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postgresql.html">PostgreSQL analogies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="introduction.html" title="previous chapter">Introduction</a></li>
+      <li>Next: <a href="custom_types.html" title="next chapter">Custom range types</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Andreas Runfalk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/ranges.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
