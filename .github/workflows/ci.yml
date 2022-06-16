@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  # This avoids having duplicate builds for a pull request
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        os: ["ubuntu-latest"]
+    name: Pytest (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      # Remove the lock file unless we're using the stable version of Python.
+      # This is required because older Python version require "polyfills" for
+      # some libraries
+      - name: Remove poetry.lock file
+        run: rm poetry.lock
+        if: ${{ matrix.python-version != '3.10' }}
+      - name: Install dev dependencies
+        run: poetry install
+      - name: Run pytest
+        run: poetry run pytest
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      - name: Install dev dependencies
+        run: poetry install
+      - name: Build documentation
+        run: |
+          poetry run sphinx-build -b html doc doc-build
+          touch doc-build/.nojekyll
+      - name: Deploy
+        uses: crazy-max/ghaction-github-pages@v3
+        if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' && github.ref == 'refs/heads/${{ github.event.repository.default_branch }}' }}
+        with:
+          allow_empty_commit: false
+          build_dir: doc-build/
+          author: Andreas Runfalk <andreas@runfalk.se>
+          keep_history: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    needs:
+      - tests
+      - docs
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: 1.1.13
+      - name: Install dev dependencies
+        run: poetry install
+      - name: Validate that version matches the tag
+        if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' && github.ref == 'refs/heads/${{ github.event.repository.default_branch }}' }}
+        run: test "$(poetry version --short)" == "${{ github.ref_name }}"
+      - name: Build package
+        run: poetry build
+      - name: Deploy
+        if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' && github.ref == 'refs/heads/${{ github.event.repository.default_branch }}' }}
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
+        run: poetry publish

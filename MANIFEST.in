@@ -1,9 +1,0 @@
-include Makefile README.rst LICENSE
-
-graft doc
-graft tests
-
-global-exclude *.py[co]
-
-prune doc/_build
-prune doc/_themes

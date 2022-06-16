@@ -1,6 +1,6 @@
 Spans
 =====
-|test-status| |test-coverage| |documentation-status| |pypi-version| |py-versions| |license|
+|pypi-version| |py-versions| |license|
 
 Spans is a pure Python implementation of PostgreSQL's
 `range types <http://www.postgresql.org/docs/9.6/static/rangetypes.html>`_.
@@ -99,21 +99,6 @@ I appreciate all the help I can get! Some things to think about:
 Pull requests are credited in the change log which is displayed on PyPI and the
 documentaion on Read the Docs.
 
-
-.. |test-status| image:: https://travis-ci.org/runfalk/spans.svg
-    :alt: Test status
-    :scale: 100%
-    :target: https://travis-ci.org/runfalk/spans
-
-.. |test-coverage| image:: https://codecov.io/github/runfalk/spans/coverage.svg?branch=master
-    :alt: Test coverage
-    :scale: 100%
-    :target: https://codecov.io/github/runfalk/spans?branch=master
-
-.. |documentation-status| image:: https://readthedocs.org/projects/spans/badge/
-    :alt: Documentation status
-    :scale: 100%
-    :target: http://spans.readthedocs.org/en/latest/
 
 .. |pypi-version| image:: https://badge.fury.io/py/Spans.svg
     :alt: PyPI version status

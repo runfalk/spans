@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "spans"
+version = "2.0.0"
+description = "Continuous set support for Python"
+repository = "https://github.com/runfalk/spans/"
+documentation = "https://runfalk.github.io/spans/"
+readme = "README.rst"
+authors = ["Andreas Runfalk <andreas@runfalk.se>"]
+license = "MIT"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Utilities"
+]
+include = [
+    "doc",
+    "tests",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"  # The oldest supported Python version
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+Sphinx = "^5.0.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "--doctest-glob='*.rst' --doctest-modules"
+doctest_optionflags = "ALLOW_UNICODE ALLOW_BYTES"
+norecursedirs = "_build"
+testpaths = "spans tests doc README.rst"

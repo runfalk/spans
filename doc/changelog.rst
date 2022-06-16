@@ -5,6 +5,19 @@ first `0.1` release does not properly adhere to this. Unless explicitly stated,
 changes are made by `Andreas Runfalk <https://github.com/runfalk>`_.
 
 
+Version 2.0.0
+-------------
+Released on UNRELEASED
+
+This release modernizes Spans and gets rid of legacy bits.
+
+- Drop Python 2.7 support
+- Drop Python 3.4 support (might still work but it's unsupported)
+- Drop Python 3.5 support (might still work but it's unsupported)
+- Drop Python 3.6 support (might still work but it's unsupported)
+- Add Python 3.10 support (was working but is now actively tested)
+
+
 Version 1.1.1
 -------------
 Released on 21st April, 2021
