@@ -1,7 +1,8 @@
+from datetime import date, timedelta
+
 import pytest
 
-from datetime import date, timedelta
-from spans import intrange, daterange
+from spans import daterange, intrange
 
 
 def test_last():

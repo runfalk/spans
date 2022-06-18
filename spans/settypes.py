@@ -1,14 +1,11 @@
+# Imports needed for doctests in date range sets
+from datetime import *
 from itertools import chain
 
 from ._compat import add_metaclass, fix_timedelta_repr
 from ._utils import PartialOrderingMixin
-from .types import Range
 from .types import *
-from .types import DiscreteRange, OffsetableRangeMixin
-
-# Imports needed for doctests in date range sets
-from datetime import *
-
+from .types import DiscreteRange, OffsetableRangeMixin, Range
 
 __all__ = [
     "intrangeset",

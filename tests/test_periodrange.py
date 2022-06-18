@@ -1,7 +1,8 @@
+from datetime import date
+
 import pytest
 
-from datetime import date
-from spans import daterange, PeriodRange
+from spans import PeriodRange, daterange
 
 
 @pytest.mark.parametrize(

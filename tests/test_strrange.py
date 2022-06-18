@@ -1,5 +1,6 @@
-import pytest
 import sys
+
+import pytest
 
 from spans import strrange
 from spans._compat import uchr

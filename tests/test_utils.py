@@ -1,6 +1,7 @@
+from datetime import date
+
 import pytest
 
-from datetime import date
 from spans._utils import date_from_iso_week, find_slots
 
 

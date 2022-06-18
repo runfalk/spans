@@ -1,5 +1,6 @@
-import pytest
 import sys
+
+import pytest
 
 from spans._compat import fix_timedelta_repr
 

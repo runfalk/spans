@@ -1,13 +1,14 @@
-import pickle
 import itertools
+import pickle
+
 import pytest
 
 from spans import (
+    PeriodRange,
     daterange,
     datetimerange,
     floatrange,
     intrange,
-    PeriodRange,
     strrange,
     timedeltarange,
 )

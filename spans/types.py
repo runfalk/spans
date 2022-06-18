@@ -1,13 +1,11 @@
 import operator
 import sys
-
 from collections import namedtuple
 from datetime import date, datetime, timedelta
 from functools import wraps
 
 from ._compat import *
-from ._utils import date_from_iso_week, PartialOrderingMixin, PicklableSlotMixin
-
+from ._utils import PartialOrderingMixin, PicklableSlotMixin, date_from_iso_week
 
 __all__ = [
     "intrange",

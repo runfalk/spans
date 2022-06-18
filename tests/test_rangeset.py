@@ -1,4 +1,5 @@
 import pickle
+
 import pytest
 
 from spans import (

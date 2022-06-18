@@ -32,5 +32,5 @@ __all__ = [
 ]
 
 
-from .types import *
 from .settypes import *
+from .types import *

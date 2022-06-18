@@ -1,6 +1,7 @@
+from datetime import date, datetime, timedelta
+
 import pytest
 
-from datetime import date, datetime, timedelta
 from spans import daterange
 
 
