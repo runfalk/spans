@@ -16,20 +16,19 @@ __version__ = "1.1.1"
 
 
 __all__ = [
-	"intrange",
-	"floatrange",
-	"strrange",
-	"daterange",
-	"datetimerange",
-	"timedeltarange",
-	"PeriodRange",
-
-	"intrangeset",
-	"floatrangeset",
-	"strrangeset",
-	"daterangeset",
-	"datetimerangeset",
-	"timedeltarangeset"
+    "intrange",
+    "floatrange",
+    "strrange",
+    "daterange",
+    "datetimerange",
+    "timedeltarange",
+    "PeriodRange",
+    "intrangeset",
+    "floatrangeset",
+    "strrangeset",
+    "daterangeset",
+    "datetimerangeset",
+    "timedeltarangeset",
 ]
 
 

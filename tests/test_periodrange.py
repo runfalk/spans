@@ -4,14 +4,17 @@ from datetime import date
 from spans import daterange, PeriodRange
 
 
-@pytest.mark.parametrize("period", [
-    "day",
-    "week",
-    "american_week",
-    "month",
-    "quarter",
-    "year",
-])
+@pytest.mark.parametrize(
+    "period",
+    [
+        "day",
+        "week",
+        "american_week",
+        "month",
+        "quarter",
+        "year",
+    ],
+)
 def test_type(period):
     span = PeriodRange.from_date(date(2000, 1, 1), period=period)
     assert span.period == period
@@ -46,11 +49,14 @@ def test_replace():
     assert span == daterange_span
 
 
-@pytest.mark.parametrize("range_type_a, range_type_b", [
-    (PeriodRange, PeriodRange),
-    (daterange, PeriodRange),
-    (PeriodRange, daterange),
-])
+@pytest.mark.parametrize(
+    "range_type_a, range_type_b",
+    [
+        (PeriodRange, PeriodRange),
+        (daterange, PeriodRange),
+        (PeriodRange, daterange),
+    ],
+)
 def test_union(range_type_a, range_type_b):
     span_2000 = range_type_a.from_year(2000)
     span_2001 = range_type_b.from_year(2001)
@@ -62,11 +68,14 @@ def test_union(range_type_a, range_type_b):
     assert type(span) is daterange
 
 
-@pytest.mark.parametrize("range_type_a, range_type_b", [
-    (PeriodRange, PeriodRange),
-    (daterange, PeriodRange),
-    (PeriodRange, daterange),
-])
+@pytest.mark.parametrize(
+    "range_type_a, range_type_b",
+    [
+        (PeriodRange, PeriodRange),
+        (daterange, PeriodRange),
+        (PeriodRange, daterange),
+    ],
+)
 def test_intersection(range_type_a, range_type_b):
     span_a = range_type_a.from_week(2000, 1)
     span_b = range_type_b.from_month(2000, 1)
@@ -78,11 +87,14 @@ def test_intersection(range_type_a, range_type_b):
     assert type(span) is daterange
 
 
-@pytest.mark.parametrize("range_type_a, range_type_b", [
-    (PeriodRange, PeriodRange),
-    (daterange, PeriodRange),
-    (PeriodRange, daterange),
-])
+@pytest.mark.parametrize(
+    "range_type_a, range_type_b",
+    [
+        (PeriodRange, PeriodRange),
+        (daterange, PeriodRange),
+        (PeriodRange, daterange),
+    ],
+)
 def test_difference(range_type_a, range_type_b):
     span_a = range_type_a.from_quarter(2000, 1)
     span_b = range_type_b.from_month(2000, 1)
@@ -94,22 +106,28 @@ def test_difference(range_type_a, range_type_b):
     assert type(span) is daterange
 
 
-@pytest.mark.parametrize("a, b", [
-    (PeriodRange.from_week(1999, 52), PeriodRange.from_week(2000, 1)),
-    (PeriodRange.from_week(2000, 1), PeriodRange.from_week(2000, 2)),
-    (PeriodRange.from_week(2009, 53), PeriodRange.from_week(2010, 1)),
-])
+@pytest.mark.parametrize(
+    "a, b",
+    [
+        (PeriodRange.from_week(1999, 52), PeriodRange.from_week(2000, 1)),
+        (PeriodRange.from_week(2000, 1), PeriodRange.from_week(2000, 2)),
+        (PeriodRange.from_week(2009, 53), PeriodRange.from_week(2010, 1)),
+    ],
+)
 def test_prev_next_period(a, b):
     assert a.next_period() == b
     assert a == b.prev_period()
 
 
-@pytest.mark.parametrize("a, offset, b", [
-    (PeriodRange.from_week(2000, 1), 52, PeriodRange.from_week(2001, 1)),
-    (PeriodRange.from_month(2000, 1), 12, PeriodRange.from_month(2001, 1)),
-    (PeriodRange.from_quarter(2000, 1), 4, PeriodRange.from_quarter(2001, 1)),
-    (PeriodRange.from_year(2000), 10, PeriodRange.from_year(2010)),
-])
+@pytest.mark.parametrize(
+    "a, offset, b",
+    [
+        (PeriodRange.from_week(2000, 1), 52, PeriodRange.from_week(2001, 1)),
+        (PeriodRange.from_month(2000, 1), 12, PeriodRange.from_month(2001, 1)),
+        (PeriodRange.from_quarter(2000, 1), 4, PeriodRange.from_quarter(2001, 1)),
+        (PeriodRange.from_year(2000), 10, PeriodRange.from_year(2010)),
+    ],
+)
 def test_offset(a, offset, b):
     assert a.offset(offset) == b
     assert a == b.offset(-offset)

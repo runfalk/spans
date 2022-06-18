@@ -70,6 +70,7 @@ class MetaRangeSet(type):
         def decorator(range_set_mixin):
             cls.add(range_mixin, range_set_mixin)
             return range_set_mixin
+
         return decorator
 
 
@@ -165,9 +166,7 @@ class RangeSet(PartialOrderingMixin):
             self.add(r)
 
     def __repr__(self):
-        return "{instance.__class__.__name__}({list!r})".format(
-            instance=self,
-            list=self._list)
+        return f"{self.__class__.__name__}({self._list!r})"
 
     # Support pickling using the default ancient pickling protocol for Python 2.7
     def __getstate__(self):
@@ -270,19 +269,15 @@ class RangeSet(PartialOrderingMixin):
 
     def _test_rangeset_type(self, item):
         if not self.is_valid_rangeset(item):
-            raise TypeError((
-                "Invalid range type '{range_type.__name__}' expected "
-                "'{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    range_type=item.__class__))
+            raise TypeError(
+                f"Invalid range type {item.__class__.__name__!r} expected {self.type.__name__!r}"
+            )
 
     def _test_range_type(self, item):
         if not self.is_valid_range(item):
-            raise TypeError((
-                "Invalid range type '{range_type.__name__}' expected "
-                "'{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    range_type=item.__class__))
+            raise TypeError(
+                f"Invalid range type {item.__class__.__name__!r} expected {self.type.__name__!r}"
+            )
 
     def copy(self):
         """
@@ -436,9 +431,13 @@ class RangeSet(PartialOrderingMixin):
                     # we do this split manually
                     del self._list[i]
                     self._list.insert(
-                        i, r.replace(lower=item.upper, lower_inc=not item.upper_inc))
+                        i,
+                        r.replace(lower=item.upper, lower_inc=not item.upper_inc),
+                    )
                     self._list.insert(
-                        i, r.replace(upper=item.lower, upper_inc=not item.lower_inc))
+                        i,
+                        r.replace(upper=item.lower, upper_inc=not item.lower_inc),
+                    )
 
                     # When this happens we know we are done
                     break
@@ -471,7 +470,8 @@ class RangeSet(PartialOrderingMixin):
 
         return self._list[0].replace(
             upper=self._list[-1].upper,
-            upper_inc=self._list[-1].upper_inc)
+            upper_inc=self._list[-1].upper_inc,
+        )
 
     def union(self, *others):
         """

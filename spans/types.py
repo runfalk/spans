@@ -21,7 +21,9 @@ __all__ = [
 
 
 _internal_range = namedtuple(
-    "_internal_range", ["lower", "upper", "lower_inc", "upper_inc", "empty"])
+    "_internal_range",
+    ["lower", "upper", "lower_inc", "upper_inc", "empty"],
+)
 _empty_internal_range = _internal_range(None, None, False, False, True)
 
 
@@ -70,8 +72,7 @@ class _Bound(PartialOrderingMixin):
 
     def __eq__(self, other):
         return all(
-            getattr(self, attr) == getattr(other, attr)
-            for attr in _Bound.__slots__
+            getattr(self, attr) == getattr(other, attr) for attr in _Bound.__slots__
         )
 
     def adjacent(self, other):
@@ -119,26 +120,23 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
     def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
         if lower is not None and not isinstance(lower, self.type):
-            raise TypeError((
-                "Invalid type for lower bound '{lower_type.__name__}'"
-                " expected '{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    lower_type=lower.__class__))
+            raise TypeError(
+                f"Invalid type for lower bound '{lower.__class__.__name__}'"
+                f" expected '{self.type.__name__}'"
+            )
 
         if upper is not None and not isinstance(upper, self.type):
-            raise TypeError((
-                "Invalid type for upper bound '{upper_type.__name__}'"
-                " expected '{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    upper_type=upper.__class__))
+            raise TypeError(
+                f"Invalid type for lower bound '{upper.__class__.__name__}'"
+                f" expected '{self.type.__name__}'"
+            )
 
         # Verify that lower is less than or equal to upper if both are set to
         # prevent invalid ranges like [10,1)
         if lower is not None and upper is not None and upper < lower:
             raise ValueError(
-                "Upper bound ({upper}) is less than lower bound ({lower})".format(
-                    upper=upper,
-                    lower=lower))
+                f"Upper bound ({upper}) is less than lower bound ({lower})"
+            )
 
         # Handle default values for lower_inc and upper_inc
         if lower_inc is None:
@@ -152,14 +150,13 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         if upper is None and upper_inc:
             raise ValueError("Upper bound can not be inclusive when infinite")
-        
+
         # Handle normalization to empty ranges
         if lower is not None and lower == upper and not (lower_inc and upper_inc):
             self._range = _empty_internal_range
             return
 
-        self._range = _internal_range(
-            lower, upper, lower_inc, upper_inc, False)
+        self._range = _internal_range(lower, upper, lower_inc, upper_inc, False)
 
     @classmethod
     def empty(cls):
@@ -177,7 +174,6 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         self = cls.__new__(cls)
         self._range = _empty_internal_range
         return self
-
 
     @classmethod
     def is_valid_range(cls, obj):
@@ -205,8 +201,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         params = {
-            k: v
-            for k, v in zip(("lower", "upper", "lower_inc", "upper_inc"), args)
+            k: v for k, v in zip(("lower", "upper", "lower_inc", "upper_inc"), args)
         }
         params.update(kwargs)
 
@@ -216,10 +211,10 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             params["lower_inc"] = False
 
         replacements = {
-            "lower" : self.lower,
-            "upper" : self.upper,
-            "lower_inc" : self.lower_inc,
-            "upper_inc" : self.upper_inc,
+            "lower": self.lower,
+            "upper": self.upper,
+            "lower_inc": self.lower_inc,
+            "upper_inc": self.upper_inc,
         }
         replacements.update(params)
 
@@ -227,30 +222,29 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
     def __repr__(self):
         if not self:
-            return "{0.__class__.__name__}.empty()".format(self)
-        urepr = lambda value: u"{!r}".format(value)
+            return f"{self.__class__.__name__}.empty()"
         out = [
-            ustr(self.__class__.__name__),
-            u"(",
+            str(self.__class__.__name__),
+            "(",
         ]
         if self.lower is not None:
-            out.append(urepr(self.lower))
+            out.append(repr(self.lower))
             if self.upper is not None:
-                out.append(u", ")
+                out.append(", ")
         elif self.upper is not None:
-            out.append(u"upper=")
+            out.append("upper=")
 
         if self.upper is not None:
-            out.append(urepr(self.upper))
+            out.append(repr(self.upper))
 
         if not self.lower_inc and not self.lower_inf:
-            out.append(u", lower_inc=False")
+            out.append(", lower_inc=False")
 
         if self.upper_inc:
-            out.append(u", upper_inc=True")
+            out.append(", upper_inc=True")
 
-        out.append(u")")
-        return u"".join(out)
+        out.append(")")
+        return "".join(out)
 
     @property
     def _lower_bound(self):
@@ -419,8 +413,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             if not self or not other:
                 return not other
             return (
-                self._lower_bound <= other._lower_bound and
-                other._upper_bound <= self._upper_bound
+                self._lower_bound <= other._lower_bound
+                and other._upper_bound <= self._upper_bound
             )
         elif self.is_valid_scalar(other):
             # If the lower bounary is not unbound we can safely perform the
@@ -442,8 +436,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
             return is_within_lower and is_within_upper
         else:
             raise TypeError(
-                "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
-                    other))
+                f"Unsupported type to test for inclusion {other.__class__.__name__!r}"
+            )
 
     def within(self, other):
         """
@@ -471,8 +465,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
 
         if not self.is_valid_range(other):
             raise TypeError(
-                "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
-                    other))
+                f"Unsupported type to test for inclusion {other.__class__.__name__!r}"
+            )
         return other.contains(self)
 
     def overlap(self, other):
@@ -529,14 +523,15 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         if not self.is_valid_range(other):
             raise TypeError(
                 "Unsupported type to test for inclusion '{0.__class__.__name__}'".format(
-                    other))
+                    other
+                )
+            )
         # Must return False if either is an empty set
         elif not self or not other:
             return False
-        return (
-            self._lower_bound.adjacent(other._upper_bound) or
-            self._upper_bound.adjacent(other._lower_bound)
-        )
+        return self._lower_bound.adjacent(
+            other._upper_bound
+        ) or self._upper_bound.adjacent(other._lower_bound)
 
     def union(self, other):
         """
@@ -657,8 +652,9 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if not self.is_valid_range(other):
-            msg = "Unsupported type to test for intersection '{.__class__.__name__}'"
-            raise TypeError(msg.format(other))
+            raise TypeError(
+                f"Unsupported type to test for intersection {other.__class__.__name__!r}"
+            )
 
         # Handle ranges not intersecting
         if not self or not other or not self.overlap(other):
@@ -700,8 +696,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 return False
         else:
             raise TypeError(
-                "Unsupported type to test for starts with '{}'".format(
-                    other.__class__.__name__))
+                f"Unsupported type to test for starts with {other.__class__.__name__!r}"
+            )
 
     def endswith(self, other):
         """
@@ -730,8 +726,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 return False
         else:
             raise TypeError(
-                "Unsupported type to test for ends with '{}'".format(
-                    other.__class__.__name__))
+                f"Unsupported type to test for ends with {other.__class__.__name__!r}"
+            )
 
     def startsafter(self, other):
         """
@@ -765,8 +761,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 return self.lower >= other
         else:
             raise TypeError(
-                "Unsupported type to test for starts after '{}'".format(
-                    other.__class__.__name__))
+                f"Unsupported type to test for starts after {other.__class__.__name__!r}"
+            )
 
     def endsbefore(self, other):
         """
@@ -798,8 +794,8 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
                 return self.upper <= other
         else:
             raise TypeError(
-                "Unsupported type to test for ends before '{}'".format(
-                    other.__class__.__name__))
+                f"Unsupported type to test for ends before {other.__class__.__name__!r}"
+            )
 
     def left_of(self, other):
         """
@@ -825,10 +821,9 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if not self.is_valid_range(other):
-            msg = (
-                "Left of is not supported for '{}', provide a proper range "
-                "class").format(other.__class__.__name__)
-            raise TypeError(msg)
+            raise TypeError(
+                f"Left of is not supported for {other.__class__.__name__}, provide a proper range class"
+            )
 
         return self._upper_bound < other._lower_bound
 
@@ -856,10 +851,9 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         """
 
         if not self.is_valid_range(other):
-            msg = (
-                "Right of is not supported for '{}', provide a proper range "
-                "class").format(other.__class__.__name__)
-            raise TypeError(msg)
+            raise TypeError(
+                f"Right of is not supported for {other.__class__.__name__}, provide a proper range class"
+            )
 
         return other.left_of(self)
 
@@ -1086,11 +1080,10 @@ class OffsetableRangeMixin(object):
         offset_type = self.type if self.offset_type is None else self.offset_type
 
         if offset is not None and not isinstance(offset, offset_type):
-            raise TypeError((
-                "Invalid type for offset '{offset_type.__name__}'"
-                " expected '{expected_type.__name__}'").format(
-                    expected_type=offset_type,
-                    offset_type=offset.__class__))
+            raise TypeError(
+                f"Invalid type for offset '{offset.__class__.__name__!r}'"
+                f" expected '{offset_type.__name__}'"
+            )
 
         lower = None if self.lower is None else self.lower + offset
         upper = None if self.upper is None else self.upper + offset
@@ -1160,7 +1153,7 @@ class strrange(DiscreteRange):
 
     __slots__ = ()
 
-    type = ustr # Custom cross version unicode type
+    type = str
 
     @classmethod
     def next(cls, curr):
@@ -1230,18 +1223,16 @@ class daterange(DiscreteRange, OffsetableRangeMixin):
 
     def __init__(self, lower=None, upper=None, lower_inc=None, upper_inc=None):
         if not _is_valid_date(lower, accept_none=True):
-            raise TypeError((
-                "Invalid type for lower bound '{lower_type.__name__}'"
-                " expected '{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    lower_type=lower.__class__))
+            raise TypeError(
+                f"Invalid type for lower bound '{lower.__class__.__name__}'"
+                f" expected '{self.type.__name__}'"
+            )
 
         if not _is_valid_date(upper, accept_none=True):
-            raise TypeError((
-                "Invalid type for upper bound '{upper_type.__name__}'"
-                " expected '{expected_type.__name__}'").format(
-                    expected_type=self.type,
-                    upper_type=upper.__class__))
+            raise TypeError(
+                f"Invalid type for upper bound '{upper.__class__.__name__}'"
+                f" expected '{self.type.__name__}'"
+            )
 
         super(daterange, self).__init__(lower, upper, lower_inc, upper_inc)
 
@@ -1358,7 +1349,8 @@ class daterange(DiscreteRange, OffsetableRangeMixin):
         if quarter not in quarter_months:
             error_msg = (
                 "quarter is not a valid quarter. Expected a value between 1 "
-                "and 4 got {!r}")
+                "and 4 got {!r}"
+            )
             raise ValueError(error_msg.format(quarter))
 
         first_day = date(year, quarter_months[quarter], 1)
@@ -1458,7 +1450,7 @@ class PeriodRange(daterange):
        used with :class:`~spans.settypes.daterangeset`.
     """
 
-    __slots__ = ("period")
+    __slots__ = "period"
 
     @classmethod
     def empty(cls):
@@ -1466,7 +1458,7 @@ class PeriodRange(daterange):
         :raise TypeError: since typed date ranges must never be empty
         """
 
-        raise TypeError("{} does not support empty ranges".format(cls.__name__))
+        raise TypeError(f"{cls.__name__} does not support empty ranges")
 
     # We override the is valid check here because dateranges will not be
     # accepted as valid arguments otherwise.
@@ -1486,8 +1478,7 @@ class PeriodRange(daterange):
 
     def __repr__(self):
         parent_repr = super(PeriodRange, self).__repr__()
-        return u"{}, period={!r})".format(parent_repr[:-1], self.period)
-
+        return f"{parent_repr[:-1]}, period={self.period!r})"
 
     @property
     def daterange(self):
@@ -1500,7 +1491,8 @@ class PeriodRange(daterange):
             lower=self.lower,
             upper=self.upper,
             lower_inc=self.lower_inc,
-            upper_inc=self.upper_inc)
+            upper_inc=self.upper_inc,
+        )
 
     def offset(self, offset):
         """

@@ -1,9 +1,16 @@
 import pickle
 import pytest
 
-from spans import \
-    daterangeset, datetimerangeset, floatrange, floatrangeset, intrange, \
-    intrangeset, strrangeset, timedeltarangeset
+from spans import (
+    daterangeset,
+    datetimerangeset,
+    floatrange,
+    floatrangeset,
+    intrange,
+    intrangeset,
+    strrangeset,
+    timedeltarangeset,
+)
 
 
 def test_empty():
@@ -14,10 +21,13 @@ def test_non_empty():
     assert intrangeset([intrange(1, 5)])
 
 
-@pytest.mark.parametrize("rangeset, span", [
-    (intrangeset([intrange(1, 5), intrange(10, 15)]), intrange(1, 15)),
-    (intrangeset([]), intrange.empty()),
-])
+@pytest.mark.parametrize(
+    "rangeset, span",
+    [
+        (intrangeset([intrange(1, 5), intrange(10, 15)]), intrange(1, 15)),
+        (intrangeset([]), intrange.empty()),
+    ],
+)
 def test_span(rangeset, span):
     assert rangeset.span() == span
 
@@ -35,29 +45,38 @@ def test_copy():
     assert rset._list is not rcopy._list
 
 
-@pytest.mark.parametrize("value", [
-    intrange(1, 5),
-    intrange(5, 10),
-    intrange.empty(),
-    1,
-    5,
-])
+@pytest.mark.parametrize(
+    "value",
+    [
+        intrange(1, 5),
+        intrange(5, 10),
+        intrange.empty(),
+        1,
+        5,
+    ],
+)
 def test_contains(value):
     assert intrangeset([intrange(1, 10)]).contains(value)
 
 
-@pytest.mark.parametrize("value", [
-    intrange(5, 15),
-    10,
-])
+@pytest.mark.parametrize(
+    "value",
+    [
+        intrange(5, 15),
+        10,
+    ],
+)
 def test_not_contains(value):
     assert not intrangeset([intrange(1, 10)]).contains(value)
 
 
-@pytest.mark.parametrize("rset", [
-    intrangeset([]),
-    intrangeset([intrange(1, 5)]),
-])
+@pytest.mark.parametrize(
+    "rset",
+    [
+        intrangeset([]),
+        intrangeset([intrange(1, 5)]),
+    ],
+)
 def test_contains_empty(rset):
     assert rset.contains(intrange.empty())
 
@@ -146,7 +165,8 @@ def test_intersection():
     assert list(a.intersection(b)) == intersection
     assert list(a & b) == intersection
     assert not intrangeset([intrange(1, 5)]).intersection(
-        intrangeset([intrange(5, 10)]))
+        intrangeset([intrange(5, 10)])
+    )
 
     with pytest.raises(TypeError):
         intrangeset([]).intersection(intrange())
@@ -158,10 +178,13 @@ def test_values():
     assert list(values) == list(range(1, 5)) + list(range(10, 15))
 
 
-@pytest.mark.parametrize("span, repr_str", [
-    (intrangeset([]), "intrangeset([])"),
-    (intrangeset([intrange(1)]), "intrangeset([intrange(1)])"),
-])
+@pytest.mark.parametrize(
+    "span, repr_str",
+    [
+        (intrangeset([]), "intrangeset([])"),
+        (intrangeset([intrange(1)]), "intrangeset([intrange(1)])"),
+    ],
+)
 def test_repr(span, repr_str):
     assert repr(span) == repr_str
 
@@ -216,6 +239,7 @@ def test_bug3_intersection():
 
     assert rangeset_a.intersection(rangeset_b, rangeset_c) == rangeset_empty
 
+
 def test_bug4_empty_set_iteration():
     """
     `Bug #4 <https://github.com/runfalk/spans/issues/4>`_
@@ -224,14 +248,17 @@ def test_bug4_empty_set_iteration():
     assert list(intrangeset([])) == []
 
 
-@pytest.mark.parametrize("cls", [
-    daterangeset,
-    datetimerangeset,
-    intrangeset,
-    floatrangeset,
-    strrangeset,
-    timedeltarangeset,
-])
+@pytest.mark.parametrize(
+    "cls",
+    [
+        daterangeset,
+        datetimerangeset,
+        intrangeset,
+        floatrangeset,
+        strrangeset,
+        timedeltarangeset,
+    ],
+)
 def test_bug10_missing_slots_in_cls_hierarchy(cls):
     """
     `Bug #10 <https://github.com/runfalk/spans/issues/10`_

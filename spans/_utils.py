@@ -10,16 +10,17 @@ __all__ = [
     "PicklableSlotMixin",
 ]
 
+
 def date_from_iso_week(year, week, day_of_week=None):
     if day_of_week is None:
         day_of_week = 1
 
     if not 1 <= day_of_week <= 7:
         raise ValueError(
-            "Day of week is not in range 1 through 7, got {!r}".format(day_of_week))
+            f"Day of week is not in range 1 through 7, got {day_of_week!r}"
+        )
 
-    day = datetime.strptime(
-        "{:04d}-{:02d}-{:d}".format(year, week, day_of_week), "%Y-%W-%w")
+    day = datetime.strptime(f"{year:04d}-{week:02d}-{day_of_week:d}", "%Y-%W-%w")
 
     # ISO week 1 is defined as the first week to have 4 or more days in January.
     # Python's built-in date parsing considers the week that contain the first
@@ -51,7 +52,7 @@ class PicklableSlotMixin(object):
     __slots__ = ()
 
     def __getstate__(self):
-        return {attr : getattr(self, attr) for attr in find_slots(self.__class__)}
+        return {attr: getattr(self, attr) for attr in find_slots(self.__class__)}
 
     def __setstate__(self, data):
         for attr, value in data.items():
