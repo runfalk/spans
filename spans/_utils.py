@@ -2,8 +2,6 @@
 
 from datetime import date, datetime, timedelta
 
-from ._compat import *
-
 __all__ = [
     "date_from_iso_week",
     "find_slots",
@@ -40,7 +38,7 @@ def find_slots(cls):
 
         if not cslots:
             continue
-        elif isinstance(cslots, (bstr, ustr)):
+        elif isinstance(cslots, str):
             cslots = (cslots,)
 
         slots.update(cslots)

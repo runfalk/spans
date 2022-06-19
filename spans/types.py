@@ -4,7 +4,6 @@ from collections import namedtuple
 from datetime import date, datetime, timedelta
 from functools import wraps
 
-from ._compat import *
 from ._utils import PartialOrderingMixin, PicklableSlotMixin, date_from_iso_week
 
 __all__ = [
@@ -374,7 +373,7 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
         # Use PartialOrderingMixin's implementation
         return super(Range, self).__gt__(other)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return not self._range.empty
 
     def contains(self, other):
@@ -888,9 +887,6 @@ class Range(PartialOrderingMixin, PicklableSlotMixin):
     # ``in`` operator support
     __contains__ = contains
 
-    # Python 3 support
-    __bool__ = __nonzero__
-
 
 class DiscreteRange(Range):
     """
@@ -1132,17 +1128,17 @@ class strrange(DiscreteRange):
     Range that operates on unicode strings. Next character is determined
     lexicographically. Representation might seem odd due to normalization.
 
-        >>> strrange(u"a", u"z")
-        strrange(u'a', u'z')
-        >>> strrange(u"a", u"z", upper_inc=True)
-        strrange(u'a', u'{')
+        >>> strrange("a", "z")
+        strrange('a', 'z')
+        >>> strrange("a", "z", upper_inc=True)
+        strrange('a', '{')
 
     Iteration over a strrange is only sensible when having single character
     boundaries.
 
-        >>> list(strrange(u"a", u"e", upper_inc=True))
-        [u'a', u'b', u'c', u'd', u'e']
-        >>> len(list(strrange(u"aa", u"zz", upper_inc=True))) # doctest: +SKIP
+        >>> list(strrange("a", "e", upper_inc=True))
+        ['a', 'b', 'c', 'd', 'e']
+        >>> len(list(strrange("aa", "zz", upper_inc=True))) # doctest: +SKIP
         27852826
 
     Inherits methods from :class:`~spans.types.Range` and
@@ -1163,9 +1159,9 @@ class strrange(DiscreteRange):
 
         # Make sure to loop around when we reach the maximum unicode point
         if ord(last) == sys.maxunicode:
-            return cls.next(curr[:-1]) + uchr(0)
+            return cls.next(curr[:-1]) + chr(0)
         else:
-            return curr[:-1] + uchr(ord(curr[-1]) + 1)
+            return curr[:-1] + chr(ord(curr[-1]) + 1)
 
     @classmethod
     def prev(cls, curr):
@@ -1177,9 +1173,9 @@ class strrange(DiscreteRange):
 
         # Make sure to loop around when we reach the minimum unicode point
         if ord(last) == 0:
-            return cls.prev(curr[:-1]) + uchr(sys.maxunicode)
+            return cls.prev(curr[:-1]) + chr(sys.maxunicode)
         else:
-            return curr[:-1] + uchr(ord(curr[-1]) - 1)
+            return curr[:-1] + chr(ord(curr[-1]) - 1)
 
 
 def _is_valid_date(obj, accept_none=True):
@@ -1405,18 +1401,17 @@ class datetimerange(Range, OffsetableRangeMixin):
     offset_type = timedelta
 
 
-@fix_timedelta_repr
 class timedeltarange(Range, OffsetableRangeMixin):
     """
     Range that operates on datetime's timedelta class.
 
         >>> timedeltarange(timedelta(1), timedelta(5))
-        timedeltarange(datetime.timedelta(1), datetime.timedelta(5))
+        timedeltarange(datetime.timedelta(days=1), datetime.timedelta(days=5))
 
     Offsets are done using ``datetime.timedelta``.
 
         >>> timedeltarange(timedelta(1), timedelta(5)).offset(timedelta(14))
-        timedeltarange(datetime.timedelta(15), datetime.timedelta(19))
+        timedeltarange(datetime.timedelta(days=15), datetime.timedelta(days=19))
 
     Inherits methods from :class:`~spans.types.Range` and
     :class:`~spans.types.OffsetableRangeMixin`.
@@ -1509,10 +1504,10 @@ class PeriodRange(daterange):
 
         span = self
         if offset > 0:
-            for i in iter_range(offset):
+            for i in range(offset):
                 span = span.next_period()
         elif offset < 0:
-            for i in iter_range(-offset):
+            for i in range(-offset):
                 span = span.prev_period()
         return span
 

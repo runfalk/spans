@@ -41,7 +41,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 addopts = "--doctest-glob='*.rst' --doctest-modules"
-doctest_optionflags = "ALLOW_UNICODE ALLOW_BYTES"
 norecursedirs = "_build"
 testpaths = "spans tests doc README.rst"
 

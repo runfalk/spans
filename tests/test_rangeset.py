@@ -142,7 +142,8 @@ def test_union():
 
     with pytest.raises(TypeError):
         intrangeset([]).union(intrange())
-    assert intrangeset([]).__or__(intrange()) is NotImplemented
+    with pytest.raises(TypeError):
+        intrangeset([]) | intrange()
 
 
 def test_difference():
@@ -155,7 +156,8 @@ def test_difference():
 
     with pytest.raises(TypeError):
         intrangeset([]).difference(intrange())
-    assert intrangeset([]).__sub__(intrange()) is NotImplemented
+    with pytest.raises(TypeError):
+        intrangeset([]) - intrange()
 
 
 def test_intersection():
@@ -171,7 +173,8 @@ def test_intersection():
 
     with pytest.raises(TypeError):
         intrangeset([]).intersection(intrange())
-    assert intrangeset([]).__and__(intrange()) is NotImplemented
+    with pytest.raises(TypeError):
+        intrangeset([]) & intrange()
 
 
 def test_values():

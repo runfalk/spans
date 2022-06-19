@@ -2,7 +2,6 @@
 from datetime import *
 from itertools import chain
 
-from ._compat import add_metaclass, fix_timedelta_repr
 from ._utils import PartialOrderingMixin
 from .types import *
 from .types import DiscreteRange, OffsetableRangeMixin, Range
@@ -125,8 +124,7 @@ class OffsetableRangeSetMixin(object):
         return self.__class__(r.offset(offset) for r in self)
 
 
-@add_metaclass(MetaRangeSet)
-class RangeSet(PartialOrderingMixin):
+class RangeSet(PartialOrderingMixin, metaclass=MetaRangeSet):
     """
     A range set works a lot like a range with some differences:
 
@@ -179,7 +177,7 @@ class RangeSet(PartialOrderingMixin):
         else:
             self._list = state
 
-    def __nonzero__(self):
+    def __bool__(self):
         """
         Returns False if the only thing in this set is the empty set, otherwise
         it returns True.
@@ -577,9 +575,6 @@ class RangeSet(PartialOrderingMixin):
     # ``in`` operator support
     __contains__ = contains
 
-    # Python 3 support
-    __bool__ = __nonzero__
-
 
 class intrangeset(RangeSet):
     """
@@ -620,9 +615,9 @@ class strrangeset(RangeSet):
     Range set that operates on .. seealso:: :class:`~spans.types.strrange`.
 
         >>> strrangeset([
-        ...     strrange(u"a", u"f", upper_inc=True),
-        ...     strrange(u"0", u"9", upper_inc=True)])
-        strrangeset([strrange(u'0', u':'), strrange(u'a', u'g')])
+        ...     strrange("a", "f", upper_inc=True),
+        ...     strrange("0", "9", upper_inc=True)])
+        strrangeset([strrange('0', ':'), strrange('a', 'g')])
 
     Inherits methods from :class:`~spans.settypes.RangeSet` and
     :class:`~spans.settypes.DiscreteRangeset`.
@@ -670,14 +665,13 @@ class datetimerangeset(RangeSet):
     type = datetimerange
 
 
-@fix_timedelta_repr
 class timedeltarangeset(RangeSet):
     """
     Range set that operates on :class:`~spans.types.timedeltarange`.
 
         >>> week = timedeltarange(timedelta(0), timedelta(7))
         >>> timedeltarangeset([week, week.offset(timedelta(7))])
-        timedeltarangeset([timedeltarange(datetime.timedelta(0), datetime.timedelta(14))])
+        timedeltarangeset([timedeltarange(datetime.timedelta(0), datetime.timedelta(days=14))])
 
     Inherits methods from :class:`~spans.settypes.RangeSet` and
     :class:`~spans.settypes.OffsetableRangeMixinset`.

@@ -6,12 +6,10 @@ Requirements
 ------------
 Spans have no requirements but the standard library. It is known to work on the following Python versions
 
-- Python 2.7
-- Python 3.3
-- Python 3.4
-- Python 3.5
-- Python 3.6
-- PyPy
+- Python 3.7
+- Python 3.8
+- Python 3.9
+- Python 3.10
 - PyPy3
 
 It may work on other version as well.

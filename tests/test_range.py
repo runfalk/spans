@@ -1,4 +1,5 @@
 import itertools
+import operator
 import pickle
 
 import pytest
@@ -236,17 +237,15 @@ def test_empty_comparison(a, b):
 @pytest.mark.parametrize(
     "op",
     [
-        "__lt__",
-        "__le__",
-        "__gt__",
-        "__ge__",
+        operator.lt,
+        operator.le,
+        operator.gt,
+        operator.ge,
     ],
 )
 def test_comparison_operator_type_checks(a, b, op):
-    # Hack used to work around version differences between Python 2 and 3
-    # Python 2 has its own idea of how objects compare to each other.
-    # Python 3 raises type error when an operation is not implemented
-    assert getattr(a, op)(b) is NotImplemented
+    with pytest.raises(TypeError):
+        op(a, b)
 
 
 def test_greater_than():
@@ -261,11 +260,11 @@ def test_greater_than():
     assert intrange(1, 5) >= intrange(1, 4)
     assert not intrange(1, 5) >= intrange(2, 5)
 
-    # Hack used to work around version differences between Python 2 and 3.
-    # Python 2 has its own idea of how objects compare to each other.
-    # Python 3 raises type error when an operation is not implemented
-    assert intrange().__gt__(floatrange()) is NotImplemented
-    assert intrange().__ge__(floatrange()) is NotImplemented
+    with pytest.raises(TypeError):
+        intrange() > floatrange()
+
+    with pytest.raises(TypeError):
+        intrange() >= floatrange()
 
 
 @pytest.mark.parametrize(
@@ -300,13 +299,15 @@ def test_not_left_or_right_of(a, b):
 def test_left_of_type_check():
     with pytest.raises(TypeError):
         floatrange().left_of(None)
-    assert floatrange().__lshift__(None) is NotImplemented
+    with pytest.raises(TypeError):
+        assert floatrange() << None
 
 
 def test_right_of_type_check():
     with pytest.raises(TypeError):
         floatrange().right_of(None)
-    assert floatrange().__rshift__(None) is NotImplemented
+    with pytest.raises(TypeError):
+        floatrange() >> None
 
 
 @pytest.mark.parametrize(
@@ -636,7 +637,8 @@ def test_union_typecheck():
 
     with pytest.raises(TypeError):
         a.union(b)
-    assert a.__or__(b) is NotImplemented
+    with pytest.raises(TypeError):
+        a | b
 
 
 @pytest.mark.parametrize(
@@ -675,7 +677,8 @@ def test_difference_typecheck():
 
     with pytest.raises(TypeError):
         a.difference(b)
-    assert a.__sub__(b) is NotImplemented
+    with pytest.raises(TypeError):
+        a - b
 
 
 @pytest.mark.parametrize(
@@ -707,7 +710,8 @@ def test_intersection_typecheck():
 
     with pytest.raises(TypeError):
         a.intersection(b)
-    assert a.__and__(b) is NotImplemented
+    with pytest.raises(TypeError):
+        a & b
 
 
 def test_pickling():

@@ -3,7 +3,6 @@ import sys
 import pytest
 
 from spans import strrange
-from spans._compat import uchr
 
 
 @pytest.mark.parametrize(
@@ -22,7 +21,7 @@ def test_last(span, last):
     [
         ("", ""),
         ("b", "a"),
-        (uchr(0), uchr(sys.maxunicode)),
+        (chr(0), chr(sys.maxunicode)),
     ],
 )
 def test_prev(a, b):
@@ -34,7 +33,7 @@ def test_prev(a, b):
     [
         ("", ""),
         ("a", "b"),
-        (uchr(sys.maxunicode), uchr(0)),
+        (chr(sys.maxunicode), chr(0)),
     ],
 )
 def test_next(a, b):
